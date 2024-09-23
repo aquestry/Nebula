@@ -14,6 +14,7 @@ import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import org.slf4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -27,39 +28,35 @@ public class ServerHandlerProxy {
     @Inject
     private ProxyServer server;
 
-    private static YamlDocument config;
+    private static YamlDocument _config;
 
     @Inject
     public ServerHandlerProxy(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         try {
-            config = YamlDocument.create(
+            _config = YamlDocument.create(
                     new File(dataDirectory.toFile(), "config.yml"),
-                    Objects.requireNonNull(
-                            getClass().getResourceAsStream("/config.yml")
-                    ),
+                    Objects.requireNonNull(getClass().getResourceAsStream("/config.yml")),
                     GeneralSettings.DEFAULT,
-                    LoaderSettings.builder()
-                            .setAutoUpdate(true)
-                            .build(),
+                    LoaderSettings.builder().setAutoUpdate(true).build(),
                     DumperSettings.DEFAULT,
                     UpdaterSettings.builder()
                             .setVersioning(new BasicVersioning("file-version"))
                             .setOptionSorting(UpdaterSettings.OptionSorting.SORT_BY_DEFAULTS)
                             .build()
             );
-            config.update();
-            config.save();
+            _config.update();
+            _config.save();
         } catch (IOException e) {
             logger.error("Could not load config! Plugin will shutdown!");
             Optional<PluginContainer> container = server.getPluginManager().getPlugin("serverhandlerproxy");
             container.ifPresent(pluginContainer -> pluginContainer.getExecutorService().shutdown());
         }
     }
+
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         logger.info("ServerHandlerProxy started");
-        logger.info("Servers:");
-        logger.info(server.getAllServers().toString());
-        logger.info("Default Server: {}", config.getString("defaultServer"));
+        logger.info("Servers: " + server.getAllServers().toString());
+        logger.info("Default Server: " + _config.getString("default-server"));
     }
 }
