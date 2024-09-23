@@ -28,7 +28,7 @@ public class ServerHandlerProxy {
     @Inject
     private ProxyServer server;
 
-    private static YamlDocument _config;
+    public static YamlDocument _config;
 
     @Inject
     public ServerHandlerProxy(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
