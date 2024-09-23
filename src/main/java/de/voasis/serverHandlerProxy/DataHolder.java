@@ -34,10 +34,10 @@ public class DataHolder {
     public ServerInfo getServerInfo(String name) {
         for (ServerInfo serverInfo : serverInfoMap) {
             if (serverInfo.getServerName().equals(name)) {
-                return Optional.of(serverInfo);
+                return serverInfo;
             }
         }
-        return Optional.empty();
+        return null;
     }
 
     public List<String> getServerNames() {
