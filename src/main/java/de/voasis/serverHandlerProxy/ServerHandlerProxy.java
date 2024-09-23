@@ -14,5 +14,6 @@ public class ServerHandlerProxy {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
+
     }
 }
