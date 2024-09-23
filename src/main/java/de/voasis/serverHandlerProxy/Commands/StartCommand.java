@@ -41,7 +41,7 @@ public class StartCommand implements SimpleCommand {
 
     @Override
     public boolean hasPermission(final Invocation invocation) {
-        return invocation.source().hasPermission("command.test");
+        return invocation.source().hasPermission("command.start");
     }
 
     @Override

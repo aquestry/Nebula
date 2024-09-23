@@ -10,6 +10,7 @@ import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.serverHandlerProxy.Commands.CreateCommand;
+import de.voasis.serverHandlerProxy.Commands.DeleteCommand;
 import de.voasis.serverHandlerProxy.Commands.StartCommand;
 import de.voasis.serverHandlerProxy.Commands.TemplateCommand;
 import de.voasis.serverHandlerProxy.Events.PostLogin;
@@ -28,8 +29,8 @@ import java.util.Optional;
 
 @Plugin(id = "serverhandlerproxy", name = "ServerHandlerProxy", version = "1.0", authors = "Aquestry")
 public class ServerHandlerProxy {
-    @Inject private Logger logger;
-    @Inject private ProxyServer server;
+    @Inject public static Logger logger;
+    @Inject public static ProxyServer server;
     public static YamlDocument config;
 
     public static DataHolder dataHolder;
@@ -48,12 +49,11 @@ public class ServerHandlerProxy {
         logger.info("ServerHandlerProxy started");
         logger.info("External Servers: " + dataHolder.getServerNames());
         assert dataHolder != null;
-        logger.info("Default Server: {}",  dataHolder.defaultServer.get().getServerInfo().getName());
-
         CommandManager commandManager = server.getCommandManager();
         commandManager.register("create", new CreateCommand());
         commandManager.register("template", new TemplateCommand());
         commandManager.register("start", new StartCommand());
+        commandManager.register("delete", new DeleteCommand());
         logger.info("Commands registered.");
 
     }

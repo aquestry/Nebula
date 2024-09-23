@@ -9,18 +9,16 @@ import java.util.*;
 
 
 public class DataHolder {
-    public Optional<RegisteredServer> defaultServer;
+    public RegisteredServer defaultServer = null;
     public List<ServerInfo> serverInfoMap = new ArrayList<>();
 
     public void Refresh(YamlDocument config, ProxyServer server, Logger logger) {
-        Optional<RegisteredServer> DS = server.getServer(config.getString("default-server"));
-
-        if (DS.isPresent()) {
-            defaultServer = DS;
+        for(RegisteredServer s : server.getAllServers()) {
+            if(s.getServerInfo().getName().equals(config.getString("default-server"))) {
+                defaultServer = s;
+            }
         }
-
         serverInfoMap.clear();
-
         Set<Object> managerServerKeys = config.getSection("manager-servers").getKeys();
         for (Object serverName : managerServerKeys) {
             String name = (String) serverName;

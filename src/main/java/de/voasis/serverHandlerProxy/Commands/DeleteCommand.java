@@ -11,31 +11,28 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class TemplateCommand implements SimpleCommand {
+public class DeleteCommand implements SimpleCommand {
     @Override
     public void execute(final Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
 
-        if (args.length != 5) {
-            source.sendMessage(Component.text("Usage: /template <externalServerName> <templateName> <newName> <startCMD> <stopCMD>", NamedTextColor.RED));
+        if (args.length != 2) {
+            source.sendMessage(Component.text("Usage: /delete <externalServerName> <InstanceName>", NamedTextColor.RED));
             return;
         }
         String externalServerName = args[0];
-        String templateName = args[1];
-        String newName = args[2];
-        String startCMD = args[3].replace("_", " ");
-        String stopCMD = args[4].replace("_", " ");
+        String Name = args[1];
         ServerInfo temp = null;
         for (ServerInfo i : ServerHandlerProxy.dataHolder.getAllInfos()) {
             if(externalServerName.equals(i.getServerName())) {
                 temp = i;
             }
         }
-        if (source instanceof ConsoleCommandSource && temp != null) {
-            ServerHandlerProxy.externalServerCreator.createFromTemplate(temp,templateName, newName, startCMD, stopCMD);
-            source.sendMessage(Component.text("Creating server instance from template...", NamedTextColor.AQUA));
 
+        if (source instanceof ConsoleCommandSource && temp != null) {
+            ServerHandlerProxy.externalServerCreator.delete(temp, Name);
+            source.sendMessage(Component.text("Deleting server instance...", NamedTextColor.AQUA));
         } else {
             source.sendMessage(Component.text("This command can only be executed by the console.", NamedTextColor.RED));
         }
@@ -44,7 +41,7 @@ public class TemplateCommand implements SimpleCommand {
 
     @Override
     public boolean hasPermission(final Invocation invocation) {
-        return invocation.source().hasPermission("command.template");
+        return invocation.source().hasPermission("command.delete");
     }
 
     @Override

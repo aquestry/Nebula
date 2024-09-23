@@ -2,9 +2,9 @@ package de.voasis.serverHandlerProxy;
 
 import com.google.gson.JsonObject;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import org.slf4j.Logger;
-
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -83,6 +83,15 @@ public class ExternalServerCreator {
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 logger.info("Instance created successfully from template.");
+                com.velocitypowered.api.proxy.server.ServerInfo info = null;
+                for (RegisteredServer i : server.getAllServers()) {
+                    if(i.getServerInfo().getName().equals(newName)) {
+                        info = i.getServerInfo();
+                    }
+                }
+                if(info != null) {
+                    server.registerServer(info);
+                }
             } else {
                 logger.info("Failed to create instance from template. Response Code: " + responseCode);
             }
@@ -124,5 +133,46 @@ public class ExternalServerCreator {
             e.printStackTrace();
         }
     }
+    public void delete(ServerInfo externalServer, String servername) {
+        try {
+            String urlString = "http://" + externalServer.getIp() + ":" + externalServer.getPort() + "/delete/" + servername;
+            URL url = new URL(urlString);
 
+
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json; utf-8");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setDoOutput(true);
+
+            JsonObject jsonRequest = new JsonObject();
+            jsonRequest.addProperty("password", externalServer.getPassword().trim());
+
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonRequest.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                logger.info("Instance deleted successfully.");
+                com.velocitypowered.api.proxy.server.ServerInfo info = null;
+                for (RegisteredServer i : server.getAllServers()) {
+                    if(i.getServerInfo().getName().equals(servername)) {
+                        info = i.getServerInfo();
+                    }
+                }
+                if(info != null) {
+                    server.unregisterServer(info);
+                }
+
+            } else {
+                logger.info("Failed to delete instance. Response Code: " + responseCode);
+            }
+
+        } catch (Exception e) {
+            logger.info("Error while deleting the instance.");
+            e.printStackTrace();
+        }
+    }
 }
