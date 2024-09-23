@@ -27,7 +27,7 @@ import java.util.Optional;
 public class ServerHandlerProxy {
     @Inject private Logger logger;
     @Inject private ProxyServer server;
-    public static YamlDocument _config;
+    public static YamlDocument config;
     public static DataHolder dataHolder;
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
@@ -60,7 +60,7 @@ public class ServerHandlerProxy {
         dataHolder = new DataHolder();
 
         try {
-            _config = YamlDocument.create(
+            config = YamlDocument.create(
                     new File(dataDirectory.toFile(), "config.yml"),
                     Objects.requireNonNull(getClass().getResourceAsStream("/config.yml")),
                     GeneralSettings.DEFAULT,
@@ -71,14 +71,14 @@ public class ServerHandlerProxy {
                             .setOptionSorting(UpdaterSettings.OptionSorting.SORT_BY_DEFAULTS)
                             .build()
             );
-            _config.update();
-            _config.save();
+            config.update();
+            config.save();
         } catch (IOException e) {
             logger.error("Could not load config! Plugin will shutdown!");
             Optional<PluginContainer> container = server.getPluginManager().getPlugin("serverhandlerproxy");
             container.ifPresent(pluginContainer -> pluginContainer.getExecutorService().shutdown());
         }
 
-        dataHolder.Refresh(_config, server, logger);
+        dataHolder.Refresh(config, server, logger);
     }
 }
