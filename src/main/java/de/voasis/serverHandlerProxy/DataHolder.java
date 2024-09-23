@@ -2,9 +2,9 @@ package de.voasis.serverHandlerProxy;
 
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import org.slf4j.Logger;
-
 import java.util.*;
 
 
@@ -46,5 +46,9 @@ public class DataHolder {
             serverNames.add(serverInfo.getServerName());
         }
         return serverNames;
+    }
+
+    public List<ServerInfo> getAllInfos() {
+        return new ArrayList<>(serverInfoMap);
     }
 }

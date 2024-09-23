@@ -1,4 +1,4 @@
-package de.voasis.serverHandlerProxy;
+package de.voasis.serverHandlerProxy.Maps;
 
 public class ServerInfo {
     private final String serverName;
