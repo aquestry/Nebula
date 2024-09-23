@@ -7,6 +7,7 @@ import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import org.slf4j.Logger;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
@@ -83,14 +84,10 @@ public class ExternalServerCreator {
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 logger.info("Instance created successfully from template.");
-                com.velocitypowered.api.proxy.server.ServerInfo info = null;
-                for (RegisteredServer i : server.getAllServers()) {
-                    if(i.getServerInfo().getName().equals(newName)) {
-                        info = i.getServerInfo();
-                    }
-                }
-                if(info != null) {
-                    server.registerServer(info);
+                com.velocitypowered.api.proxy.server.ServerInfo newInfo = new com.velocitypowered.api.proxy.server.ServerInfo(
+                        newName, new InetSocketAddress(externalServer.getIp(), Integer.parseInt(startCMD.split("-p")[1].trim())));
+                if(newInfo != null) {
+                    server.registerServer(newInfo);
                 }
             } else {
                 logger.info("Failed to create instance from template. Response Code: " + responseCode);
