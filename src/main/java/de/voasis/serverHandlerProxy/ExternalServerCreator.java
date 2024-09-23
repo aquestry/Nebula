@@ -94,7 +94,7 @@ public class ExternalServerCreator {
     }
     public void start(ServerInfo externalServer, String servername) {
         try {
-            String urlString = "http://" + externalServer.getIp() + ":" + externalServer.getPort() + "/start";
+            String urlString = "http://" + externalServer.getIp() + ":" + externalServer.getPort() + "/start/" + servername;
             URL url = new URL(urlString);
 
 
@@ -105,7 +105,6 @@ public class ExternalServerCreator {
             connection.setDoOutput(true);
 
             JsonObject jsonRequest = new JsonObject();
-            jsonRequest.addProperty("name", servername);
             jsonRequest.addProperty("password", externalServer.getPassword().trim());
 
             try (OutputStream os = connection.getOutputStream()) {
