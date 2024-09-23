@@ -25,13 +25,13 @@ public class DataHolder {
         for (Object serverName : managerServerKeys) {
             String name = (String) serverName;
             String ip = config.getString("manager-servers." + name + ".ip");
-            int port = config.getInt("manager-servers." + name + ".port");
+            String port = config.getString("manager-servers." + name + ".port");
             String password = config.getString("manager-servers." + name + ".password");
             serverInfoMap.add(new ServerInfo(name, ip, port, password));
         }
     }
 
-    public Optional<ServerInfo> getServerInfo(String name) {
+    public ServerInfo getServerInfo(String name) {
         for (ServerInfo serverInfo : serverInfoMap) {
             if (serverInfo.getServerName().equals(name)) {
                 return Optional.of(serverInfo);

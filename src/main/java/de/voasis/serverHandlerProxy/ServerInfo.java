@@ -3,10 +3,10 @@ package de.voasis.serverHandlerProxy;
 public class ServerInfo {
     private final String serverName;
     private final String ip;
-    private final int port;
+    private final String port;
     private final String password;
 
-    public ServerInfo(String name, String ip, int port, String password) {
+    public ServerInfo(String name, String ip, String port, String password) {
         this.serverName = name;
         this.ip = ip;
         this.port = port;
@@ -19,7 +19,7 @@ public class ServerInfo {
         return ip;
     }
 
-    public int getPort() {
+    public String getPort() {
         return port;
     }
 

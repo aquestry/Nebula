@@ -28,7 +28,9 @@ public class ServerHandlerProxy {
     @Inject private Logger logger;
     @Inject private ProxyServer server;
     public static YamlDocument config;
+
     public static DataHolder dataHolder;
+    public static ExternalServerCreator externalServerCreator;
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         String logo =
@@ -41,11 +43,11 @@ public class ServerHandlerProxy {
                         "╚═════╝░╚═╝░░╚═╝╚═╝░░░░░░░░░░░░░░╚═╝░░░╚══════╝";
         logger.info(logo);
         logger.info("ServerHandlerProxy started");
-        if(dataHolder != null) {
-            logger.info("External Servers: " + dataHolder.getServerNames());
-            logger.info("Default Server: {}",  dataHolder.defaultServer.get().getServerInfo().getName());
-        }
+        logger.info("External Servers: " + dataHolder.getServerNames());
+        logger.info("Default Server: {}",  dataHolder.defaultServer.get().getServerInfo().getName());
 
+        assert dataHolder != null;
+        externalServerCreator.create(dataHolder.getServerInfo("server-1"), "mctest-server", "java_-jar_server.jar", "stop");
     }
     private void LoadEvents() {
         EventManager eventManager = server.getEventManager();
@@ -58,18 +60,17 @@ public class ServerHandlerProxy {
         this.logger = logger;
 
         dataHolder = new DataHolder();
+        externalServerCreator = new ExternalServerCreator(logger, server, dataHolder);
 
         try {
             config = YamlDocument.create(
                     new File(dataDirectory.toFile(), "config.yml"),
                     Objects.requireNonNull(getClass().getResourceAsStream("/config.yml")),
-                    GeneralSettings.DEFAULT,
-                    LoaderSettings.builder().setAutoUpdate(true).build(),
-                    DumperSettings.DEFAULT,
-                    UpdaterSettings.builder()
-                            .setVersioning(new BasicVersioning("file-version"))
-                            .setOptionSorting(UpdaterSettings.OptionSorting.SORT_BY_DEFAULTS)
-                            .build()
+                    GeneralSettings.DEFAULT, LoaderSettings.builder().setAutoUpdate(true).build(),
+                    DumperSettings.DEFAULT, UpdaterSettings.builder()
+                    .setVersioning(new BasicVersioning("file-version"))
+                    .setOptionSorting(UpdaterSettings.OptionSorting.SORT_BY_DEFAULTS)
+                    .build()
             );
             config.update();
             config.save();
