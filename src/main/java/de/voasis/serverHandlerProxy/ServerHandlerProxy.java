@@ -1,12 +1,14 @@
 package de.voasis.serverHandlerProxy;
 
 import com.google.inject.Inject;
+import com.velocitypowered.api.event.EventManager;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
+import de.voasis.serverHandlerProxy.Events.PostLogin;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.dvs.versioning.BasicVersioning;
 import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
@@ -29,7 +31,6 @@ public class ServerHandlerProxy {
     public static DataHolder dataHolder;
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
-        dataHolder = new DataHolder();
         String logo =
                 "\n" +
                         "░██████╗██╗░░██╗██████╗░░░░░░░██╗░░░██╗░░███╗░░\n" +
@@ -40,8 +41,15 @@ public class ServerHandlerProxy {
                         "╚═════╝░╚═╝░░╚═╝╚═╝░░░░░░░░░░░░░░╚═╝░░░╚══════╝";
         logger.info(logo);
         logger.info("ServerHandlerProxy started");
-        logger.info("External Servers: " + dataHolder.getServerNames());
-        logger.info("Default Server: {}",  dataHolder.defaultServer.get().getServerInfo().getName());
+        if(dataHolder != null) {
+            logger.info("External Servers: " + dataHolder.getServerNames());
+            logger.info("Default Server: {}",  dataHolder.defaultServer.get().getServerInfo().getName());
+        }
+
+    }
+    private void LoadEvents() {
+        EventManager eventManager = server.getEventManager();
+        eventManager.register(this, new PostLogin());
     }
 
     @Inject
@@ -49,7 +57,6 @@ public class ServerHandlerProxy {
         this.server = server;
         this.logger = logger;
 
-        // Initialize DataHolder before using it
         dataHolder = new DataHolder();
 
         try {

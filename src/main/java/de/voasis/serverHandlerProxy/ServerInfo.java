@@ -6,8 +6,8 @@ public class ServerInfo {
     private final int port;
     private final String password;
 
-    public ServerInfo(String ip, int port, String password) {
-        this.serverName = ip;
+    public ServerInfo(String name, String ip, int port, String password) {
+        this.serverName = name;
         this.ip = ip;
         this.port = port;
         this.password = password;
