@@ -23,15 +23,35 @@ import java.util.Optional;
 
 @Plugin(id = "serverhandlerproxy", name = "ServerHandlerProxy", version = "1.0", authors = "Aquestry")
 public class ServerHandlerProxy {
-    @Inject
-    private Logger logger;
-    @Inject
-    private ProxyServer server;
-
+    @Inject private Logger logger;
+    @Inject private ProxyServer server;
     public static YamlDocument _config;
+    public static DataHolder dataHolder;
+    @Subscribe
+    public void onProxyInitialization(ProxyInitializeEvent event) {
+        dataHolder = new DataHolder();
+        String logo =
+                "\n" +
+                        "░██████╗██╗░░██╗██████╗░░░░░░░██╗░░░██╗░░███╗░░\n" +
+                        "██╔════╝██║░░██║██╔══██╗░░░░░░██║░░░██║░████║░░\n" +
+                        "╚█████╗░███████║██████╔╝█████╗╚██╗░██╔╝██╔██║░░\n" +
+                        "░╚═══██╗██╔══██║██╔═══╝░╚════╝░╚████╔╝░╚═╝██║░░\n" +
+                        "██████╔╝██║░░██║██║░░░░░░░░░░░░░╚██╔╝░░███████╗\n" +
+                        "╚═════╝░╚═╝░░╚═╝╚═╝░░░░░░░░░░░░░░╚═╝░░░╚══════╝";
+        logger.info(logo);
+        logger.info("ServerHandlerProxy started");
+        logger.info("External Servers: " + dataHolder.getServerNames());
+        logger.info("Default Server: {}",  dataHolder.defaultServer.get().getServerInfo().getName());
+    }
 
     @Inject
     public ServerHandlerProxy(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
+        this.server = server;
+        this.logger = logger;
+
+        // Initialize DataHolder before using it
+        dataHolder = new DataHolder();
+
         try {
             _config = YamlDocument.create(
                     new File(dataDirectory.toFile(), "config.yml"),
@@ -51,12 +71,7 @@ public class ServerHandlerProxy {
             Optional<PluginContainer> container = server.getPluginManager().getPlugin("serverhandlerproxy");
             container.ifPresent(pluginContainer -> pluginContainer.getExecutorService().shutdown());
         }
-    }
 
-    @Subscribe
-    public void onProxyInitialization(ProxyInitializeEvent event) {
-        logger.info("ServerHandlerProxy started");
-        logger.info("Servers: " + server.getAllServers().toString());
-        logger.info("Default Server: " + _config.getString("default-server"));
+        dataHolder.Refresh(_config, server, logger);
     }
 }
