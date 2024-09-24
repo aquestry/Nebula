@@ -5,6 +5,7 @@ import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
+import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
@@ -166,6 +167,17 @@ public class ServerHandlerProxy {
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
         deleteDefaultServer();
+    }
+    @Subscribe
+    public void SeverKick(KickedFromServerEvent event) {
+        Player player = event.getPlayer();
+        RegisteredServer kickedFrom = event.getServer();
+        if(!kickedFrom.equals(dataHolder.defaultRegisteredServer)) {
+            player.createConnectionRequest(dataHolder.defaultRegisteredServer).fireAndForget();
+        }
+    }
+    public final void shutdown() {
+        server.shutdown();
     }
     @Subscribe
     public void Perm(PermissionsSetupEvent event) {
