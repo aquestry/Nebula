@@ -3,9 +3,12 @@ package de.voasis.serverHandlerProxy;
 import com.google.inject.Inject;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.event.EventManager;
-import com.velocitypowered.api.event.connection.PostLoginEvent;
+import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
+import com.velocitypowered.api.event.proxy.server.ServerRegisteredEvent;
+import com.velocitypowered.api.event.proxy.server.ServerUnregisteredEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
@@ -22,8 +25,6 @@ import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
 import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
 import java.io.File;
 import java.io.IOException;
@@ -61,10 +62,15 @@ public class ServerHandlerProxy {
         commandManager.register("start", new StartCommand());
         commandManager.register("delete", new DeleteCommand());
         logger.info("Commands registered.");
-
+        logger.info("Creating Default-Server...");
+        createDefaultServer();
     }
     private void LoadEvents() {
         EventManager eventManager = server.getEventManager();
+    }
+
+    private void createDefaultServer() {
+        externalServerCreator.createFromTemplate(dataHolder.getAllInfos().getFirst(), dataHolder.defaultServer, dataHolder.defaultServer, "java -jar server.jar -p 25568", "stop");
     }
 
     @Inject
@@ -92,56 +98,40 @@ public class ServerHandlerProxy {
 
         dataHolder.Refresh(config, server, logger);
     }
+    private void startDefaultServer() {
+        logger.info("Starting Default-Server...");
+        externalServerCreator.start(dataHolder.getAllInfos().getFirst(), dataHolder.defaultServer);
+    }
+    private void deleteDefaultServer() {
+        logger.info("Deleting Default-Server...");
+        externalServerCreator.delete(dataHolder.getAllInfos().getFirst(), dataHolder.defaultServer);
+    }
     @Subscribe
-    public void onPostLogin(PostLoginEvent event) {
-        logger.info("PostLogin event triggered for player: " + event.getPlayer().getUsername());
-        logger.info("Backend-Servers:");
-        RegisteredServer defaultServer = null;
-
-        String expectedDefaultServer = ServerHandlerProxy.dataHolder.defaultServer;
-        logger.info("Expected default server: " + (expectedDefaultServer != null ? expectedDefaultServer : "not set"));
-
-        for (RegisteredServer server : server.getAllServers()) {
-            String serverName = server.getServerInfo().getName();
-            logger.info("Found server: '" + serverName + "'");
-
-            if (expectedDefaultServer != null && expectedDefaultServer.equals(serverName)) {
-                defaultServer = server;
-                logger.info("Default server matched: " + serverName);
-                break;
-            }
-        }
-
-        if (defaultServer != null) {
-            final RegisteredServer finalDefaultServer = defaultServer;
-            logger.info("Attempting to connect player to default server: " + finalDefaultServer.getServerInfo().getName());
-            event.getPlayer().createConnectionRequest(finalDefaultServer).connect()
-                    .thenAccept(result -> {
-                        if (result.isSuccessful()) {
-                            logger.info("Player " + event.getPlayer().getUsername() + " successfully connected to " + finalDefaultServer.getServerInfo().getName());
-                        } else {
-                            logger.error("Failed to connect player " + event.getPlayer().getUsername() + " to " + finalDefaultServer.getServerInfo().getName() +
-                                    ". Reason: " + (result.getReasonComponent().isPresent() ? result.getReasonComponent().get().toString() : "Unknown"));
-                            disconnectPlayer(event.getPlayer(), "Failed to connect to the default server. Please try again later.");
-                        }
-                    })
-                    .exceptionally(ex -> {
-                        logger.error("Exception occurred while connecting player " + event.getPlayer().getUsername() + " to " + finalDefaultServer.getServerInfo().getName(), ex);
-                        if (ex.getCause() instanceof IOException) {
-                            logger.error("IO Exception details: " + ex.getCause().getMessage());
-                        }
-                        disconnectPlayer(event.getPlayer(), "An error occurred while connecting. Please try again later.");
-                        return null;
-                    });
-        } else {
-            logger.warn("Default server not found or not set!");
-            disconnectPlayer(event.getPlayer(), "Es gibt keine verfügbaren Server mit denen du dich verbinden kannst. Versuche es später erneut oder kontaktiere einen Admin.");
+    public void ServerReg(ServerRegisteredEvent event) {
+        RegisteredServer reg = event.registeredServer();
+        logger.info("Server registered: " + reg.getServerInfo().getName() + ", IP: " + reg.getServerInfo().getAddress());
+        if(event.registeredServer().getServerInfo().getName().equals(dataHolder.defaultServer)) {
+            logger.info("Default-Server registered.");
+            dataHolder.defaultRegisteredServer = server.registerServer(reg.getServerInfo());
+            startDefaultServer();
         }
     }
 
-    private void disconnectPlayer(Player player, String reason) {
-        logger.info("Disconnecting player " + player.getUsername() + " with reason: " + reason);
-        Component disconnectMessage = Component.text(reason).color(NamedTextColor.RED);
-        player.disconnect(disconnectMessage);
+    @Subscribe
+    public void ServerUnReg(ServerUnregisteredEvent event) {
+        RegisteredServer unreg = event.unregisteredServer();
+        logger.info("Server unregistered: " + unreg.getServerInfo().getName() + ", IP: " + unreg.getServerInfo().getAddress());
+    }
+    @Subscribe
+    public void ChooseServer(PlayerChooseInitialServerEvent event) {
+        Player player = event.getPlayer();
+        RegisteredServer defaultServer = dataHolder.defaultRegisteredServer;
+        if (defaultServer != null) {
+            event.setInitialServer(defaultServer);
+        }
+    }
+    @Subscribe
+    public void Shutdown(ProxyShutdownEvent event) {
+        deleteDefaultServer();
     }
 }

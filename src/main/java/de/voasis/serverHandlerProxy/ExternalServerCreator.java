@@ -84,11 +84,10 @@ public class ExternalServerCreator {
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 logger.info("Instance created successfully from template.");
+
                 com.velocitypowered.api.proxy.server.ServerInfo newInfo = new com.velocitypowered.api.proxy.server.ServerInfo(
                         newName, new InetSocketAddress(externalServer.getIp(), Integer.parseInt(startCMD.split("-p")[1].trim())));
-                if(newInfo != null) {
-                    server.registerServer(newInfo);
-                }
+                server.registerServer(newInfo);
             } else {
                 logger.info("Failed to create instance from template. Response Code: " + responseCode);
             }
@@ -120,7 +119,12 @@ public class ExternalServerCreator {
 
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                logger.info("Instance started successfully.");
+
+                if(servername.equals(dataHolder.defaultServer)) {
+                    logger.info("Default-Server started successfully.");
+                } else {
+                    logger.info("Instance started successfully.");
+                }
             } else {
                 logger.info("Failed to start instance. Response Code: " + responseCode);
             }
