@@ -15,6 +15,8 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import com.velocitypowered.api.proxy.server.ServerInfo;
+import com.velocitypowered.api.scheduler.ScheduledTask;
 import de.voasis.serverHandlerProxy.Commands.CreateCommand;
 import de.voasis.serverHandlerProxy.Commands.DeleteCommand;
 import de.voasis.serverHandlerProxy.Commands.StartCommand;
@@ -32,6 +34,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 @Plugin(id = "serverhandlerproxy", name = "ServerHandlerProxy", version = "1.0", authors = "Aquestry")
 public class ServerHandlerProxy {
@@ -39,7 +43,6 @@ public class ServerHandlerProxy {
     private Logger logger;
     @Inject
     private ProxyServer server;
-
     public static YamlDocument config;
     public static DataHolder dataHolder;
     public static ExternalServerCreator externalServerCreator;
@@ -106,10 +109,6 @@ public class ServerHandlerProxy {
     private void deleteDefaultServer() {
         logger.info("Deleting Default-Server...");
         externalServerCreator.delete(dataHolder.getAllInfos().getFirst(), dataHolder.defaultServer);
-        externalServerCreator.delete(dataHolder.getAllInfos().getFirst(), dataHolder.defaultServer);
-        externalServerCreator.delete(dataHolder.getAllInfos().getFirst(), dataHolder.defaultServer);
-        // Just to be safe its deleted (need to fix this in the python server)
-
     }
     @Subscribe
     public void ServerReg(ServerRegisteredEvent event) {
@@ -117,9 +116,30 @@ public class ServerHandlerProxy {
         logger.info("Server registered: " + reg.getServerInfo().getName() + ", IP: " + reg.getServerInfo().getAddress());
         if(event.registeredServer().getServerInfo().getName().equals(dataHolder.defaultServer)) {
             logger.info("Default-Server registered.");
-            dataHolder.defaultRegisteredServer = server.registerServer(reg.getServerInfo());
+
             startDefaultServer();
+            pingServerUntilOnline(reg, () -> defaultServerstarted(reg.getServerInfo()));
         }
+    }
+    public Void defaultServerstarted(ServerInfo ser) {
+        dataHolder.defaultRegisteredServer = server.registerServer(ser);
+        return null;
+    }
+    public void pingServerUntilOnline(RegisteredServer regServer, Callable<Void> response) {
+        final ScheduledTask[] pingTaskHolder = new ScheduledTask[1];
+
+        pingTaskHolder[0] = server.getScheduler().buildTask(this, () -> regServer.ping().whenComplete((result, exception) -> {
+            if (exception == null) {
+                try {
+                    response.call();
+                } catch (Exception ignored) {}
+                if (pingTaskHolder[0] != null) {
+                    pingTaskHolder[0].cancel();
+                }
+            } else {
+                logger.info("Server {} is offline. Retrying...", regServer.getServerInfo().getName());
+            }
+        })).repeat(3, TimeUnit.SECONDS).schedule();
     }
 
     @Subscribe
@@ -138,7 +158,6 @@ public class ServerHandlerProxy {
         } else {
             logger.info("Default-Server is offline disconnecting player...");
             player.disconnect(Component.text("Default-Server ist not online"));
-
         }
 
     }
