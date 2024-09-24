@@ -106,6 +106,10 @@ public class ServerHandlerProxy {
     private void deleteDefaultServer() {
         logger.info("Deleting Default-Server...");
         externalServerCreator.delete(dataHolder.getAllInfos().getFirst(), dataHolder.defaultServer);
+        externalServerCreator.delete(dataHolder.getAllInfos().getFirst(), dataHolder.defaultServer);
+        externalServerCreator.delete(dataHolder.getAllInfos().getFirst(), dataHolder.defaultServer);
+        // Just to be safe its deleted (need to fix this in the python server)
+
     }
     @Subscribe
     public void ServerReg(ServerRegisteredEvent event) {
@@ -134,6 +138,7 @@ public class ServerHandlerProxy {
         } else {
             logger.info("Default-Server is offline disconnecting player...");
             player.disconnect(Component.text("Default-Server ist not online"));
+
         }
 
     }
