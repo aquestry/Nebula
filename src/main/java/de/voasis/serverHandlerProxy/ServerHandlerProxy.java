@@ -175,10 +175,10 @@ public class ServerHandlerProxy {
     public void onPlayerJoin(LoginEvent event) {
         Player player = event.getPlayer();
         if(dataHolder.admins.contains(player.getUniqueId().toString())) {
-            permissionManager.addPermission(player, "admin");
+            permissionManager.addPermission(player, "velocity.admin");
         }
 
-        logger.info("Player is admin: " + player.hasPermission("admin"));
+        logger.info("Player is admin: " + player.hasPermission("velocity.admin"));
     }
     private void startDefaultServer() {
         logger.info("Starting Default-Server...");

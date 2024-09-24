@@ -40,7 +40,7 @@ public class CreateCommand implements SimpleCommand {
 
     @Override
     public boolean hasPermission(final Invocation invocation) {
-        return invocation.source().hasPermission("admin");
+        return invocation.source().hasPermission("velocity.admin");
     }
 
     @Override

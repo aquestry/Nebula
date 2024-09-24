@@ -3,7 +3,6 @@ package de.voasis.serverHandlerProxy.Commands;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
-import com.velocitypowered.api.proxy.Player;
 import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import de.voasis.serverHandlerProxy.ServerHandlerProxy;
 import net.kyori.adventure.text.Component;
@@ -42,7 +41,7 @@ public class StartCommand implements SimpleCommand {
 
     @Override
     public boolean hasPermission(final Invocation invocation) {
-        return invocation.source().hasPermission("admin");
+        return invocation.source().hasPermission("velocity.admin");
     }
 
     @Override
