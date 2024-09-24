@@ -178,6 +178,7 @@ public class ServerHandlerProxy {
             permissionManager.addPermission(player, "admin");
         }
 
+        logger.info("Player is admin: " + player.hasPermission("admin"));
     }
     private void startDefaultServer() {
         logger.info("Starting Default-Server...");
