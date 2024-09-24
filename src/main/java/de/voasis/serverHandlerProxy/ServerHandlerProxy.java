@@ -3,6 +3,8 @@ package de.voasis.serverHandlerProxy;
 import com.google.inject.Inject;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.LoginEvent;
+import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
@@ -20,6 +22,7 @@ import de.voasis.serverHandlerProxy.Commands.CreateCommand;
 import de.voasis.serverHandlerProxy.Commands.DeleteCommand;
 import de.voasis.serverHandlerProxy.Commands.StartCommand;
 import de.voasis.serverHandlerProxy.Commands.TemplateCommand;
+import de.voasis.serverHandlerProxy.Permission.PermissionManager;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.dvs.versioning.BasicVersioning;
 import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
@@ -49,13 +52,14 @@ public class ServerHandlerProxy {
     public static YamlDocument config;
     public static DataHolder dataHolder;
     public static ExternalServerCreator externalServerCreator;
-
+    public PermissionManager permissionManager;
     @Inject
     public ServerHandlerProxy(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         dataHolder = new DataHolder();
         externalServerCreator = new ExternalServerCreator(logger, server, dataHolder);
         loadConfig(dataDirectory);
         dataHolder.Refresh(config, server, logger);
+        permissionManager  = new PermissionManager();
     }
 
     @Subscribe
@@ -163,7 +167,18 @@ public class ServerHandlerProxy {
     public void onProxyShutdown(ProxyShutdownEvent event) {
         deleteDefaultServer();
     }
+    @Subscribe
+    public void Perm(PermissionsSetupEvent event) {
+        event.setProvider(permissionManager);
+    }
+    @Subscribe
+    public void onPlayerJoin(LoginEvent event) {
+        Player player = event.getPlayer();
+        if(dataHolder.admins.contains(player.getUniqueId().toString())) {
+            permissionManager.addPermission(player, "admin");
+        }
 
+    }
     private void startDefaultServer() {
         logger.info("Starting Default-Server...");
         externalServerCreator.start(dataHolder.getAllInfos().getFirst(), dataHolder.defaultServer);
