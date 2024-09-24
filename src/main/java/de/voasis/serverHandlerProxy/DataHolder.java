@@ -12,10 +12,12 @@ public class DataHolder {
     public String defaultServer = null;
     public RegisteredServer defaultRegisteredServer = null;
     public List<ServerInfo> serverInfoMap = new ArrayList<>();
-
+    public List<String> admins = new ArrayList<>();
     public void Refresh(YamlDocument config, ProxyServer server, Logger logger) {
         defaultServer = config.getString("default-server");
         serverInfoMap.clear();
+        admins.clear();
+        admins = List.of(config.getString("admins").split(","));
         Set<Object> managerServerKeys = config.getSection("manager-servers").getKeys();
         for (Object serverName : managerServerKeys) {
             String name = (String) serverName;

@@ -3,6 +3,7 @@ package de.voasis.serverHandlerProxy.Commands;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
+import com.velocitypowered.api.proxy.Player;
 import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import de.voasis.serverHandlerProxy.ServerHandlerProxy;
 import net.kyori.adventure.text.Component;
@@ -30,7 +31,7 @@ public class StartCommand implements SimpleCommand {
             }
         }
 
-        if (source instanceof ConsoleCommandSource && temp != null) {
+        if (source instanceof ConsoleCommandSource && temp != null || hasPermission(invocation)) {
             ServerHandlerProxy.externalServerCreator.start(temp, Name);
             source.sendMessage(Component.text("Starting server instance...", NamedTextColor.AQUA));
         } else {
@@ -41,7 +42,11 @@ public class StartCommand implements SimpleCommand {
 
     @Override
     public boolean hasPermission(final Invocation invocation) {
-        return invocation.source().hasPermission("command.start");
+        if(invocation.source() instanceof Player player) {
+            return ServerHandlerProxy.dataHolder.admins.contains(player.getUniqueId());
+        } else {
+            return true;
+        }
     }
 
     @Override
