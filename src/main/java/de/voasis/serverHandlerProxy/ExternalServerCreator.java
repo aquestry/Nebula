@@ -169,6 +169,7 @@ public class ExternalServerCreator {
 
             } else {
                 logger.info("Failed to delete instance. Response Code: " + responseCode);
+                delete(externalServer, servername);
             }
 
         } catch (Exception e) {

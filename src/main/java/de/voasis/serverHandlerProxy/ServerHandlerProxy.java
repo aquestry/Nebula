@@ -136,8 +136,6 @@ public class ServerHandlerProxy {
                 if (pingTaskHolder[0] != null) {
                     pingTaskHolder[0].cancel();
                 }
-            } else {
-                logger.info("Server {} is offline. Retrying...", regServer.getServerInfo().getName());
             }
         })).repeat(3, TimeUnit.SECONDS).schedule();
     }
