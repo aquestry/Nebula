@@ -119,7 +119,14 @@ public class ExternalServerCreator {
             }
 
             int responseCode = connection.getResponseCode();
-            if (responseCode != HttpURLConnection.HTTP_OK) {
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+
+                if(servername.equals(dataHolder.defaultServer)) {
+                    logger.info("Default-Server started successfully.");
+                } else {
+                    logger.info("Instance started successfully.");
+                }
+            } else {
                 logger.info("Failed to start instance. Response Code: " + responseCode);
             }
 
