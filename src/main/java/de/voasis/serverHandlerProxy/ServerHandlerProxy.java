@@ -25,6 +25,7 @@ import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
 import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
+import net.kyori.adventure.text.Component;
 import org.slf4j.Logger;
 import java.io.File;
 import java.io.IOException;
@@ -126,9 +127,15 @@ public class ServerHandlerProxy {
     public void ChooseServer(PlayerChooseInitialServerEvent event) {
         Player player = event.getPlayer();
         RegisteredServer defaultServer = dataHolder.defaultRegisteredServer;
+        logger.info("Choose Server Event for player: " + player.getUsername());
         if (defaultServer != null) {
             event.setInitialServer(defaultServer);
+            logger.info("Default-Server is online connecting player...");
+        } else {
+            logger.info("Default-Server is offline disconnecting player...");
+            player.disconnect(Component.text("Default-Server ist not online"));
         }
+
     }
     @Subscribe
     public void Shutdown(ProxyShutdownEvent event) {
