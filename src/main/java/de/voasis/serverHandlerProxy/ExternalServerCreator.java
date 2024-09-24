@@ -46,8 +46,9 @@ public class ExternalServerCreator {
             }
 
             int responseCode = connection.getResponseCode();
+            String response = connection.getResponseMessage();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                logger.info("Instance created successfully.");
+                logger.info("Instance created successfully. Response: " + response);
             } else {
                 logger.info("Failed to create instance. Response Code: " + responseCode);
             }
@@ -155,8 +156,9 @@ public class ExternalServerCreator {
             }
 
             int responseCode = connection.getResponseCode();
+            String response = connection.getResponseMessage();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                logger.info("Instance deleted successfully.");
+                logger.info("Instance deleted successfully. Response: " + response);
                 com.velocitypowered.api.proxy.server.ServerInfo info = null;
                 for (RegisteredServer i : server.getAllServers()) {
                     if(i.getServerInfo().getName().equals(servername)) {
@@ -169,7 +171,6 @@ public class ExternalServerCreator {
 
             } else {
                 logger.info("Failed to delete instance. Response Code: " + responseCode);
-                delete(externalServer, servername);
             }
 
         } catch (Exception e) {
