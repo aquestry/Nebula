@@ -42,11 +42,7 @@ public class StartCommand implements SimpleCommand {
 
     @Override
     public boolean hasPermission(final Invocation invocation) {
-        if(invocation.source() instanceof Player player) {
-            return ServerHandlerProxy.dataHolder.admins.contains(player.getUniqueId());
-        } else {
-            return true;
-        }
+        return invocation.source().hasPermission("admin");
     }
 
     @Override
