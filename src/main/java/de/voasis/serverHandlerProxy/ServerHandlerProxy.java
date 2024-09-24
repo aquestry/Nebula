@@ -2,10 +2,9 @@ package de.voasis.serverHandlerProxy;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.command.CommandManager;
-import com.velocitypowered.api.event.EventManager;
+import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
-import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.event.proxy.server.ServerRegisteredEvent;
 import com.velocitypowered.api.event.proxy.server.ServerUnregisteredEvent;
@@ -29,6 +28,7 @@ import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import net.kyori.adventure.text.Component;
 import org.slf4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -39,129 +39,162 @@ import java.util.concurrent.TimeUnit;
 
 @Plugin(id = "serverhandlerproxy", name = "ServerHandlerProxy", version = "1.0", authors = "Aquestry")
 public class ServerHandlerProxy {
+
     @Inject
     private Logger logger;
+
     @Inject
     private ProxyServer server;
+    private boolean defaultstarted = false;
     public static YamlDocument config;
     public static DataHolder dataHolder;
     public static ExternalServerCreator externalServerCreator;
+
+    @Inject
+    public ServerHandlerProxy(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
+        dataHolder = new DataHolder();
+        externalServerCreator = new ExternalServerCreator(logger, server, dataHolder);
+        loadConfig(dataDirectory);
+        dataHolder.Refresh(config, server, logger);
+    }
+
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
-        String logo =
-                "\n" +
-                        "░██████╗██╗░░██╗██████╗░░░░░░░██╗░░░██╗░░███╗░░\n" +
-                        "██╔════╝██║░░██║██╔══██╗░░░░░░██║░░░██║░████║░░\n" +
-                        "╚█████╗░███████║██████╔╝█████╗╚██╗░██╔╝██╔██║░░\n" +
-                        "░╚═══██╗██╔══██║██╔═══╝░╚════╝░╚████╔╝░╚═╝██║░░\n" +
-                        "██████╔╝██║░░██║██║░░░░░░░░░░░░░╚██╔╝░░███████╗\n" +
-                        "╚═════╝░╚═╝░░╚═╝╚═╝░░░░░░░░░░░░░░╚═╝░░░╚══════╝";
+        logStartup();
+        registerCommands();
+        logger.info("Creating Default-Server...");
+        createDefaultServer();
+    }
+
+    private void loadConfig(Path dataDirectory) {
+        try {
+            config = YamlDocument.create(
+                    new File(dataDirectory.toFile(), "config.yml"),
+                    Objects.requireNonNull(getClass().getResourceAsStream("/config.yml")),
+                    GeneralSettings.DEFAULT,
+                    LoaderSettings.builder().setAutoUpdate(true).build(),
+                    DumperSettings.DEFAULT,
+                    UpdaterSettings.builder()
+                            .setVersioning(new BasicVersioning("file-version"))
+                            .setOptionSorting(UpdaterSettings.OptionSorting.SORT_BY_DEFAULTS)
+                            .build()
+            );
+            config.update();
+            config.save();
+        } catch (IOException e) {
+            logger.error("Could not load config! Plugin will shutdown!");
+            shutdownPlugin();
+        }
+    }
+
+    private void shutdownPlugin() {
+        Optional<PluginContainer> container = server.getPluginManager().getPlugin("serverhandlerproxy");
+        container.ifPresent(pluginContainer -> pluginContainer.getExecutorService().shutdown());
+    }
+
+    private void logStartup() {
+        String logo = """
+                \n
+                ░██████╗██╗░░██╗██████╗░░░░░░░██╗░░░██╗░░███╗░░
+                ██╔════╝██║░░██║██╔══██╗░░░░░░██║░░░██║░████║░░
+                ╚█████╗░███████║██████╔╝█████╗╚██╗░██╔╝██╔██║░░
+                ░╚═══██╗██╔══██║██╔═══╝░╚════╝░╚████╔╝░╚═╝██║░░
+                ██████╔╝██║░░██║██║░░░░░░░░░░░░░╚██╔╝░░███████╗
+                ╚═════╝░╚═╝░░╚═╝╚═╝░░░░░░░░░░░░░░╚═╝░░░╚══════╝
+                """;
         logger.info(logo);
         logger.info("ServerHandlerProxy started");
         logger.info("External Servers: " + dataHolder.getServerNames());
-        assert dataHolder != null;
+    }
+
+    private void registerCommands() {
         CommandManager commandManager = server.getCommandManager();
         commandManager.register("create", new CreateCommand());
         commandManager.register("template", new TemplateCommand());
         commandManager.register("start", new StartCommand());
         commandManager.register("delete", new DeleteCommand());
         logger.info("Commands registered.");
-        logger.info("Creating Default-Server...");
-        createDefaultServer();
-    }
-    private void LoadEvents() {
-        EventManager eventManager = server.getEventManager();
     }
 
     private void createDefaultServer() {
-        externalServerCreator.createFromTemplate(dataHolder.getAllInfos().getFirst(), dataHolder.defaultServer, dataHolder.defaultServer, "java -jar server.jar -p 25568", "stop");
+        externalServerCreator.createFromTemplate(
+                dataHolder.getAllInfos().getFirst(),
+                dataHolder.defaultServer,
+                dataHolder.defaultServer,
+                "java -jar server.jar -p 25568",
+                "stop"
+        );
     }
 
-    @Inject
-    public ServerHandlerProxy(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
-        dataHolder = new DataHolder();
-        externalServerCreator = new ExternalServerCreator(logger, server, dataHolder);
+    @Subscribe
+    public void onServerRegistered(ServerRegisteredEvent event) {
+        RegisteredServer reg = event.registeredServer();
+        logger.info("Server registered: " + reg.getServerInfo().getName() + ", IP: " + reg.getServerInfo().getAddress());
 
-        try {
-            config = YamlDocument.create(
-                    new File(dataDirectory.toFile(), "config.yml"),
-                    Objects.requireNonNull(getClass().getResourceAsStream("/config.yml")),
-                    GeneralSettings.DEFAULT, LoaderSettings.builder().setAutoUpdate(true).build(),
-                    DumperSettings.DEFAULT, UpdaterSettings.builder()
-                    .setVersioning(new BasicVersioning("file-version"))
-                    .setOptionSorting(UpdaterSettings.OptionSorting.SORT_BY_DEFAULTS)
-                    .build()
-            );
-            config.update();
-            config.save();
-        } catch (IOException e) {
-            logger.error("Could not load config! Plugin will shutdown!");
-            Optional<PluginContainer> container = server.getPluginManager().getPlugin("serverhandlerproxy");
-            container.ifPresent(pluginContainer -> pluginContainer.getExecutorService().shutdown());
+        if (reg.getServerInfo().getName().equals(dataHolder.defaultServer)) {
+            logger.info("Default-Server registered.");
+            startDefaultServer();
+            pingServerUntilOnline(reg, () -> defaultServerStarted(reg.getServerInfo()));
         }
-
-        dataHolder.Refresh(config, server, logger);
     }
+
+    @Subscribe
+    public void onServerUnregistered(ServerUnregisteredEvent event) {
+        RegisteredServer unreg = event.unregisteredServer();
+        logger.info("Server unregistered: " + unreg.getServerInfo().getName() + ", IP: " + unreg.getServerInfo().getAddress());
+    }
+
+    @Subscribe
+    public void onChooseServer(PlayerChooseInitialServerEvent event) {
+        Player player = event.getPlayer();
+        RegisteredServer defaultServer = dataHolder.defaultRegisteredServer;
+        logger.info("Choose Server Event for player: " + player.getUsername());
+
+        if (defaultServer != null) {
+            event.setInitialServer(defaultServer);
+            logger.info("Default-Server is online, connecting player...");
+        } else {
+            logger.info("Default-Server is offline, disconnecting player...");
+            player.disconnect(Component.text("Default-Server is not online"));
+        }
+    }
+
+    @Subscribe
+    public void onProxyShutdown(ProxyShutdownEvent event) {
+        deleteDefaultServer();
+    }
+
     private void startDefaultServer() {
         logger.info("Starting Default-Server...");
         externalServerCreator.start(dataHolder.getAllInfos().getFirst(), dataHolder.defaultServer);
     }
+
     private void deleteDefaultServer() {
         logger.info("Deleting Default-Server...");
         externalServerCreator.delete(dataHolder.getAllInfos().getFirst(), dataHolder.defaultServer);
     }
-    @Subscribe
-    public void ServerReg(ServerRegisteredEvent event) {
-        RegisteredServer reg = event.registeredServer();
-        logger.info("Server registered: " + reg.getServerInfo().getName() + ", IP: " + reg.getServerInfo().getAddress());
-        if(event.registeredServer().getServerInfo().getName().equals(dataHolder.defaultServer)) {
-            logger.info("Default-Server registered.");
 
-            startDefaultServer();
-            pingServerUntilOnline(reg, () -> defaultServerstarted(reg.getServerInfo()));
-        }
-    }
-    public Void defaultServerstarted(ServerInfo ser) {
-        dataHolder.defaultRegisteredServer = server.registerServer(ser);
+    private Void defaultServerStarted(ServerInfo serverInfo) {
+        if(defaultstarted) {return null;}
+        defaultstarted = true;
+        dataHolder.defaultRegisteredServer = server.registerServer(serverInfo);
         logger.info("Default-Server started successfully.");
         return null;
     }
-    public void pingServerUntilOnline(RegisteredServer regServer, Callable<Void> response) {
+
+    private void pingServerUntilOnline(RegisteredServer regServer, Callable<Void> response) {
         final ScheduledTask[] pingTaskHolder = new ScheduledTask[1];
-
-        pingTaskHolder[0] = server.getScheduler().buildTask(this, () -> regServer.ping().whenComplete((result, exception) -> {
-            if (exception == null) {
-                try {
-                    response.call();
-                } catch (Exception ignored) {}
-                if (pingTaskHolder[0] != null) {
-                    pingTaskHolder[0].cancel();
-                }
-            }
-        })).repeat(3, TimeUnit.SECONDS).schedule();
-    }
-
-    @Subscribe
-    public void ServerUnReg(ServerUnregisteredEvent event) {
-        RegisteredServer unreg = event.unregisteredServer();
-        logger.info("Server unregistered: " + unreg.getServerInfo().getName() + ", IP: " + unreg.getServerInfo().getAddress());
-    }
-    @Subscribe
-    public void ChooseServer(PlayerChooseInitialServerEvent event) {
-        Player player = event.getPlayer();
-        RegisteredServer defaultServer = dataHolder.defaultRegisteredServer;
-        logger.info("Choose Server Event for player: " + player.getUsername());
-        if (defaultServer != null) {
-            event.setInitialServer(defaultServer);
-            logger.info("Default-Server is online connecting player...");
-        } else {
-            logger.info("Default-Server is offline disconnecting player...");
-            player.disconnect(Component.text("Default-Server ist not online"));
-        }
-
-    }
-    @Subscribe
-    public void Shutdown(ProxyShutdownEvent event) {
-        deleteDefaultServer();
+        pingTaskHolder[0] = server.getScheduler().buildTask(this, () ->
+                regServer.ping().whenComplete((result, exception) -> {
+                    if (exception == null) {
+                        try {
+                            response.call();
+                        } catch (Exception ignored) {}
+                        if (pingTaskHolder[0] != null) {
+                            pingTaskHolder[0].cancel();
+                        }
+                    }
+                })
+        ).repeat(3, TimeUnit.SECONDS).schedule();
     }
 }

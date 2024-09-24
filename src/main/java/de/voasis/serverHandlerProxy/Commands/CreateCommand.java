@@ -15,7 +15,6 @@ public class CreateCommand implements SimpleCommand {
     public void execute(final Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
-
         if (args.length != 4) {
             source.sendMessage(Component.text("Usage: /create <externalServerName> <newName> <startCMD> <stopCMD>", NamedTextColor.RED));
             return;
