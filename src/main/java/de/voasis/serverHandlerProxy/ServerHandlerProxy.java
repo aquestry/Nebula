@@ -123,6 +123,7 @@ public class ServerHandlerProxy {
     }
     public Void defaultServerstarted(ServerInfo ser) {
         dataHolder.defaultRegisteredServer = server.registerServer(ser);
+        logger.info("Default-Server started successfully.");
         return null;
     }
     public void pingServerUntilOnline(RegisteredServer regServer, Callable<Void> response) {
