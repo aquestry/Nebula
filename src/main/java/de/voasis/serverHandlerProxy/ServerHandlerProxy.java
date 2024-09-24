@@ -176,6 +176,11 @@ public class ServerHandlerProxy {
         Player player = event.getPlayer();
         if(dataHolder.admins.contains(player.getUniqueId().toString())) {
             permissionManager.addPermission(player, "velocity.admin");
+            permissionManager.addPermission(player, "velocity.command.plugins");
+            permissionManager.addPermission(player, "velocity.command.info");
+            permissionManager.addPermission(player, "velocity.command.server");
+            permissionManager.addPermission(player, "velocity.command.send");
+            permissionManager.addPermission(player, "velocity.command.glist");
         }
 
         logger.info("Player is admin: " + player.hasPermission("velocity.admin"));
