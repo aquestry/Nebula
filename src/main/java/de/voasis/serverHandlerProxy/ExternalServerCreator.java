@@ -5,6 +5,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.serverHandlerProxy.Maps.BackendServer;
+import de.voasis.serverHandlerProxy.Maps.Messages;
 import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -98,7 +99,7 @@ public class ExternalServerCreator {
         }
     }
     public void delete(ServerInfo externalServer, String servername) {
-        disconnectAll(servername);
+        disconnectAll(servername, Messages.deleted);
         try {
             String urlString = "http://" + externalServer.getIp() + ":" + externalServer.getPort() + "/delete/" + servername;
             URL url = new URL(urlString);
@@ -142,7 +143,7 @@ public class ExternalServerCreator {
         }
     }
     public void stop(ServerInfo externalServer, String servername) {
-        disconnectAll(servername);
+        disconnectAll(servername, Messages.stopped);
         try {
             String urlString = "http://" + externalServer.getIp() + ":" + externalServer.getPort() + "/kill/" + servername;
             URL url = new URL(urlString);
@@ -171,13 +172,13 @@ public class ExternalServerCreator {
             e.printStackTrace();
         }
     }
-    public void disconnectAll(String backendServer) {
+    public void disconnectAll(String backendServer, String reaason) {
         logger.info("Sending all to default server. Server: " + backendServer);
         Optional<RegisteredServer> r = server.getServer(backendServer);
         if(r.isPresent()) {
             for (Player player : r.get().getPlayersConnected()) {
                 if(dataHolder.getState(dataHolder.defaultServer)) {
-                    player.disconnect(Component.text("The Server you were on was deleted.", NamedTextColor.RED));
+                    player.disconnect(Component.text(reaason, NamedTextColor.RED));
                 }
             }
         }
