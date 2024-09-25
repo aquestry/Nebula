@@ -160,10 +160,18 @@ public class AdminCommand implements SimpleCommand {
             return CompletableFuture.completedFuture(ServerHandlerProxy.dataHolder.serverInfoMap.stream()
                     .map(ServerInfo::getServerName)
                     .toList());
-        } else if (args.length == 3 && (args[0].equals("start") || args[0].equals("stop"))) {
-            return CompletableFuture.completedFuture(ServerHandlerProxy.dataHolder.backendInfoMap.stream()
-                    .map(BackendServer::getServerName)
-                    .toList());
+        } else if (args.length == 3) {
+            if (args[0].equals("start")) {
+                return CompletableFuture.completedFuture(ServerHandlerProxy.dataHolder.backendInfoMap.stream()
+                        .filter(server -> !server.getState())
+                        .map(BackendServer::getServerName)
+                        .toList());
+            } else if (args[0].equals("stop")) {
+                return CompletableFuture.completedFuture(ServerHandlerProxy.dataHolder.backendInfoMap.stream()
+                        .filter(BackendServer::getState)
+                        .map(BackendServer::getServerName)
+                        .toList());
+            }
         }
 
         return CompletableFuture.completedFuture(List.of());
