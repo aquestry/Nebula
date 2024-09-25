@@ -38,18 +38,14 @@ public class StopCommand implements SimpleCommand {
             source.sendMessage(Component.text(Messages.norights, NamedTextColor.RED));
         }
     }
-
-
     @Override
     public boolean hasPermission(final Invocation invocation) {
         return invocation.source().hasPermission("velocity.admin");
     }
-
     @Override
     public List<String> suggest(final Invocation invocation) {
         return List.of();
     }
-
     @Override
     public CompletableFuture<List<String>> suggestAsync(final Invocation invocation) {
         return CompletableFuture.completedFuture(List.of());

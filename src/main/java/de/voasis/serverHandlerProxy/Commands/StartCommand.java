@@ -17,7 +17,6 @@ public class StartCommand implements SimpleCommand {
     public void execute(final Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
-
         if (args.length < 2) {
             source.sendMessage(Component.text("Usage: /start <externalServerName> <InstanceName>", NamedTextColor.RED));
             return;
@@ -30,7 +29,6 @@ public class StartCommand implements SimpleCommand {
                 temp = i;
             }
         }
-
         if (source instanceof ConsoleCommandSource && temp != null || hasPermission(invocation)) {
             ServerHandlerProxy.externalServerCreator.start(temp, Name);
             source.sendMessage(Component.text("Starting server instance...", NamedTextColor.AQUA));
@@ -38,18 +36,14 @@ public class StartCommand implements SimpleCommand {
             source.sendMessage(Component.text(Messages.norights, NamedTextColor.RED));
         }
     }
-
-
     @Override
     public boolean hasPermission(final Invocation invocation) {
         return invocation.source().hasPermission("velocity.admin");
     }
-
     @Override
     public List<String> suggest(final Invocation invocation) {
         return List.of();
     }
-
     @Override
     public CompletableFuture<List<String>> suggestAsync(final Invocation invocation) {
         return CompletableFuture.completedFuture(List.of());

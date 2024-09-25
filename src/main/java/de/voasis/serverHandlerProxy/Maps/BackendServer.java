@@ -15,7 +15,6 @@ public class BackendServer {
     public String getServerName() {
         return serverName;
     }
-
     public int getPort() {
         return port;
     }
@@ -25,7 +24,6 @@ public class BackendServer {
     public boolean getState() {
         return online;
     }
-
     public void setState(boolean online) {
         this.online = online;
     }

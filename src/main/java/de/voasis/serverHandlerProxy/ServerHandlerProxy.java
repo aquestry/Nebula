@@ -15,6 +15,7 @@ import de.voasis.serverHandlerProxy.Commands.TemplateCommand;
 import de.voasis.serverHandlerProxy.Events.EventManager;
 import de.voasis.serverHandlerProxy.Helper.DataHolder;
 import de.voasis.serverHandlerProxy.Helper.PingUtil;
+import de.voasis.serverHandlerProxy.Maps.Messages;
 import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import de.voasis.serverHandlerProxy.Permission.PermissionManager;
 import dev.dejvokep.boostedyaml.YamlDocument;
@@ -59,9 +60,9 @@ public class ServerHandlerProxy {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         logStartup();
         registerCommands();
-        createDefaultServer();
         pingUtil = new PingUtil(dataHolder, server, logger, this);
         server.getEventManager().register(this, new EventManager(server, dataHolder, logger, externalServerCreator, permissionManager));
+        createDefaultServer();
         server.getScheduler()
                 .buildTask(this, pingUtil::updateState)
                 .repeat(3L, TimeUnit.SECONDS)
@@ -74,17 +75,9 @@ public class ServerHandlerProxy {
     }
 
     private void logStartup() {
-        String logo = """
-                \n
-                ░██████╗██╗░░██╗██████╗░░░░░░░██╗░░░██╗░░███╗░░
-                ██╔════╝██║░░██║██╔══██╗░░░░░░██║░░░██║░████║░░
-                ╚█████╗░███████║██████╔╝█████╗╚██╗░██╔╝██╔██║░░
-                ░╚═══██╗██╔══██║██╔═══╝░╚════╝░╚████╔╝░╚═╝██║░░
-                ██████╔╝██║░░██║██║░░░░░░░░░░░░░╚██╔╝░░███████╗
-                ╚═════╝░╚═╝░░╚═╝╚═╝░░░░░░░░░░░░░░╚═╝░░░╚══════╝
-                """;
-        logger.info(logo);
+        logger.info(Messages.logo);
         logger.info("ServerHandlerProxy started");
+        logger.info("Default-Server: " + dataHolder.defaultServer);
         logger.info("External Servers:");
         for (ServerInfo s : dataHolder.serverInfoMap) {
             logger.info(s.getServerName());

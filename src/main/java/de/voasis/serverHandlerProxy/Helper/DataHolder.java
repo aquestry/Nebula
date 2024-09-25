@@ -10,7 +10,6 @@ import java.util.*;
 
 
 public class DataHolder {
-
     public String defaultServer = null;
     public RegisteredServer defaultRegisteredServer = null;
     public List<ServerInfo> serverInfoMap = new ArrayList<>();
@@ -31,7 +30,6 @@ public class DataHolder {
             serverInfoMap.add(new ServerInfo(name, ip, port, password));
         }
     }
-
     public ServerInfo getServerInfo(String name) {
         for (ServerInfo serverInfo : serverInfoMap) {
             if (serverInfo.getServerName().equals(name)) {

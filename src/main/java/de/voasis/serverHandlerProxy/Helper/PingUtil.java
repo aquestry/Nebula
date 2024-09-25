@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 
 public class PingUtil {
-
     static DataHolder dataHolder;
     static ProxyServer server;
     static Logger logger;
@@ -21,7 +20,6 @@ public class PingUtil {
         PingUtil.logger = logger;
         PingUtil.plugin = plugin;
     }
-
     public void updateState() {
         for(BackendServer backendServer : dataHolder.backendInfoMap) {
             Optional<RegisteredServer> r = server.getServer(backendServer.getServerName());

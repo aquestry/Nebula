@@ -18,14 +18,10 @@ public class ServerInfo {
     public String getIp() {
         return ip;
     }
-
     public String getPort() {
         return port;
     }
     public String getPassword() {
         return password;
     }
-
-
-
 }
