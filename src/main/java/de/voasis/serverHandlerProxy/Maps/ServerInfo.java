@@ -1,10 +1,10 @@
 package de.voasis.serverHandlerProxy.Maps;
 
 public class ServerInfo {
-    private final String serverName;
-    private final String ip;
-    private final String port;
-    private final String password;
+    private String serverName;
+    private String ip;
+    private String port;
+    private String password;
 
     public ServerInfo(String name, String ip, String port, String password) {
         this.serverName = name;
@@ -22,8 +22,10 @@ public class ServerInfo {
     public String getPort() {
         return port;
     }
-
     public String getPassword() {
         return password;
     }
+
+
+
 }

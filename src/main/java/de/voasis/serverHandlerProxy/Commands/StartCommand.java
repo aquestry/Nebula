@@ -3,6 +3,7 @@ package de.voasis.serverHandlerProxy.Commands;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
+import de.voasis.serverHandlerProxy.Maps.Messages;
 import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import de.voasis.serverHandlerProxy.ServerHandlerProxy;
 import net.kyori.adventure.text.Component;
@@ -24,7 +25,7 @@ public class StartCommand implements SimpleCommand {
         String externalServerName = args[0];
         String Name = args[1];
         ServerInfo temp = null;
-        for (ServerInfo i : ServerHandlerProxy.dataHolder.getAllInfos()) {
+        for (ServerInfo i : ServerHandlerProxy.dataHolder.serverInfoMap) {
             if(externalServerName.equals(i.getServerName())) {
                 temp = i;
             }
@@ -34,7 +35,7 @@ public class StartCommand implements SimpleCommand {
             ServerHandlerProxy.externalServerCreator.start(temp, Name);
             source.sendMessage(Component.text("Starting server instance...", NamedTextColor.AQUA));
         } else {
-            source.sendMessage(Component.text("This command can only be executed by the console.", NamedTextColor.RED));
+            source.sendMessage(Component.text(Messages.norights, NamedTextColor.RED));
         }
     }
 

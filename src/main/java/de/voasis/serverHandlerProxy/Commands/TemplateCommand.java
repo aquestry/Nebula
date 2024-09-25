@@ -3,6 +3,7 @@ package de.voasis.serverHandlerProxy.Commands;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
+import de.voasis.serverHandlerProxy.Maps.Messages;
 import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import de.voasis.serverHandlerProxy.ServerHandlerProxy;
 import net.kyori.adventure.text.Component;
@@ -27,7 +28,7 @@ public class TemplateCommand implements SimpleCommand {
         String startCMD = args[3].replace("_", " ");
         String stopCMD = args[4].replace("_", " ");
         ServerInfo temp = null;
-        for (ServerInfo i : ServerHandlerProxy.dataHolder.getAllInfos()) {
+        for (ServerInfo i : ServerHandlerProxy.dataHolder.serverInfoMap) {
             if(externalServerName.equals(i.getServerName())) {
                 temp = i;
             }
@@ -37,7 +38,7 @@ public class TemplateCommand implements SimpleCommand {
             source.sendMessage(Component.text("Creating server instance from template...", NamedTextColor.AQUA));
 
         } else {
-            source.sendMessage(Component.text("This command can only be executed by the console.", NamedTextColor.RED));
+            source.sendMessage(Component.text(Messages.norights, NamedTextColor.RED));
         }
     }
 

@@ -2,6 +2,7 @@ package de.voasis.serverHandlerProxy;
 
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import de.voasis.serverHandlerProxy.Maps.BackendServer;
 import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import org.slf4j.Logger;
@@ -9,10 +10,19 @@ import java.util.*;
 
 
 public class DataHolder {
+
+
+
+
     public String defaultServer = null;
     public RegisteredServer defaultRegisteredServer = null;
     public List<ServerInfo> serverInfoMap = new ArrayList<>();
+    public List<BackendServer> backendInfoMap = new ArrayList<>();
     public List<String> admins = new ArrayList<>();
+
+
+
+
     public void Refresh(YamlDocument config, ProxyServer server, Logger logger) {
         defaultServer = config.getString("default-server");
         serverInfoMap.clear();
@@ -37,15 +47,20 @@ public class DataHolder {
         return null;
     }
 
-    public List<String> getServerNames() {
-        List<String> serverNames = new ArrayList<>();
-        for (ServerInfo serverInfo : serverInfoMap) {
-            serverNames.add(serverInfo.getServerName());
+    public BackendServer getBackendServer(String name) {
+        for (BackendServer server : backendInfoMap) {
+            if (server.getServerName().equals(name)) {
+                return server;
+            }
         }
-        return serverNames;
+        return null;
     }
-
-    public List<ServerInfo> getAllInfos() {
-        return new ArrayList<>(serverInfoMap);
+    public boolean getState(String backendServer) {
+        for (BackendServer server : backendInfoMap) {
+            if (server.getServerName().equals(backendServer)) {
+                return server.getState();
+            }
+        }
+        return false;
     }
 }

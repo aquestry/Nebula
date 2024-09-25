@@ -2,38 +2,40 @@ package de.voasis.serverHandlerProxy.Commands;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
-import java.util.concurrent.CompletableFuture;
-import java.util.List;
-
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
+import de.voasis.serverHandlerProxy.Maps.Messages;
 import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import de.voasis.serverHandlerProxy.ServerHandlerProxy;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-public class CreateCommand implements SimpleCommand {
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+public class StopCommand implements SimpleCommand {
     @Override
     public void execute(final Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
-        if (args.length != 4) {
-            source.sendMessage(Component.text("Usage: /create <externalServerName> <newName> <startCMD> <stopCMD>", NamedTextColor.RED));
+
+        if (args.length < 2) {
+            source.sendMessage(Component.text("Usage: /stop <externalServerName> <InstanceName>", NamedTextColor.RED));
             return;
         }
         String externalServerName = args[0];
-        String newName = args[1];
-        String startCMD = args[2].replace("_", " ");
-        String stopCMD = args[3].replace("_", " ");
+        String Name = args[1];
         ServerInfo temp = null;
-        for (ServerInfo i : ServerHandlerProxy.dataHolder.getAllInfos()) {
+        for (ServerInfo i : ServerHandlerProxy.dataHolder.serverInfoMap) {
             if(externalServerName.equals(i.getServerName())) {
                 temp = i;
             }
         }
+
         if (source instanceof ConsoleCommandSource && temp != null || hasPermission(invocation)) {
-            ServerHandlerProxy.externalServerCreator.create(temp, newName, startCMD, stopCMD);
-            source.sendMessage(Component.text("Creating server instance...", NamedTextColor.AQUA));
+            ServerHandlerProxy.externalServerCreator.stop(temp, Name);
+            source.sendMessage(Component.text("Stopping server instance...", NamedTextColor.AQUA));
         } else {
-            source.sendMessage(Component.text("This command can only be executed by the console.", NamedTextColor.RED));
+            source.sendMessage(Component.text(Messages.norights, NamedTextColor.RED));
         }
     }
 
