@@ -17,6 +17,7 @@ import de.voasis.serverHandlerProxy.Maps.BackendServer;
 import de.voasis.serverHandlerProxy.Maps.Messages;
 import de.voasis.serverHandlerProxy.Permission.PermissionManager;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
 
 public class EventManager {
@@ -76,6 +77,7 @@ public class EventManager {
         RegisteredServer target = event.getOriginalServer();
         if(!dataHolder.getState(target.getServerInfo().getName())) {
             event.setResult(ServerPreConnectEvent.ServerResult.denied());
+            player.sendMessage(Component.text(Messages.offline, NamedTextColor.GOLD));
         }
     }
     @Subscribe

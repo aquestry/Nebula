@@ -51,8 +51,7 @@ public class PermissionManager implements PermissionProvider {
             if (subject instanceof Player) {
                 return Tristate.fromBoolean(hasPermission((Player) subject, permission));
             } else {
-                // For console or other non-player subjects, return true or false based on your needs
-                return Tristate.fromBoolean(true); // You can change this to false if you want to restrict access
+                return Tristate.fromBoolean(true);
             }
         };
     }
