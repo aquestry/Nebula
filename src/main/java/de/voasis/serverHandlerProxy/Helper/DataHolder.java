@@ -1,4 +1,4 @@
-package de.voasis.serverHandlerProxy;
+package de.voasis.serverHandlerProxy.Helper;
 
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
@@ -11,17 +11,11 @@ import java.util.*;
 
 public class DataHolder {
 
-
-
-
     public String defaultServer = null;
     public RegisteredServer defaultRegisteredServer = null;
     public List<ServerInfo> serverInfoMap = new ArrayList<>();
     public List<BackendServer> backendInfoMap = new ArrayList<>();
     public List<String> admins = new ArrayList<>();
-
-
-
 
     public void Refresh(YamlDocument config, ProxyServer server, Logger logger) {
         defaultServer = config.getString("default-server");
@@ -46,7 +40,6 @@ public class DataHolder {
         }
         return null;
     }
-
     public BackendServer getBackendServer(String name) {
         for (BackendServer server : backendInfoMap) {
             if (server.getServerName().equals(name)) {

@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import de.voasis.serverHandlerProxy.Helper.DataHolder;
 import de.voasis.serverHandlerProxy.Maps.BackendServer;
 import de.voasis.serverHandlerProxy.Maps.Messages;
 import de.voasis.serverHandlerProxy.Maps.ServerInfo;
