@@ -27,12 +27,10 @@ public class ExternalServerCreator {
         this.server = proxyServer;
         this.dataHolder = dataHolder;
     }
-
     public void createFromTemplate(ServerInfo externalServer, String templateName, String newName, String startCMD, String stopCMD) {
         try {
             String urlString = "http://" + externalServer.getIp() + ":" + externalServer.getPort() + "/create";
             URL url = new URL(urlString);
-
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
@@ -53,19 +51,46 @@ public class ExternalServerCreator {
             }
 
             int responseCode = connection.getResponseCode();
+            logger.info("Response code: " + responseCode + ", Response message: " + connection.getResponseMessage());
+
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 logger.info("Instance created successfully from template.");
-                int tempPort = Integer.parseInt(startCMD.split("-p")[1].trim());
+
+                int tempPort;
+                try {
+                    String[] splitCmd = startCMD.split("-p");
+                    if (splitCmd.length > 1) {
+                        tempPort = Integer.parseInt(splitCmd[1].trim());
+                    } else {
+                        logger.error("Failed to extract port from startCMD: " + startCMD);
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    logger.error("Invalid port number in startCMD: " + startCMD, e);
+                    return;
+                }
+
+                // Register the new server in Velocity
                 com.velocitypowered.api.proxy.server.ServerInfo newInfo = new com.velocitypowered.api.proxy.server.ServerInfo(
                         newName, new InetSocketAddress(externalServer.getIp(), tempPort));
                 server.registerServer(newInfo);
-                dataHolder.backendInfoMap.add(new BackendServer(newName, externalServer.getServerName(), tempPort, false));
+
+                Optional<RegisteredServer> registeredServer = server.getServer(newName);
+                if (registeredServer.isPresent()) {
+                    logger.info("Server successfully registered: " + newName + " at port " + tempPort);
+                    dataHolder.backendInfoMap.add(new BackendServer(newName, externalServer.getServerName(), tempPort, false));
+                } else {
+                    logger.error("Failed to register the server: " + newName);
+                }
             } else {
-                logger.info("Failed to create instance from template. Response Code: " + responseCode);
+                logger.error("Failed to create instance from template. Response Code: " + responseCode);
             }
 
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            logger.error("Exception occurred while creating instance from template", e);
+        }
     }
+
     public void start(ServerInfo externalServer, String servername) {
         try {
             String urlString = "http://" + externalServer.getIp() + ":" + externalServer.getPort() + "/start/" + servername;

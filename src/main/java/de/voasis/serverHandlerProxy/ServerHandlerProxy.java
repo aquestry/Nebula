@@ -82,7 +82,7 @@ public class ServerHandlerProxy {
 
     private void registerCommands() {
         CommandManager commandManager = server.getCommandManager();
-        commandManager.register("admin", new AdminCommand());
+        commandManager.register("admin", new AdminCommand(logger));
         logger.info("Commands registered.");
     }
 

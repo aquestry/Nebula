@@ -57,7 +57,6 @@ public class EventManager {
     public void onChooseServer(PlayerChooseInitialServerEvent event) {
         Player player = event.getPlayer();
         RegisteredServer defaultServer = dataHolder.defaultRegisteredServer;
-        logger.info("Choose Server Event for player: " + player.getUsername());
         if (defaultServer != null) {
             BackendServer info = dataHolder.getBackendServer(defaultServer.getServerInfo().getName());
             if(info != null) {
