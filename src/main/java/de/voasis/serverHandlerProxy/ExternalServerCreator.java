@@ -64,10 +64,7 @@ public class ExternalServerCreator {
                 logger.info("Failed to create instance from template. Response Code: " + responseCode);
             }
 
-        } catch (Exception e) {
-            logger.info("Error while creating the instance from template.");
-            e.printStackTrace();
-        }
+        } catch (Exception ignored) {}
     }
     public void start(ServerInfo externalServer, String servername) {
         try {
@@ -94,10 +91,7 @@ public class ExternalServerCreator {
                 logger.info("Failed to start instance. Response Code: " + responseCode);
             }
 
-        } catch (Exception e) {
-            logger.info("Error while starting the instance.");
-            e.printStackTrace();
-        }
+        } catch (Exception ignored) {}
     }
     public void delete(ServerInfo externalServer, String servername) {
         disconnectAll(servername, Messages.deleted);
@@ -138,10 +132,7 @@ public class ExternalServerCreator {
                 logger.info("Failed to delete instance. Response Code: " + responseCode);
             }
 
-        } catch (Exception e) {
-            logger.info("Error while deleting the instance.");
-            e.printStackTrace();
-        }
+        } catch (Exception ignored) {}
     }
     public void stop(ServerInfo externalServer, String servername) {
         disconnectAll(servername, Messages.stopped);
@@ -168,10 +159,7 @@ public class ExternalServerCreator {
                 logger.info("Failed to stop instance. Response Code: " + responseCode);
             }
 
-        } catch (Exception e) {
-            logger.info("Error while stopping the instance.");
-            e.printStackTrace();
-        }
+        } catch (Exception ignored) {}
     }
     public void disconnectAll(String backendServer, String reaason) {
         logger.info("Sending all to default server. Server: " + backendServer);

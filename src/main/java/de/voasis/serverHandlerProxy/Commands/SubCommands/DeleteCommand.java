@@ -1,4 +1,4 @@
-package de.voasis.serverHandlerProxy.Commands;
+package de.voasis.serverHandlerProxy.Commands.SubCommands;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
@@ -12,13 +12,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class StartCommand implements SimpleCommand {
+public class DeleteCommand implements SimpleCommand {
     @Override
     public void execute(final Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
-        if (args.length < 2) {
-            source.sendMessage(Component.text("Usage: /start <externalServerName> <InstanceName>", NamedTextColor.RED));
+        if (args.length != 2) {
+            source.sendMessage(Component.text("Usage: /delete <externalServerName> <InstanceName>", NamedTextColor.RED));
             return;
         }
         String externalServerName = args[0];
@@ -30,8 +30,8 @@ public class StartCommand implements SimpleCommand {
             }
         }
         if (source instanceof ConsoleCommandSource && temp != null || hasPermission(invocation)) {
-            ServerHandlerProxy.externalServerCreator.start(temp, Name);
-            source.sendMessage(Component.text("Starting server instance...", NamedTextColor.AQUA));
+            ServerHandlerProxy.externalServerCreator.delete(temp, Name);
+            source.sendMessage(Component.text("Deleting server instance...", NamedTextColor.AQUA));
         } else {
             source.sendMessage(Component.text(Messages.norights, NamedTextColor.RED));
         }

@@ -8,10 +8,7 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
-import de.voasis.serverHandlerProxy.Commands.DeleteCommand;
-import de.voasis.serverHandlerProxy.Commands.StartCommand;
-import de.voasis.serverHandlerProxy.Commands.StopCommand;
-import de.voasis.serverHandlerProxy.Commands.TemplateCommand;
+import de.voasis.serverHandlerProxy.Commands.AdminCommand;
 import de.voasis.serverHandlerProxy.Events.EventManager;
 import de.voasis.serverHandlerProxy.Helper.DataHolder;
 import de.voasis.serverHandlerProxy.Helper.PingUtil;
@@ -25,7 +22,6 @@ import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import org.slf4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -86,10 +82,7 @@ public class ServerHandlerProxy {
 
     private void registerCommands() {
         CommandManager commandManager = server.getCommandManager();
-        commandManager.register("template", new TemplateCommand());
-        commandManager.register("start", new StartCommand());
-        commandManager.register("delete", new DeleteCommand());
-        commandManager.register("stopserver", new StopCommand());
+        commandManager.register("admin", new AdminCommand());
         logger.info("Commands registered.");
     }
 

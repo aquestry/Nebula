@@ -1,4 +1,4 @@
-package de.voasis.serverHandlerProxy.Commands;
+package de.voasis.serverHandlerProxy.Commands.SubCommands;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
@@ -12,17 +12,21 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class DeleteCommand implements SimpleCommand {
+public class TemplateCommand implements SimpleCommand {
     @Override
     public void execute(final Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
-        if (args.length != 2) {
-            source.sendMessage(Component.text("Usage: /delete <externalServerName> <InstanceName>", NamedTextColor.RED));
+
+        if (args.length != 5) {
+            source.sendMessage(Component.text("Usage: /template <externalServerName> <templateName> <newName> <startCMD> <stopCMD>", NamedTextColor.RED));
             return;
         }
         String externalServerName = args[0];
-        String Name = args[1];
+        String templateName = args[1];
+        String newName = args[2];
+        String startCMD = args[3].replace("_", " ");
+        String stopCMD = args[4].replace("_", " ");
         ServerInfo temp = null;
         for (ServerInfo i : ServerHandlerProxy.dataHolder.serverInfoMap) {
             if(externalServerName.equals(i.getServerName())) {
@@ -30,8 +34,9 @@ public class DeleteCommand implements SimpleCommand {
             }
         }
         if (source instanceof ConsoleCommandSource && temp != null || hasPermission(invocation)) {
-            ServerHandlerProxy.externalServerCreator.delete(temp, Name);
-            source.sendMessage(Component.text("Deleting server instance...", NamedTextColor.AQUA));
+            ServerHandlerProxy.externalServerCreator.createFromTemplate(temp,templateName, newName, startCMD, stopCMD);
+            source.sendMessage(Component.text("Creating server instance from template...", NamedTextColor.AQUA));
+
         } else {
             source.sendMessage(Component.text(Messages.norights, NamedTextColor.RED));
         }
