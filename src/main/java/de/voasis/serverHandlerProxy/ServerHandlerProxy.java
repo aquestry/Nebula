@@ -15,6 +15,7 @@ import de.voasis.serverHandlerProxy.Commands.TemplateCommand;
 import de.voasis.serverHandlerProxy.Events.EventManager;
 import de.voasis.serverHandlerProxy.Helper.DataHolder;
 import de.voasis.serverHandlerProxy.Helper.PingUtil;
+import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import de.voasis.serverHandlerProxy.Permission.PermissionManager;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.dvs.versioning.BasicVersioning;
@@ -84,7 +85,10 @@ public class ServerHandlerProxy {
                 """;
         logger.info(logo);
         logger.info("ServerHandlerProxy started");
-        logger.info("External Servers: " + dataHolder.serverInfoMap);
+        logger.info("External Servers:");
+        for (ServerInfo s : dataHolder.serverInfoMap) {
+            logger.info(s.getServerName());
+        }
     }
 
     private void registerCommands() {
