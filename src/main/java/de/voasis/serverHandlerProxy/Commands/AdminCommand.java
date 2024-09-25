@@ -2,6 +2,7 @@ package de.voasis.serverHandlerProxy.Commands;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
+import de.voasis.serverHandlerProxy.Maps.BackendServer;
 import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import de.voasis.serverHandlerProxy.ServerHandlerProxy;
 import net.kyori.adventure.text.Component;
@@ -158,6 +159,10 @@ public class AdminCommand implements SimpleCommand {
         } else if (args.length == 2) {
             return CompletableFuture.completedFuture(ServerHandlerProxy.dataHolder.serverInfoMap.stream()
                     .map(ServerInfo::getServerName)
+                    .toList());
+        } else if (args.length == 3 && (args[0].equals("start") || args[0].equals("stop"))) {
+            return CompletableFuture.completedFuture(ServerHandlerProxy.dataHolder.backendInfoMap.stream()
+                    .map(BackendServer::getServerName)
                     .toList());
         }
 
