@@ -58,10 +58,7 @@ public class ServerHandlerProxy {
         logStartup();
         registerCommands();
         server.getEventManager().register(this, new EventManager(server, dataHolder, logger, externalServerCreator, permissionManager));
-        server.getScheduler()
-                .buildTask(this, this::createDefaultServer)
-                .delay(3L, TimeUnit.SECONDS)
-                .schedule();
+        createDefaultServer();
         server.getScheduler()
                 .buildTask(this, pingUtil::updateState)
                 .repeat(1L, TimeUnit.SECONDS)

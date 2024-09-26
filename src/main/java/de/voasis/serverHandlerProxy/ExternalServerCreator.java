@@ -69,6 +69,7 @@ public class ExternalServerCreator {
                 if (registeredServer.isPresent()) {
                     logger.info("Server successfully registered: " + newName + " at port " + tempPort);
                     dataHolder.backendInfoMap.add(new BackendServer(newName, externalServer.getServerName(), tempPort, false, source));
+                    ServerHandlerProxy.pingUtil.updateFreePort(dataHolder.getServerInfo(externalServer.getServerName()));
                 } else {
                     logger.error("Failed to register the server: " + newName);
                     sendErrorMessage(source, "Failed to register the server: " + newName);
