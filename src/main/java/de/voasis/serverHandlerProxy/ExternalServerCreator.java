@@ -59,8 +59,6 @@ public class ExternalServerCreator {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 sendSuccessMessage(source, "Instance-Template request successfully sent.");
 
-
-
                 com.velocitypowered.api.proxy.server.ServerInfo newInfo = new com.velocitypowered.api.proxy.server.ServerInfo(
                         newName, new InetSocketAddress(externalServer.getIp(), tempPort));
                 server.registerServer(newInfo);
@@ -79,8 +77,8 @@ public class ExternalServerCreator {
                 sendErrorMessage(source, "Failed to create instance from template. Response Code: " + responseCode);
             }
 
-        } catch (Exception e) {
-            logger.error("Exception occurred while creating instance from template", e);
+        } catch (Exception ignored) {
+            logger.error("Exception occurred while creating instance from template");
             sendErrorMessage(source, "Exception occurred while creating instance from template.");
         }
     }
