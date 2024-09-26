@@ -1,8 +1,11 @@
 package de.voasis.serverHandlerProxy.Helper;
 
+import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.serverHandlerProxy.Maps.BackendServer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
 
 import java.util.Optional;
@@ -33,6 +36,10 @@ public class PingUtil {
                     if (!backendServer.getState()) {
                         backendServer.setState(true);
                         logger.info("Server: " + backendServer.getServerName() + ", is now online.");
+                        CommandSource creator = backendServer.getCreator();
+                        if(creator != null) {
+                            creator.sendMessage(Component.text("Server: " + backendServer.getServerName() + ", is now online.", NamedTextColor.GREEN));
+                        }
                     }
                 }
             }

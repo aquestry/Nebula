@@ -81,7 +81,7 @@ public class ExternalServerCreator {
                 Optional<RegisteredServer> registeredServer = server.getServer(newName);
                 if (registeredServer.isPresent()) {
                     logger.info("Server successfully registered: " + newName + " at port " + tempPort);
-                    dataHolder.backendInfoMap.add(new BackendServer(newName, externalServer.getServerName(), tempPort, false));
+                    dataHolder.backendInfoMap.add(new BackendServer(newName, externalServer.getServerName(), tempPort, false, source));
                 } else {
                     logger.error("Failed to register the server: " + newName);
                     sendErrorMessage(source, "Failed to register the server: " + newName);
@@ -118,7 +118,7 @@ public class ExternalServerCreator {
 
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                sendSuccessMessage(source, "Instance successfully started.");
+                sendSuccessMessage(source, "Instance start request successfully sent.");
             } else {
                 logger.error("Failed to start instance. Response Code: " + responseCode);
                 sendErrorMessage(source, "Failed to start instance. Response Code: " + responseCode);
