@@ -26,7 +26,6 @@ public class EventManager {
     DataHolder dataHolder;
     PermissionManager permissionManager;
     ExternalServerCreator externalServerCreator;
-
     public EventManager(ProxyServer server, DataHolder dataHolder, Logger logger, ExternalServerCreator externalServerCreator, PermissionManager permissionManager) {
         this.logger = logger;
         this.dataHolder = dataHolder;
@@ -34,7 +33,6 @@ public class EventManager {
         this.permissionManager = permissionManager;
         this.externalServerCreator = externalServerCreator;
     }
-
     @Subscribe
     public void onServerRegistered(ServerRegisteredEvent event) {
         RegisteredServer reg = event.registeredServer();
@@ -93,13 +91,12 @@ public class EventManager {
         }
         logger.info("Player is admin: " + player.hasPermission("velocity.admin"));
     }
-
     private void startDefaultServer() {
         logger.info("Starting Default-Server...");
-        externalServerCreator.start(dataHolder.serverInfoMap.getFirst(), dataHolder.defaultServer);
+        externalServerCreator.start(dataHolder.serverInfoMap.getFirst(), dataHolder.defaultServer, null);
     }
     private void deleteDefaultServer() {
         logger.info("Deleting Default-Server...");
-        externalServerCreator.delete(dataHolder.serverInfoMap.getFirst(), dataHolder.defaultServer);
+        externalServerCreator.delete(dataHolder.serverInfoMap.getFirst(), dataHolder.defaultServer, null);
     }
 }

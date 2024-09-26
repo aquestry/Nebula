@@ -93,7 +93,8 @@ public class ServerHandlerProxy {
                 dataHolder.defaultServer,
                 dataHolder.defaultServer,
                 "java -jar server.jar -p 25568",
-                "stop"
+                "stop",
+                null
         );
     }
     public void loadConfig(Path dataDirectory) {
