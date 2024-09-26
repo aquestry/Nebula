@@ -5,12 +5,14 @@ public class ServerInfo {
     private String ip;
     private String port;
     private String password;
+    private String freePort;
 
-    public ServerInfo(String name, String ip, String port, String password) {
+    public ServerInfo(String name, String ip, String port, String password, String freePort) {
         this.serverName = name;
         this.ip = ip;
         this.port = port;
         this.password = password;
+        this.freePort = freePort;
     }
     public String getServerName() {
         return serverName;
@@ -23,5 +25,11 @@ public class ServerInfo {
     }
     public String getPassword() {
         return password;
+    }
+    public String getFreePort() {
+        return password;
+    }
+    public void setFreePort(String freePort) {
+        this.freePort = freePort;
     }
 }

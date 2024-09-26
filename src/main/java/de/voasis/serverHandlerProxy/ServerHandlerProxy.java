@@ -41,7 +41,7 @@ public class ServerHandlerProxy {
     public static DataHolder dataHolder;
     public static ExternalServerCreator externalServerCreator;
     public PermissionManager permissionManager;
-    public PingUtil pingUtil;
+    public static PingUtil pingUtil;
 
     @Inject
     public ServerHandlerProxy(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
@@ -55,7 +55,7 @@ public class ServerHandlerProxy {
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         logStartup();
-        registerCommands(); 
+        registerCommands();
         pingUtil = new PingUtil(dataHolder, server, logger, this);
         server.getEventManager().register(this, new EventManager(server, dataHolder, logger, externalServerCreator, permissionManager));
         createDefaultServer();
@@ -92,7 +92,7 @@ public class ServerHandlerProxy {
                 dataHolder.serverInfoMap.getFirst(),
                 dataHolder.defaultServer,
                 dataHolder.defaultServer,
-                "java -jar server.jar -p 25568",
+                "java -jar server.jar -p " + dataHolder.getServerInfo(dataHolder.defaultServer).getFreePort(),
                 "stop",
                 null
         );

@@ -4,6 +4,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.serverHandlerProxy.Maps.BackendServer;
 import de.voasis.serverHandlerProxy.Maps.ServerInfo;
+import de.voasis.serverHandlerProxy.ServerHandlerProxy;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import org.slf4j.Logger;
 import java.util.*;
@@ -27,7 +28,9 @@ public class DataHolder {
             String ip = config.getString("manager-servers." + name + ".ip");
             String port = config.getString("manager-servers." + name + ".port");
             String password = config.getString("manager-servers." + name + ".password");
-            serverInfoMap.add(new ServerInfo(name, ip, port, password));
+            ServerInfo serverInfo = new ServerInfo(name, ip, port, password, null);
+            ServerHandlerProxy.pingUtil.updateFreePort(serverInfo);
+            serverInfoMap.add(serverInfo);
         }
     }
     public ServerInfo getServerInfo(String name) {
