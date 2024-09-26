@@ -74,8 +74,8 @@ public class AdminCommand implements SimpleCommand {
         ServerInfo temp = findServerInfo(externalServerName);
 
         if (temp != null) {
-            ServerHandlerProxy.externalServerCreator.start(temp, instanceName, source);
             source.sendMessage(Component.text("Starting server instance...", NamedTextColor.AQUA));
+            ServerHandlerProxy.externalServerCreator.start(temp, instanceName, source);
         } else {
             source.sendMessage(Component.text("Server not found.", NamedTextColor.RED));
         }
@@ -87,8 +87,8 @@ public class AdminCommand implements SimpleCommand {
         ServerInfo temp = findServerInfo(externalServerName);
 
         if (temp != null) {
-            ServerHandlerProxy.externalServerCreator.stop(temp, instanceName, source);
             source.sendMessage(Component.text("Stopping server instance...", NamedTextColor.AQUA));
+            ServerHandlerProxy.externalServerCreator.stop(temp, instanceName, source);
         } else {
             source.sendMessage(Component.text("Server not found.", NamedTextColor.RED));
         }
@@ -100,8 +100,8 @@ public class AdminCommand implements SimpleCommand {
         ServerInfo temp = findServerInfo(externalServerName);
 
         if (temp != null) {
-            ServerHandlerProxy.externalServerCreator.delete(temp, instanceName, source);
             source.sendMessage(Component.text("Deleting server instance...", NamedTextColor.AQUA));
+            ServerHandlerProxy.externalServerCreator.delete(temp, instanceName, source);
         } else {
             source.sendMessage(Component.text("Server not found.", NamedTextColor.RED));
         }
@@ -121,8 +121,8 @@ public class AdminCommand implements SimpleCommand {
                 source.sendMessage(Component.text("Invalid or missing port in startCMD: " + startCMD, NamedTextColor.RED));
                 return;
             }
-            ServerHandlerProxy.externalServerCreator.createFromTemplate(temp, templateName, newName, startCMD, stopCMD, source);
             source.sendMessage(Component.text("Creating server instance from template...", NamedTextColor.AQUA));
+            ServerHandlerProxy.externalServerCreator.createFromTemplate(temp, templateName, newName, startCMD, stopCMD, source);
         } else {
             source.sendMessage(Component.text("Server not found.", NamedTextColor.RED));
         }
@@ -211,11 +211,9 @@ public class AdminCommand implements SimpleCommand {
                 result.add(arg);
             }
         }
-
         if (inQuotes) {
             result.add(currentArg.toString());
         }
-
         return result.toArray(new String[0]);
     }
 }

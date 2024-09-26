@@ -76,6 +76,10 @@ public class EventManager {
             event.setResult(ServerPreConnectEvent.ServerResult.denied());
             player.sendMessage(Component.text(Messages.offline, NamedTextColor.GOLD));
         }
+        if(player.getCurrentServer().equals(target)) {
+            event.setResult(ServerPreConnectEvent.ServerResult.denied());
+            player.sendMessage(Component.text(Messages.already, NamedTextColor.GOLD));
+        }
     }
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {deleteDefaultServer();}
