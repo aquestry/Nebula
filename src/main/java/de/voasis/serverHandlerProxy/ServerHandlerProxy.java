@@ -46,8 +46,9 @@ public class ServerHandlerProxy {
     @Inject
     public ServerHandlerProxy(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         dataHolder = new DataHolder();
-        externalServerCreator = new ExternalServerCreator(logger, server, dataHolder);
         loadConfig(dataDirectory);
+        externalServerCreator = new ExternalServerCreator(logger, server, dataHolder);
+        pingUtil = new PingUtil(dataHolder, server, logger, this);
         dataHolder.Refresh(config, server, logger);
         permissionManager  = new PermissionManager();
     }
@@ -56,9 +57,11 @@ public class ServerHandlerProxy {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         logStartup();
         registerCommands();
-        pingUtil = new PingUtil(dataHolder, server, logger, this);
         server.getEventManager().register(this, new EventManager(server, dataHolder, logger, externalServerCreator, permissionManager));
-        createDefaultServer();
+        server.getScheduler()
+                .buildTask(this, this::createDefaultServer)
+                .delay(3L, TimeUnit.SECONDS)
+                .schedule();
         server.getScheduler()
                 .buildTask(this, pingUtil::updateState)
                 .repeat(1L, TimeUnit.SECONDS)

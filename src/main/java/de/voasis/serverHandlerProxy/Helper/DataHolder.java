@@ -29,8 +29,8 @@ public class DataHolder {
             String port = config.getString("manager-servers." + name + ".port");
             String password = config.getString("manager-servers." + name + ".password");
             ServerInfo serverInfo = new ServerInfo(name, ip, port, password, null);
-            ServerHandlerProxy.pingUtil.updateFreePort(serverInfo);
             serverInfoMap.add(serverInfo);
+            ServerHandlerProxy.pingUtil.updateFreePort(serverInfo);
         }
     }
     public ServerInfo getServerInfo(String name) {
