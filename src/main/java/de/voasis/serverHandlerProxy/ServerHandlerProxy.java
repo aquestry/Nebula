@@ -93,7 +93,7 @@ public class ServerHandlerProxy {
             logger.error("ServerInfo for default server not found: " + dataHolder.defaultServer);
             return;
         }
-        String startCommand = "java -jar server.jar -p " + serverInfo.getFreePort();
+        String startCommand = "java -jar server.jar";
         externalServerCreator.createFromTemplate(
                 serverInfo,
                 dataHolder.defaultServer,
