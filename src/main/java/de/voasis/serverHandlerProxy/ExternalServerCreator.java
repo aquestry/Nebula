@@ -40,11 +40,11 @@ public class ExternalServerCreator {
             connection.setRequestProperty("Content-Type", "application/json; utf-8");
             connection.setRequestProperty("Accept", "application/json");
             connection.setDoOutput(true);
-
+            int tempPort = dataHolder.getServerInfo(externalServer.getServerName()).getFreePort();
             JsonObject jsonRequest = new JsonObject();
             jsonRequest.addProperty("template", templateName);
             jsonRequest.addProperty("name", newName);
-            jsonRequest.addProperty("start_cmd", startCMD);
+            jsonRequest.addProperty("start_cmd", startCMD + " -p " + tempPort);
             jsonRequest.addProperty("stop_cmd", stopCMD);
             jsonRequest.addProperty("password", externalServer.getPassword().trim());
 
@@ -58,7 +58,7 @@ public class ExternalServerCreator {
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 sendSuccessMessage(source, "Instance-Template request successfully sent.");
-                int tempPort = dataHolder.getServerInfo(externalServer.getServerName()).getFreePort();
+
 
 
                 com.velocitypowered.api.proxy.server.ServerInfo newInfo = new com.velocitypowered.api.proxy.server.ServerInfo(
