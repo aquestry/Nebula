@@ -55,7 +55,7 @@ public class ServerHandlerProxy {
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         logStartup();
-        registerCommands();
+        registerCommands(); 
         pingUtil = new PingUtil(dataHolder, server, logger, this);
         server.getEventManager().register(this, new EventManager(server, dataHolder, logger, externalServerCreator, permissionManager));
         createDefaultServer();
