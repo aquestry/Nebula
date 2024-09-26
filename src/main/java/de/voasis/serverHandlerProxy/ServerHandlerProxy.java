@@ -61,7 +61,7 @@ public class ServerHandlerProxy {
         createDefaultServer();
         server.getScheduler()
                 .buildTask(this, pingUtil::updateState)
-                .repeat(3L, TimeUnit.SECONDS)
+                .repeat(1L, TimeUnit.SECONDS)
                 .schedule();
     }
 
