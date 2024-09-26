@@ -26,8 +26,8 @@ public class ServerInfo {
     public String getPassword() {
         return password;
     }
-    public String getFreePort() {
-        return password;
+    public int getFreePort() {
+        return freePort;
     }
     public void setFreePort(int freePort) {
         this.freePort = freePort;

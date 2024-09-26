@@ -58,21 +58,8 @@ public class ExternalServerCreator {
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 sendSuccessMessage(source, "Instance-Template request successfully sent.");
-                int tempPort;
-                try {
-                    String[] splitCmd = startCMD.split("-p");
-                    if (splitCmd.length > 1) {
-                        tempPort = Integer.parseInt(splitCmd[1].trim());
-                    } else {
-                        logger.error("Failed to extract port from startCMD: " + startCMD);
-                        sendErrorMessage(source, "Failed to extract port from startCMD.");
-                        return;
-                    }
-                } catch (NumberFormatException e) {
-                    logger.error("Invalid port number in startCMD: " + startCMD, e);
-                    sendErrorMessage(source, "Invalid port number in startCMD.");
-                    return;
-                }
+                int tempPort = dataHolder.getServerInfo(externalServer.getServerName()).getFreePort();
+
 
                 com.velocitypowered.api.proxy.server.ServerInfo newInfo = new com.velocitypowered.api.proxy.server.ServerInfo(
                         newName, new InetSocketAddress(externalServer.getIp(), tempPort));
