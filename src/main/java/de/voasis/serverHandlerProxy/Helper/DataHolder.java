@@ -35,8 +35,6 @@ public class DataHolder {
             int port = config.getInt("manager-servers." + name + ".port");
             String password = config.getString("manager-servers." + name + ".password");
 
-            logger.info("Processing server: " + name + " (IP: " + ip + ", Port: " + port + ")");
-
             ServerInfo serverInfo = new ServerInfo(name, ip, port, password, 25568);
             serverInfoMap.add(serverInfo);
 

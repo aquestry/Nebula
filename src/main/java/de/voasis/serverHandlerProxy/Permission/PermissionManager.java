@@ -6,7 +6,6 @@ import com.velocitypowered.api.permission.Tristate;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.permission.PermissionProvider;
 import com.velocitypowered.api.permission.PermissionSubject;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -41,8 +40,7 @@ public class PermissionManager implements PermissionProvider {
         if (subject instanceof Player) {
             return hasPermission((Player) subject, permission);
         }
-        // Console or other non-player subjects can be granted permissions here
-        return subject.getPermissionValue(permission).asBoolean(); // Allow console access
+        return subject.getPermissionValue(permission).asBoolean();
     }
 
     @Subscribe

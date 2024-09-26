@@ -8,12 +8,9 @@ import de.voasis.serverHandlerProxy.ServerHandlerProxy;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class AdminCommand implements SimpleCommand {
 
@@ -114,13 +111,7 @@ public class AdminCommand implements SimpleCommand {
         String startCMD = args[4];
         String stopCMD = args[5];
         ServerInfo temp = findServerInfo(externalServerName);
-
         if (temp != null) {
-            int tempPort = extractPortFromStartCmd(startCMD);
-            if (tempPort == -1) {
-                source.sendMessage(Component.text("Invalid or missing port in startCMD: " + startCMD, NamedTextColor.RED));
-                return;
-            }
             source.sendMessage(Component.text("Creating server instance from template...", NamedTextColor.AQUA));
             ServerHandlerProxy.externalServerCreator.createFromTemplate(temp, templateName, newName, startCMD, stopCMD, source);
         } else {
@@ -135,19 +126,6 @@ public class AdminCommand implements SimpleCommand {
             }
         }
         return null;
-    }
-
-    private int extractPortFromStartCmd(String startCMD) {
-        Pattern pattern = Pattern.compile("-p\\s+(\\d+)");
-        Matcher matcher = pattern.matcher(startCMD);
-        if (matcher.find()) {
-            try {
-                return Integer.parseInt(matcher.group(1));
-            } catch (NumberFormatException e) {
-                logger.error("Error parsing port number: " + matcher.group(1), e);
-            }
-        }
-        return -1;
     }
 
     @Override
