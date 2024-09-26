@@ -3,11 +3,11 @@ package de.voasis.serverHandlerProxy.Maps;
 public class ServerInfo {
     private String serverName;
     private String ip;
-    private String port;
+    private int port;
     private String password;
-    private String freePort;
+    private int freePort;
 
-    public ServerInfo(String name, String ip, String port, String password, String freePort) {
+    public ServerInfo(String name, String ip, int port, String password, int freePort) {
         this.serverName = name;
         this.ip = ip;
         this.port = port;
@@ -20,7 +20,7 @@ public class ServerInfo {
     public String getIp() {
         return ip;
     }
-    public String getPort() {
+    public int getPort() {
         return port;
     }
     public String getPassword() {
@@ -29,7 +29,7 @@ public class ServerInfo {
     public String getFreePort() {
         return password;
     }
-    public void setFreePort(String freePort) {
+    public void setFreePort(int freePort) {
         this.freePort = freePort;
     }
 }

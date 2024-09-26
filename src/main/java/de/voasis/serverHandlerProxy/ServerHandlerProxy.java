@@ -91,15 +91,22 @@ public class ServerHandlerProxy {
 
     private void createDefaultServer() {
         logger.info("Creating Default-Server");
+        ServerInfo serverInfo = dataHolder.serverInfoMap.getFirst();
+        if (serverInfo == null) {
+            logger.error("ServerInfo for default server not found: " + dataHolder.defaultServer);
+            return;
+        }
+        String startCommand = "java -jar server.jar -p " + serverInfo.getFreePort();
         externalServerCreator.createFromTemplate(
-                dataHolder.serverInfoMap.getFirst(),
+                serverInfo,
                 dataHolder.defaultServer,
                 dataHolder.defaultServer,
-                "java -jar server.jar -p " + dataHolder.getServerInfo(dataHolder.defaultServer).getFreePort(),
+                startCommand,
                 "stop",
                 null
         );
     }
+
     public void loadConfig(Path dataDirectory) {
         try {
             config = YamlDocument.create(

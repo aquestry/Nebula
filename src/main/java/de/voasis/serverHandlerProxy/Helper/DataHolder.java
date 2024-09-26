@@ -7,10 +7,13 @@ import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import de.voasis.serverHandlerProxy.ServerHandlerProxy;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 
 public class DataHolder {
+    private static final Logger log = LoggerFactory.getLogger(DataHolder.class);
     public String defaultServer = null;
     public RegisteredServer defaultRegisteredServer = null;
     public List<ServerInfo> serverInfoMap = new ArrayList<>();
@@ -23,16 +26,25 @@ public class DataHolder {
         admins.clear();
         admins = List.of(config.getString("admins").split(","));
         Set<Object> managerServerKeys = config.getSection("manager-servers").getKeys();
+
+        logger.info("Loading servers from config...");
+
         for (Object serverName : managerServerKeys) {
             String name = (String) serverName;
             String ip = config.getString("manager-servers." + name + ".ip");
-            String port = config.getString("manager-servers." + name + ".port");
+            int port = config.getInt("manager-servers." + name + ".port");
             String password = config.getString("manager-servers." + name + ".password");
-            ServerInfo serverInfo = new ServerInfo(name, ip, port, password, null);
+
+            logger.info("Processing server: " + name + " (IP: " + ip + ", Port: " + port + ")");
+
+            ServerInfo serverInfo = new ServerInfo(name, ip, port, password, 25568);
             serverInfoMap.add(serverInfo);
+
+            log.info("Added Server to pool: " + name);
             ServerHandlerProxy.pingUtil.updateFreePort(serverInfo);
         }
     }
+
     public ServerInfo getServerInfo(String name) {
         for (ServerInfo serverInfo : serverInfoMap) {
             if (serverInfo.getServerName().equals(name)) {

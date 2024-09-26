@@ -132,7 +132,7 @@ public class PingUtil {
 
     private void answerFreePort(ServerInfo externalServer, int freePort) {
         if (freePort != -1) {
-            externalServer.setFreePort(String.valueOf(freePort));
+            externalServer.setFreePort(freePort);
         } else {
             logger.error("Failed to receive free port from external server.");
         }
