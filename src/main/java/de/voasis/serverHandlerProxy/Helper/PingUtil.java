@@ -61,7 +61,11 @@ public class PingUtil {
                 if (registeredServer.getServerInfo().getName().equals(backendServer.getServerName())) {
                     if (backendServer.getState()) {
                         backendServer.setState(false);
+                        CommandSource creator = backendServer.getCreator();
                         logger.info("Server: " + backendServer.getServerName() + ", is now offline.");
+                        if(creator != null) {
+                            creator.sendMessage(Component.text("Server: " + backendServer.getServerName() + ", is now offline.", NamedTextColor.GREEN));
+                        }
                     }
                 }
             }
