@@ -30,7 +30,7 @@ public class ExternalServerCreator {
         this.dataHolder = dataHolder;
     }
 
-    public void createFromTemplate(ServerInfo externalServer, String templateName, String newName, String startCMD, String stopCMD, CommandSource source) {
+    public void createFromTemplate(ServerInfo externalServer, String templateName, String newName, CommandSource source) {
         try {
             String urlString = "http://" + externalServer.getIp() + ":" + externalServer.getPort() + "/create";
             URL url = new URL(urlString);
@@ -44,8 +44,8 @@ public class ExternalServerCreator {
             JsonObject jsonRequest = new JsonObject();
             jsonRequest.addProperty("template", templateName);
             jsonRequest.addProperty("name", newName);
-            jsonRequest.addProperty("start_cmd", startCMD + " -p " + tempPort);
-            jsonRequest.addProperty("stop_cmd", stopCMD);
+            jsonRequest.addProperty("start_cmd", "java -jar server.jar -p " + tempPort);
+            jsonRequest.addProperty("stop_cmd", "%kill%");
             jsonRequest.addProperty("password", externalServer.getPassword().trim());
 
             try (OutputStream os = connection.getOutputStream()) {
@@ -119,7 +119,7 @@ public class ExternalServerCreator {
     public void stop(ServerInfo externalServer, String servername, CommandSource source) {
         disconnectAll(servername, Messages.stopped);
         try {
-            String urlString = "http://" + externalServer.getIp() + ":" + externalServer.getPort() + "/kill/" + servername;
+            String urlString = "http://" + externalServer.getIp() + ":" + externalServer.getPort() + "/stop/" + servername;
             URL url = new URL(urlString);
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();

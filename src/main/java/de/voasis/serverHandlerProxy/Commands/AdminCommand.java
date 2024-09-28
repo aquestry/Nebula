@@ -54,8 +54,8 @@ public class AdminCommand implements SimpleCommand {
                 handleDeleteCommand(source, args);
                 break;
             case "template":
-                if (args.length < 6) {
-                    source.sendMessage(Component.text("Usage: /admin template <externalServerName> <templateName> <newName> \"<startCMD>\" \"<stopCMD>\"", NamedTextColor.GOLD));
+                if (args.length < 4) {
+                    source.sendMessage(Component.text("Usage: /admin template <externalServerName> <templateName> <newName>", NamedTextColor.GOLD));
                     return;
                 }
                 handleTemplateCommand(source, args);
@@ -70,11 +70,11 @@ public class AdminCommand implements SimpleCommand {
         String instanceName = args[2];
         ServerInfo temp = findServerInfo(externalServerName);
 
-        if (temp != null) {
+        if (temp != null && ServerHandlerProxy.dataHolder.getBackendServer(instanceName) != null) {
             source.sendMessage(Component.text("Starting server instance...", NamedTextColor.AQUA));
             ServerHandlerProxy.externalServerCreator.start(temp, instanceName, source);
         } else {
-            source.sendMessage(Component.text("Server not found.", NamedTextColor.RED));
+            source.sendMessage(Component.text("Server not found.", NamedTextColor.GOLD));
         }
     }
 
@@ -83,11 +83,11 @@ public class AdminCommand implements SimpleCommand {
         String instanceName = args[2];
         ServerInfo temp = findServerInfo(externalServerName);
 
-        if (temp != null) {
+        if (temp != null && ServerHandlerProxy.dataHolder.getBackendServer(instanceName) != null) {
             source.sendMessage(Component.text("Stopping server instance...", NamedTextColor.AQUA));
             ServerHandlerProxy.externalServerCreator.stop(temp, instanceName, source);
         } else {
-            source.sendMessage(Component.text("Server not found.", NamedTextColor.RED));
+            source.sendMessage(Component.text("Server not found.", NamedTextColor.GOLD));
         }
     }
 
@@ -96,11 +96,11 @@ public class AdminCommand implements SimpleCommand {
         String instanceName = args[2];
         ServerInfo temp = findServerInfo(externalServerName);
 
-        if (temp != null) {
+        if (temp != null && ServerHandlerProxy.dataHolder.getBackendServer(instanceName) != null) {
             source.sendMessage(Component.text("Deleting server instance...", NamedTextColor.AQUA));
             ServerHandlerProxy.externalServerCreator.delete(temp, instanceName, source);
         } else {
-            source.sendMessage(Component.text("Server not found.", NamedTextColor.RED));
+            source.sendMessage(Component.text("Server not found.", NamedTextColor.GOLD));
         }
     }
 
@@ -108,14 +108,16 @@ public class AdminCommand implements SimpleCommand {
         String externalServerName = args[1];
         String templateName = args[2];
         String newName = args[3];
-        String startCMD = args[4];
-        String stopCMD = args[5];
         ServerInfo temp = findServerInfo(externalServerName);
         if (temp != null) {
-            source.sendMessage(Component.text("Creating server instance from template...", NamedTextColor.AQUA));
-            ServerHandlerProxy.externalServerCreator.createFromTemplate(temp, templateName, newName, startCMD, stopCMD, source);
+            if(ServerHandlerProxy.dataHolder.getBackendServer(newName) == null) {
+                source.sendMessage(Component.text("Creating server instance from template...", NamedTextColor.AQUA));
+                ServerHandlerProxy.externalServerCreator.createFromTemplate(temp, templateName, newName, source);
+            } else {
+                source.sendMessage(Component.text("Server already exists.", NamedTextColor.GOLD));
+            }
         } else {
-            source.sendMessage(Component.text("Server not found.", NamedTextColor.RED));
+            source.sendMessage(Component.text("Server not found.", NamedTextColor.GOLD));
         }
     }
 

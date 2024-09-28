@@ -98,8 +98,6 @@ public class ServerHandlerProxy {
                 serverInfo,
                 dataHolder.defaultServer,
                 dataHolder.defaultServer,
-                startCommand,
-                "stop",
                 null
         );
     }
