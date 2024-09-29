@@ -23,9 +23,11 @@
 2. Configure `config.json` with your desired settings (including passwords and ports).
 3. Run the Flask backend to manage server requests.
 4. Use the HTTP API to interact with the server instances (create, start, stop, delete).
+   
+## Important Info:
+On start, it tries to create a server via a template named like the default server and names it according to the default server set in the config on the first backend server.
 
 ## In-Game Commands
-
 ServerHandlerProxy also supports in-game commands for admins to manage server instances directly within Minecraft. Here are the available commands:
 
 ### **Admin Commands:**
