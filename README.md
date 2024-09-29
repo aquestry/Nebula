@@ -5,6 +5,7 @@
 ## Key Features:
 - **Dynamic Server Creation**: Easily create Minecraft servers on the fly via HTTP API requests.
 - **Server Control**: Template, start, stop, and delete server instances directly from the web interface or API.
+- **Simple Permissions**: Simply define admins via there UUID in the config.
 - **Port Management**: Automatically retrieve free ports to assign to new server instances.
 - **Flask Backend**: Python-based backend using Flask for managing instance operations.
 - **Velocity Integration**: Integrates with Velocity, allowing dynamic server registration and player management within the Velocity proxy environment.
