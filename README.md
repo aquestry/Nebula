@@ -4,18 +4,18 @@
 
 ## Key Features:
 - **Dynamic Server Creation**: Easily create Minecraft servers on the fly via HTTP API requests.
-- **Server Control**: Start, stop, and delete server instances directly from the web interface or API.
+- **Server Control**: Template, Start, stop, and delete server instances directly from the web interface or API.
 - **Port Management**: Automatically retrieve free ports to assign to new server instances.
 - **Flask Backend**: Python-based backend using Flask for managing instance operations.
 - **Velocity Integration**: Integrates with Velocity, allowing dynamic server registration and player management within the Velocity proxy environment.
 - **Password Protection**: Secure operations with password-protected requests for server actions.
-- **Custom Plugin Support**: Includes a custom Velocity plugin for additional server handling capabilities.
 
 ## Requirements:
-- **Java 11+**
+- **Java 21**
 - **Velocity Proxy**
 - **Python 3.8+** (for the Flask backend)
 - **libtmux** (for managing server instances in tmux sessions)
+- **flask** (for managing the requests to the backend)
 
 ## Usage:
 1. Clone the repository.
