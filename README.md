@@ -75,15 +75,6 @@ ServerHandlerProxy also supports in-game commands for admins to manage server in
     /admin info lobby3
     ```
 
-### **Player Commands:**
-
-- **/join [server_name]**  
-  - **Description**: Allows players to join a specific server instance.
-  - **Example**:  
-    ```
-    /join lobby3
-    ```
-
 ## Future Enhancements:
 - Player permissions management within the Velocity proxy.
 - Improved UI for easier server management.
