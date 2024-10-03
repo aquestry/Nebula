@@ -12,7 +12,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.serverHandlerProxy.Helper.DataHolder;
-import de.voasis.serverHandlerProxy.ExternalServerCreator;
+import de.voasis.serverHandlerProxy.ExternalServerManager;
 import de.voasis.serverHandlerProxy.Maps.BackendServer;
 import de.voasis.serverHandlerProxy.Maps.Messages;
 import de.voasis.serverHandlerProxy.Permission.PermissionManager;
@@ -25,13 +25,13 @@ public class EventManager {
     ProxyServer server;
     DataHolder dataHolder;
     PermissionManager permissionManager;
-    ExternalServerCreator externalServerCreator;
-    public EventManager(ProxyServer server, DataHolder dataHolder, Logger logger, ExternalServerCreator externalServerCreator, PermissionManager permissionManager) {
+    ExternalServerManager externalServerManager;
+    public EventManager(ProxyServer server, DataHolder dataHolder, Logger logger, ExternalServerManager externalServerManager, PermissionManager permissionManager) {
         this.logger = logger;
         this.dataHolder = dataHolder;
         this.server = server;
         this.permissionManager = permissionManager;
-        this.externalServerCreator = externalServerCreator;
+        this.externalServerManager = externalServerManager;
     }
     @Subscribe
     public void onServerRegistered(ServerRegisteredEvent event) {
@@ -97,10 +97,10 @@ public class EventManager {
     }
     private void startDefaultServer() {
         logger.info("Starting Default-Server...");
-        externalServerCreator.start(dataHolder.serverInfoMap.getFirst(), dataHolder.defaultServer, null);
+        externalServerManager.start(dataHolder.serverInfoMap.getFirst(), dataHolder.defaultServer, null);
     }
     private void deleteDefaultServer() {
         logger.info("Deleting Default-Server...");
-        externalServerCreator.delete(dataHolder.serverInfoMap.getFirst(), dataHolder.defaultServer, null);
+        externalServerManager.delete(dataHolder.serverInfoMap.getFirst(), dataHolder.defaultServer, null);
     }
 }

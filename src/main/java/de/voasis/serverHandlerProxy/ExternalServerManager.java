@@ -1,6 +1,7 @@
 package de.voasis.serverHandlerProxy;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -12,19 +13,24 @@ import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-public class ExternalServerCreator {
+public class ExternalServerManager {
     private Logger logger;
     private ProxyServer server;
     private DataHolder dataHolder;
 
-    public ExternalServerCreator(Logger logger, ProxyServer proxyServer, DataHolder dataHolder) {
+    public ExternalServerManager(Logger logger, ProxyServer proxyServer, DataHolder dataHolder) {
         this.logger = logger;
         this.server = proxyServer;
         this.dataHolder = dataHolder;
@@ -178,6 +184,55 @@ public class ExternalServerCreator {
             } else {
                 logger.error("Failed to delete instance. Response Code: " + responseCode);
                 sendErrorMessage(source, "Failed to delete instance. Response Code: " + responseCode);
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception occurred while deleting instance.", e);
+            sendErrorMessage(source, "Exception occurred while deleting instance.");
+        }
+    }
+    public void gettemplates(ServerInfo externalServer, CommandSource source) {
+        try {
+            String urlString = "http://" + externalServer.getIp() + ":" + externalServer.getPort() + "/gettemplates";
+            URL url = new URL(urlString);
+
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json; utf-8");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setDoOutput(true);
+
+            JsonObject jsonRequest = new JsonObject();
+            jsonRequest.addProperty("password", externalServer.getPassword().trim());
+
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonRequest.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                List<String> newtemplates = new ArrayList<>();
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder response = new StringBuilder();
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                    JsonObject jsonResponse = JsonParser.parseString(response.toString()).getAsJsonObject();
+                    if (jsonResponse.has("success") && jsonResponse.get("success").getAsBoolean()) {
+                        newtemplates.addAll(List.of(jsonResponse.get("message").getAsString().split(",")));
+                    }
+                }
+                sendSuccessMessage(source, "Instance Templates received.");
+                for (String t : newtemplates) {
+                    if(!Messages.templates.contains(t)) {
+                        Messages.templates.add(t);
+                    }
+                }
+            } else {
+                logger.error("Failed to get Templates. Response Code: " + responseCode);
+                sendErrorMessage(source, "Failed to get Templates. Response Code: " + responseCode);
             }
 
         } catch (Exception e) {

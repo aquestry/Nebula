@@ -3,6 +3,7 @@ package de.voasis.serverHandlerProxy.Commands;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import de.voasis.serverHandlerProxy.Maps.BackendServer;
+import de.voasis.serverHandlerProxy.Maps.Messages;
 import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import de.voasis.serverHandlerProxy.ServerHandlerProxy;
 import net.kyori.adventure.text.Component;
@@ -72,7 +73,7 @@ public class AdminCommand implements SimpleCommand {
 
         if (temp != null && ServerHandlerProxy.dataHolder.getBackendServer(instanceName) != null) {
             source.sendMessage(Component.text("Starting server instance...", NamedTextColor.AQUA));
-            ServerHandlerProxy.externalServerCreator.start(temp, instanceName, source);
+            ServerHandlerProxy.externalServerManager.start(temp, instanceName, source);
         } else {
             source.sendMessage(Component.text("Server not found.", NamedTextColor.GOLD));
         }
@@ -85,7 +86,7 @@ public class AdminCommand implements SimpleCommand {
 
         if (temp != null && ServerHandlerProxy.dataHolder.getBackendServer(instanceName) != null) {
             source.sendMessage(Component.text("Stopping server instance...", NamedTextColor.AQUA));
-            ServerHandlerProxy.externalServerCreator.stop(temp, instanceName, source);
+            ServerHandlerProxy.externalServerManager.stop(temp, instanceName, source);
         } else {
             source.sendMessage(Component.text("Server not found.", NamedTextColor.GOLD));
         }
@@ -98,7 +99,7 @@ public class AdminCommand implements SimpleCommand {
 
         if (temp != null && ServerHandlerProxy.dataHolder.getBackendServer(instanceName) != null) {
             source.sendMessage(Component.text("Deleting server instance...", NamedTextColor.AQUA));
-            ServerHandlerProxy.externalServerCreator.delete(temp, instanceName, source);
+            ServerHandlerProxy.externalServerManager.delete(temp, instanceName, source);
         } else {
             source.sendMessage(Component.text("Server not found.", NamedTextColor.GOLD));
         }
@@ -112,7 +113,7 @@ public class AdminCommand implements SimpleCommand {
         if (temp != null) {
             if(ServerHandlerProxy.dataHolder.getBackendServer(newName) == null) {
                 source.sendMessage(Component.text("Creating server instance from template...", NamedTextColor.AQUA));
-                ServerHandlerProxy.externalServerCreator.createFromTemplate(temp, templateName, newName, source);
+                ServerHandlerProxy.externalServerManager.createFromTemplate(temp, templateName, newName, source);
             } else {
                 source.sendMessage(Component.text("Server already exists.", NamedTextColor.GOLD));
             }
@@ -162,6 +163,10 @@ public class AdminCommand implements SimpleCommand {
                     return CompletableFuture.completedFuture(ServerHandlerProxy.dataHolder.backendInfoMap.stream()
                             .filter(server -> server.getHoldServer().equals(args[1]))
                             .map(BackendServer::getServerName)
+                            .toList());
+                }
+                case "template" -> {
+                    return CompletableFuture.completedFuture(Messages.templates.stream()
                             .toList());
                 }
             }

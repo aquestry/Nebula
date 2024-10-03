@@ -39,7 +39,7 @@ public class ServerHandlerProxy {
 
     public static YamlDocument config;
     public static DataHolder dataHolder;
-    public static ExternalServerCreator externalServerCreator;
+    public static ExternalServerManager externalServerManager;
     public PermissionManager permissionManager;
     public static PingUtil pingUtil;
 
@@ -47,7 +47,7 @@ public class ServerHandlerProxy {
     public ServerHandlerProxy(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         dataHolder = new DataHolder();
         loadConfig(dataDirectory);
-        externalServerCreator = new ExternalServerCreator(logger, server, dataHolder);
+        externalServerManager = new ExternalServerManager(logger, server, dataHolder);
         pingUtil = new PingUtil(dataHolder, server, logger, this);
         dataHolder.Refresh(config, server, logger);
         permissionManager  = new PermissionManager();
@@ -57,7 +57,7 @@ public class ServerHandlerProxy {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         logStartup();
         registerCommands();
-        server.getEventManager().register(this, new EventManager(server, dataHolder, logger, externalServerCreator, permissionManager));
+        server.getEventManager().register(this, new EventManager(server, dataHolder, logger, externalServerManager, permissionManager));
         createDefaultServer();
         server.getScheduler()
                 .buildTask(this, pingUtil::updateState)
@@ -94,7 +94,7 @@ public class ServerHandlerProxy {
             return;
         }
         String startCommand = "java -jar server.jar";
-        externalServerCreator.createFromTemplate(
+        externalServerManager.createFromTemplate(
                 serverInfo,
                 dataHolder.defaultServer,
                 dataHolder.defaultServer,
