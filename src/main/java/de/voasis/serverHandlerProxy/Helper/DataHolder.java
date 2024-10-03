@@ -37,9 +37,9 @@ public class DataHolder {
 
             ServerInfo serverInfo = new ServerInfo(name, ip, port, password, 25568);
             serverInfoMap.add(serverInfo);
-
             log.info("Added Server to pool: " + name);
             ServerHandlerProxy.pingUtil.updateFreePort(serverInfo);
+            ServerHandlerProxy.externalServerManager.gettemplates(serverInfo, null);
         }
     }
 
