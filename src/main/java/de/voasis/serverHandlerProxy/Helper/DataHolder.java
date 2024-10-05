@@ -15,14 +15,14 @@ import java.util.*;
 
 public class DataHolder {
     private static final Logger log = LoggerFactory.getLogger(DataHolder.class);
-    public String defaultServer = null;
+    public String defaultServerTemplate = null;
     public RegisteredServer defaultRegisteredServer = null;
     public List<ServerInfo> serverInfoMap = new ArrayList<>();
     public List<BackendServer> backendInfoMap = new ArrayList<>();
     public List<String> admins = new ArrayList<>();
 
     public void Refresh(YamlDocument config, ProxyServer server, Logger logger) {
-        defaultServer = config.getString("default-server");
+        defaultServerTemplate = config.getString("default-template");
         Messages.vsecret = config.getString("vsecret");
         serverInfoMap.clear();
         admins.clear();

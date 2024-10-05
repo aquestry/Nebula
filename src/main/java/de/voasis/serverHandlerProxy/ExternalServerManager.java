@@ -82,7 +82,6 @@ public class ExternalServerManager {
                 }
             }
             int tempPort = dataHolder.getServerInfo(externalServer.getServerName()).getFreePort();
-            logger.info("Template Method, V-Secret: " + Messages.vsecret);
             String command =  "docker run -d -p " + tempPort + ":25565 " + templateName + " SECRET=" + Messages.vsecret;
             executeSSHCommand(externalServer, command, source,
                     "Docker container created from Docker Hub template: " + templateName,

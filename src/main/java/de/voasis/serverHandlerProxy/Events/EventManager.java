@@ -38,7 +38,7 @@ public class EventManager {
     public void onServerRegistered(ServerRegisteredEvent event) {
         RegisteredServer reg = event.registeredServer();
         ServerInfo info = reg.getServerInfo();
-        if (reg.getServerInfo().getName().equals(dataHolder.defaultServer)) {
+        if (reg.getServerInfo().getName().equals("default")) {
             logger.info("Default-Server registered.");
             dataHolder.defaultRegisteredServer = server.registerServer(reg.getServerInfo());
         }
@@ -97,6 +97,6 @@ public class EventManager {
     }
     private void deleteDefaultServer() {
         logger.info("Deleting Default-Server...");
-        externalServerManager.delete(dataHolder.serverInfoMap.getFirst(), dataHolder.defaultServer, null);
+        externalServerManager.delete(dataHolder.serverInfoMap.getFirst(), "default", null);
     }
 }

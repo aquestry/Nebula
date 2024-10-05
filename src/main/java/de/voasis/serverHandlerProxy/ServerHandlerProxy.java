@@ -73,8 +73,8 @@ public class ServerHandlerProxy {
 
     private void logStartup() {
         logger.info(Messages.logo);
-        logger.info("ServerHandlerProxy started");
-        logger.info("Default-Server: " + dataHolder.defaultServer);
+        logger.info("ServerHandlerProxy is starting...");
+        logger.info("Default-Server-Template: " + dataHolder.defaultServerTemplate);
         logger.info("External Servers:");
         for (ServerInfo s : dataHolder.serverInfoMap) {
             logger.info(s.getServerName());
@@ -91,12 +91,14 @@ public class ServerHandlerProxy {
         logger.info("Creating Default-Server");
         ServerInfo serverInfo = dataHolder.serverInfoMap.getFirst();
         if (serverInfo == null) {
-            logger.error("ServerInfo for default server not found: " + dataHolder.defaultServer);
+            logger.error("No Server Registered! - Shutdown!");
+            shutdownPlugin();
+            server.shutdown();
             return;
         }
         externalServerManager.createFromTemplate(
                 serverInfo,
-                dataHolder.defaultServer,
+                dataHolder.defaultServerTemplate,
                 "default",
                 null
         );
