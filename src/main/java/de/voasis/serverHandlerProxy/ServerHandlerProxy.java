@@ -97,7 +97,7 @@ public class ServerHandlerProxy {
         externalServerManager.createFromTemplate(
                 serverInfo,
                 dataHolder.defaultServer,
-                dataHolder.defaultServer,
+                "default",
                 null
         );
     }

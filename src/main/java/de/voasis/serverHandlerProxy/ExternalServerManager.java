@@ -75,6 +75,12 @@ public class ExternalServerManager {
     }
 
     public void createFromTemplate(ServerInfo externalServer, String templateName, String newName, CommandSource source) {
+            for (BackendServer backendServer : dataHolder.backendInfoMap) {
+                if(backendServer.getServerName().equals(newName)) {
+                    sendErrorMessage(source, "Server already exists.");
+                    return;
+                }
+            }
             int tempPort = dataHolder.getServerInfo(externalServer.getServerName()).getFreePort();
             logger.info("Template Method, V-Secret: " + Messages.vsecret);
             String command =  "docker run -d -p " + tempPort + ":25565 " + templateName + " SECRET=" + Messages.vsecret;
