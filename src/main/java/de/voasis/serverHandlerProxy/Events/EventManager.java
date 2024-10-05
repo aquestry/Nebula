@@ -11,6 +11,7 @@ import com.velocitypowered.api.event.proxy.server.ServerUnregisteredEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import com.velocitypowered.api.proxy.server.ServerInfo;
 import de.voasis.serverHandlerProxy.Helper.DataHolder;
 import de.voasis.serverHandlerProxy.ExternalServerManager;
 import de.voasis.serverHandlerProxy.Maps.BackendServer;
@@ -36,11 +37,10 @@ public class EventManager {
     @Subscribe
     public void onServerRegistered(ServerRegisteredEvent event) {
         RegisteredServer reg = event.registeredServer();
-        logger.info("ServerRegisteredEvent triggered");
+        ServerInfo info = reg.getServerInfo();
         if (reg.getServerInfo().getName().equals(dataHolder.defaultServer)) {
             logger.info("Default-Server registered.");
             dataHolder.defaultRegisteredServer = server.registerServer(reg.getServerInfo());
-            startDefaultServer();
         }
         logger.info("Server registered: " + reg.getServerInfo().getName() + ", IP: " + reg.getServerInfo().getAddress());
 
@@ -94,10 +94,6 @@ public class EventManager {
             }
         }
         logger.info("Player is admin: " + player.hasPermission("velocity.admin"));
-    }
-    private void startDefaultServer() {
-        logger.info("Starting Default-Server...");
-        externalServerManager.start(dataHolder.serverInfoMap.getFirst(), dataHolder.defaultServer, null);
     }
     private void deleteDefaultServer() {
         logger.info("Deleting Default-Server...");

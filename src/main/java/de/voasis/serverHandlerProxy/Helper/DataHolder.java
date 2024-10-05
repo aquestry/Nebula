@@ -3,6 +3,7 @@ package de.voasis.serverHandlerProxy.Helper;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.serverHandlerProxy.Maps.BackendServer;
+import de.voasis.serverHandlerProxy.Maps.Messages;
 import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import de.voasis.serverHandlerProxy.ServerHandlerProxy;
 import dev.dejvokep.boostedyaml.YamlDocument;
@@ -22,6 +23,7 @@ public class DataHolder {
 
     public void Refresh(YamlDocument config, ProxyServer server, Logger logger) {
         defaultServer = config.getString("default-server");
+        Messages.vsecret = config.getString("vsecret");
         serverInfoMap.clear();
         admins.clear();
         admins = List.of(config.getString("admins").split(","));
@@ -32,14 +34,12 @@ public class DataHolder {
         for (Object serverName : managerServerKeys) {
             String name = (String) serverName;
             String ip = config.getString("manager-servers." + name + ".ip");
-            int port = config.getInt("manager-servers." + name + ".port");
             String password = config.getString("manager-servers." + name + ".password");
-
-            ServerInfo serverInfo = new ServerInfo(name, ip, port, password, 25568);
+            String username = config.getString("manager-servers." + name + ".username");
+            ServerInfo serverInfo = new ServerInfo(name, ip, password, 0, username);
             serverInfoMap.add(serverInfo);
             log.info("Added Server to pool: " + name);
             ServerHandlerProxy.pingUtil.updateFreePort(serverInfo);
-            ServerHandlerProxy.externalServerManager.gettemplates(serverInfo, null);
         }
     }
 

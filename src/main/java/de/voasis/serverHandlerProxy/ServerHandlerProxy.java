@@ -47,8 +47,8 @@ public class ServerHandlerProxy {
     public ServerHandlerProxy(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         dataHolder = new DataHolder();
         loadConfig(dataDirectory);
-        externalServerManager = new ExternalServerManager(logger, server, dataHolder);
         pingUtil = new PingUtil(dataHolder, server, logger, this);
+        externalServerManager = new ExternalServerManager(logger, server, dataHolder, pingUtil);
         dataHolder.Refresh(config, server, logger);
         permissionManager  = new PermissionManager();
     }
@@ -94,7 +94,6 @@ public class ServerHandlerProxy {
             logger.error("ServerInfo for default server not found: " + dataHolder.defaultServer);
             return;
         }
-        String startCommand = "java -jar server.jar";
         externalServerManager.createFromTemplate(
                 serverInfo,
                 dataHolder.defaultServer,

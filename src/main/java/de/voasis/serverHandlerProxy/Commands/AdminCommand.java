@@ -3,7 +3,6 @@ package de.voasis.serverHandlerProxy.Commands;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import de.voasis.serverHandlerProxy.Maps.BackendServer;
-import de.voasis.serverHandlerProxy.Maps.Messages;
 import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import de.voasis.serverHandlerProxy.ServerHandlerProxy;
 import net.kyori.adventure.text.Component;
@@ -26,20 +25,13 @@ public class AdminCommand implements SimpleCommand {
         String[] args = parseQuotedArguments(invocation.arguments());
 
         if (args.length < 1) {
-            source.sendMessage(Component.text("Usage: /admin <start|stop|delete|template> <args...>", NamedTextColor.GOLD));
+            source.sendMessage(Component.text("Usage: /admin <stop|delete|template> <args...>", NamedTextColor.GOLD));
             return;
         }
 
         String subcommand = args[0].toLowerCase();
 
         switch (subcommand) {
-            case "start":
-                if (args.length < 3) {
-                    source.sendMessage(Component.text("Usage: /admin start <externalServerName> <InstanceName>", NamedTextColor.GOLD));
-                    return;
-                }
-                handleStartCommand(source, args);
-                break;
             case "stop":
                 if (args.length < 3) {
                     source.sendMessage(Component.text("Usage: /admin stop <externalServerName> <InstanceName>", NamedTextColor.GOLD));
@@ -62,22 +54,10 @@ public class AdminCommand implements SimpleCommand {
                 handleTemplateCommand(source, args);
                 break;
             default:
-                source.sendMessage(Component.text("Unknown command. Usage: /admin <start|stop|delete|template> <args...>", NamedTextColor.GOLD));
+                source.sendMessage(Component.text("Unknown command. Usage: /admin <stop|delete|template> <args...>", NamedTextColor.GOLD));
         }
     }
 
-    private void handleStartCommand(CommandSource source, String[] args) {
-        String externalServerName = args[1];
-        String instanceName = args[2];
-        ServerInfo temp = findServerInfo(externalServerName);
-
-        if (temp != null && ServerHandlerProxy.dataHolder.getBackendServer(instanceName) != null) {
-            source.sendMessage(Component.text("Starting server instance...", NamedTextColor.AQUA));
-            ServerHandlerProxy.externalServerManager.start(temp, instanceName, source);
-        } else {
-            source.sendMessage(Component.text("Server not found.", NamedTextColor.GOLD));
-        }
-    }
 
     private void handleStopCommand(CommandSource source, String[] args) {
         String externalServerName = args[1];
@@ -86,7 +66,7 @@ public class AdminCommand implements SimpleCommand {
 
         if (temp != null && ServerHandlerProxy.dataHolder.getBackendServer(instanceName) != null) {
             source.sendMessage(Component.text("Stopping server instance...", NamedTextColor.AQUA));
-            ServerHandlerProxy.externalServerManager.stop(temp, instanceName, source);
+            ServerHandlerProxy.externalServerManager.kill(temp, instanceName, source);
         } else {
             source.sendMessage(Component.text("Server not found.", NamedTextColor.GOLD));
         }
@@ -136,22 +116,13 @@ public class AdminCommand implements SimpleCommand {
         String[] args = invocation.arguments();
 
         if (args.length == 1) {
-            return CompletableFuture.completedFuture(List.of("start", "stop", "delete", "template"));
+            return CompletableFuture.completedFuture(List.of("stop", "delete", "template"));
         } else if (args.length == 2) {
             return CompletableFuture.completedFuture(ServerHandlerProxy.dataHolder.serverInfoMap.stream()
                     .map(ServerInfo::getServerName)
                     .toList());
         } else if (args.length == 3) {
             switch (args[0]) {
-                case "start" -> {
-                    return CompletableFuture.completedFuture(ServerHandlerProxy.dataHolder.backendInfoMap.stream()
-                            .filter(server -> !server.getState())
-                            .filter(server -> server.getHoldServer().equals(args[1]))
-                            .map(BackendServer::getServerName)
-                            .toList());
-
-
-                }
                 case "stop" -> {
                     return CompletableFuture.completedFuture(ServerHandlerProxy.dataHolder.backendInfoMap.stream()
                             .filter(BackendServer::getState)
@@ -163,10 +134,6 @@ public class AdminCommand implements SimpleCommand {
                     return CompletableFuture.completedFuture(ServerHandlerProxy.dataHolder.backendInfoMap.stream()
                             .filter(server -> server.getHoldServer().equals(args[1]))
                             .map(BackendServer::getServerName)
-                            .toList());
-                }
-                case "template" -> {
-                    return CompletableFuture.completedFuture(Messages.templates.stream()
                             .toList());
                 }
             }

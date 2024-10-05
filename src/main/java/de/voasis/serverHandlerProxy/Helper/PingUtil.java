@@ -1,7 +1,8 @@
 package de.voasis.serverHandlerProxy.Helper;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
@@ -11,13 +12,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStream;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 
 public class PingUtil {
@@ -32,12 +29,59 @@ public class PingUtil {
         PingUtil.logger = logger;
         PingUtil.plugin = plugin;
     }
-    public void updateState() {
-        for(BackendServer backendServer : dataHolder.backendInfoMap) {
-            Optional<RegisteredServer> r = server.getServer(backendServer.getServerName());
-            r.ifPresent(registeredServer -> pingServer(registeredServer, stateComplete(registeredServer), stateCompleteFailed(registeredServer), logger, plugin));
+
+    // Method to update free port using SSH
+    public void updateFreePort(ServerInfo externalServer) {
+        int freePort = -1;
+        try {
+            JSch jsch = new JSch();
+            Session session = jsch.getSession(externalServer.getUsername(), externalServer.getIp(), 22);
+            session.setPassword(externalServer.getPassword());
+
+            // SSH settings
+            Properties config = new Properties();
+            config.put("StrictHostKeyChecking", "no");
+            session.setConfig(config);
+            session.connect();
+
+            // Command to find a free port between 5000 and 5100
+            String command = "ruby -e 'require \"socket\"; puts Addrinfo.tcp(\"\", 0).bind {|s| s.local_address.ip_port }'";
+
+            // Execute the command
+            ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
+            channelExec.setCommand(command);
+
+            InputStream in = channelExec.getInputStream();
+            channelExec.connect();
+
+            // Read the result of the command
+            byte[] tmp = new byte[1024];
+            int i = in.read(tmp, 0, 1024);
+            if (i != -1) {
+                freePort = Integer.parseInt(new String(tmp, 0, i).trim());
+            }
+
+            channelExec.disconnect();
+            session.disconnect();
+
+            if (freePort > 0) {
+                logger.info("Free port received via SSH: " + freePort);
+                externalServer.setFreePort(freePort);
+            } else {
+                logger.error("No free port found via SSH.");
+            }
+        } catch (Exception e) {
+            logger.error("Failed to fetch free port via SSH.", e);
         }
     }
+
+    public void updateState() {
+        for (BackendServer backendServer : dataHolder.backendInfoMap) {
+            Optional<RegisteredServer> registeredServer = server.getServer(backendServer.getServerName());
+            registeredServer.ifPresent(value -> pingServer(value, stateComplete(value), stateCompleteFailed(value), logger, plugin));
+        }
+    }
+
     public Callable<Void> stateComplete(RegisteredServer registeredServer) {
         return () -> {
             for (BackendServer backendServer : dataHolder.backendInfoMap) {
@@ -46,8 +90,8 @@ public class PingUtil {
                         backendServer.setState(true);
                         logger.info("Server: " + backendServer.getServerName() + ", is now online.");
                         CommandSource creator = backendServer.getCreator();
-                        if(creator != null) {
-                            creator.sendMessage(Component.text("Server: " + backendServer.getServerName() + ", is now online.", NamedTextColor.GREEN));
+                        if (creator != null) {
+                            creator.sendMessage(Component.text("Server: " + backendServer.getServerName() + " is now online.", NamedTextColor.GREEN));
                         }
                     }
                 }
@@ -55,6 +99,7 @@ public class PingUtil {
             return null;
         };
     }
+
     public Callable<Void> stateCompleteFailed(RegisteredServer registeredServer) {
         return () -> {
             for (BackendServer backendServer : dataHolder.backendInfoMap) {
@@ -63,8 +108,8 @@ public class PingUtil {
                         backendServer.setState(false);
                         CommandSource creator = backendServer.getCreator();
                         logger.info("Server: " + backendServer.getServerName() + ", is now offline.");
-                        if(creator != null) {
-                            creator.sendMessage(Component.text("Server: " + backendServer.getServerName() + ", is now offline.", NamedTextColor.GREEN));
+                        if (creator != null) {
+                            creator.sendMessage(Component.text("Server: " + backendServer.getServerName() + " is now offline.", NamedTextColor.RED));
                         }
                     }
                 }
@@ -72,6 +117,7 @@ public class PingUtil {
             return null;
         };
     }
+
     public void pingServer(RegisteredServer regServer, Callable<Void> response, Callable<Void> noResponse, Logger logger, Object plugin) {
         regServer.ping().whenComplete((result, exception) -> {
             if (exception == null) {
@@ -92,53 +138,5 @@ public class PingUtil {
                 }
             }
         });
-    }
-    public void updateFreePort(ServerInfo externalServer) {
-        int freePort = -1;
-        try {
-            String urlString = "http://" + externalServer.getIp() + ":" + externalServer.getPort() + "/freeport";
-            URL url = new URL(urlString);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json; utf-8");
-            connection.setRequestProperty("Accept", "application/json");
-            connection.setDoOutput(true);
-            JsonObject jsonRequest = new JsonObject();
-            jsonRequest.addProperty("password", externalServer.getPassword().trim());
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonRequest.toString().getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
-            }
-            int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
-                    StringBuilder response = new StringBuilder();
-                    String responseLine;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
-                    }
-                    JsonObject jsonResponse = JsonParser.parseString(response.toString()).getAsJsonObject();
-                    if (jsonResponse.has("success") && jsonResponse.get("success").getAsBoolean()) {
-                        freePort = jsonResponse.get("message").getAsInt();
-                        logger.info("Free port received: " + freePort);
-                    } else {
-                        logger.error("Failed to get free port from external server.");
-                    }
-                }
-            } else {
-                logger.error("Failed to request free port. Response Code: " + responseCode);
-            }
-        } catch (Exception ignored) {
-            logger.error("Exception occurred while requesting free port");
-        }
-        answerFreePort(externalServer, freePort);
-    }
-
-    private void answerFreePort(ServerInfo externalServer, int freePort) {
-        if (freePort != -1) {
-            externalServer.setFreePort(freePort);
-        } else {
-            logger.error("Failed to receive free port from external server.");
-        }
     }
 }

@@ -1,12 +1,12 @@
 package de.voasis.serverHandlerProxy;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
 import com.velocitypowered.api.command.CommandSource;
-import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.serverHandlerProxy.Helper.DataHolder;
+import de.voasis.serverHandlerProxy.Helper.PingUtil;
 import de.voasis.serverHandlerProxy.Maps.BackendServer;
 import de.voasis.serverHandlerProxy.Maps.Messages;
 import de.voasis.serverHandlerProxy.Maps.ServerInfo;
@@ -14,231 +14,91 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.Properties;
 
 public class ExternalServerManager {
     private Logger logger;
     private ProxyServer server;
     private DataHolder dataHolder;
+    private PingUtil pingUtil;
 
-    public ExternalServerManager(Logger logger, ProxyServer proxyServer, DataHolder dataHolder) {
+    public ExternalServerManager(Logger logger, ProxyServer proxyServer, DataHolder dataHolder, PingUtil pingUtil) {
         this.logger = logger;
         this.server = proxyServer;
         this.dataHolder = dataHolder;
+        this.pingUtil = pingUtil;
+    }
+
+    private void executeSSHCommand(ServerInfo externalServer, String command, CommandSource source, String successMessage, String errorMessage) {
+        try {
+            JSch jsch = new JSch();
+            Session session = jsch.getSession(externalServer.getUsername(), externalServer.getIp(), 22);
+            session.setPassword(externalServer.getPassword());
+
+            Properties config = new Properties();
+            config.put("StrictHostKeyChecking", "no");
+            session.setConfig(config);
+            session.connect();
+
+            ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
+            channelExec.setCommand(command);
+
+            InputStream in = channelExec.getInputStream();
+            channelExec.connect();
+
+            byte[] tmp = new byte[1024];
+            while (true) {
+                while (in.available() > 0) {
+                    int i = in.read(tmp, 0, 1024);
+                    if (i < 0) break;
+                    System.out.print(new String(tmp, 0, i));
+                }
+                if (channelExec.isClosed()) {
+                    if (channelExec.getExitStatus() == 0) {
+                        sendSuccessMessage(source, successMessage);
+                    } else {
+                        sendErrorMessage(source, errorMessage);
+                    }
+                    break;
+                }
+                Thread.sleep(1000);
+            }
+
+            channelExec.disconnect();
+            session.disconnect();
+        } catch (Exception e) {
+            logger.error("Failed to execute SSH command.", e);
+            sendErrorMessage(source, errorMessage);
+        }
     }
 
     public void createFromTemplate(ServerInfo externalServer, String templateName, String newName, CommandSource source) {
-        try {
-            String urlString = "http://" + externalServer.getIp() + ":" + externalServer.getPort() + "/create";
-            URL url = new URL(urlString);
-
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json; utf-8");
-            connection.setRequestProperty("Accept", "application/json");
-            connection.setDoOutput(true);
             int tempPort = dataHolder.getServerInfo(externalServer.getServerName()).getFreePort();
-            JsonObject jsonRequest = new JsonObject();
-            jsonRequest.addProperty("template", templateName);
-            jsonRequest.addProperty("name", newName);
-            jsonRequest.addProperty("start_cmd", "java -jar server.jar -p " + tempPort);
-            jsonRequest.addProperty("stop_cmd", "%kill%");
-            jsonRequest.addProperty("password", externalServer.getPassword().trim());
+            logger.info("Template Method, V-Secret: " + Messages.vsecret);
+            String command =  "docker run -d -p " + tempPort + ":25565 " + templateName + " SECRET=" + Messages.vsecret;
+            executeSSHCommand(externalServer, command, source,
+                    "Docker container created from Docker Hub template: " + templateName,
+                    "Failed to create Docker container from Docker Hub template.");
 
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonRequest.toString().getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
-            }
-
-            int responseCode = connection.getResponseCode();
-            logger.info("Response code: " + responseCode + ", Response message: " + connection.getResponseMessage());
-
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                sendSuccessMessage(source, "Instance-Template request successfully sent.");
-
-                com.velocitypowered.api.proxy.server.ServerInfo newInfo = new com.velocitypowered.api.proxy.server.ServerInfo(
-                        newName, new InetSocketAddress(externalServer.getIp(), tempPort));
-                server.registerServer(newInfo);
-
-                Optional<RegisteredServer> registeredServer = server.getServer(newName);
-                if (registeredServer.isPresent()) {
-                    logger.info("Server successfully registered: " + newName + " at port " + tempPort);
-                    dataHolder.backendInfoMap.add(new BackendServer(newName, externalServer.getServerName(), tempPort, false, source));
-                    ServerHandlerProxy.pingUtil.updateFreePort(dataHolder.getServerInfo(externalServer.getServerName()));
-                } else {
-                    logger.error("Failed to register the server: " + newName);
-                    sendErrorMessage(source, "Failed to register the server: " + newName);
-                }
-            } else {
-                logger.error("Failed to create instance from template. Response Code: " + responseCode);
-                sendErrorMessage(source, "Failed to create instance from template. Response Code: " + responseCode);
-            }
-
-        } catch (Exception ignored) {
-            logger.error("Exception occurred while creating instance from template");
-            sendErrorMessage(source, "Exception occurred while creating instance from template.");
-        }
+            com.velocitypowered.api.proxy.server.ServerInfo newInfo = new com.velocitypowered.api.proxy.server.ServerInfo(
+                    newName, new InetSocketAddress(externalServer.getIp(), tempPort));
+            server.registerServer(newInfo);
+            dataHolder.backendInfoMap.add(new BackendServer(newInfo.getName(), externalServer.getServerName(), externalServer.getFreePort(), false, source));
+            pingUtil.updateFreePort(dataHolder.getServerInfo(externalServer.getServerName()));
     }
 
-    public void start(ServerInfo externalServer, String servername, CommandSource source) {
-        try {
-            String urlString = "http://" + externalServer.getIp() + ":" + externalServer.getPort() + "/start/" + servername;
-            URL url = new URL(urlString);
+    public void kill(ServerInfo externalServer, String servername, CommandSource source) {
+        String command = "docker kill " + servername;
+        executeSSHCommand(externalServer, command, source, "Docker container stopped: " + servername, "Failed to stop Docker container.");
 
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json; utf-8");
-            connection.setRequestProperty("Accept", "application/json");
-            connection.setDoOutput(true);
-
-            JsonObject jsonRequest = new JsonObject();
-            jsonRequest.addProperty("password", externalServer.getPassword().trim());
-
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonRequest.toString().getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
-            }
-
-            int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                sendSuccessMessage(source, "Instance start request successfully sent.");
-            } else {
-                logger.error("Failed to start instance. Response Code: " + responseCode);
-                sendErrorMessage(source, "Failed to start instance. Response Code: " + responseCode);
-            }
-
-        } catch (Exception e) {
-            logger.error("Exception occurred while starting instance.", e);
-            sendErrorMessage(source, "Exception occurred while starting instance.");
-        }
-    }
-
-    public void stop(ServerInfo externalServer, String servername, CommandSource source) {
-        disconnectAll(servername, Messages.stopped);
-        try {
-            String urlString = "http://" + externalServer.getIp() + ":" + externalServer.getPort() + "/stop/" + servername;
-            URL url = new URL(urlString);
-
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json; utf-8");
-            connection.setRequestProperty("Accept", "application/json");
-            connection.setDoOutput(true);
-
-            JsonObject jsonRequest = new JsonObject();
-            jsonRequest.addProperty("password", externalServer.getPassword().trim());
-
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonRequest.toString().getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
-            }
-
-            int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                sendSuccessMessage(source, "Instance successfully stopped.");
-            } else {
-                logger.error("Failed to stop instance. Response Code: " + responseCode);
-                sendErrorMessage(source, "Failed to stop instance. Response Code: " + responseCode);
-            }
-
-        } catch (Exception e) {
-            logger.error("Exception occurred while stopping instance.", e);
-            sendErrorMessage(source, "Exception occurred while stopping instance.");
-        }
     }
 
     public void delete(ServerInfo externalServer, String servername, CommandSource source) {
-        disconnectAll(servername, Messages.deleted);
-        try {
-            String urlString = "http://" + externalServer.getIp() + ":" + externalServer.getPort() + "/delete/" + servername;
-            URL url = new URL(urlString);
-
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json; utf-8");
-            connection.setRequestProperty("Accept", "application/json");
-            connection.setDoOutput(true);
-
-            JsonObject jsonRequest = new JsonObject();
-            jsonRequest.addProperty("password", externalServer.getPassword().trim());
-
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonRequest.toString().getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
-            }
-
-            int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                sendSuccessMessage(source, "Instance successfully deleted.");
-                server.getServer(servername).ifPresent(s -> server.unregisterServer(s.getServerInfo()));
-                dataHolder.backendInfoMap.removeIf(back -> back.getServerName().equals(servername));
-            } else {
-                logger.error("Failed to delete instance. Response Code: " + responseCode);
-                sendErrorMessage(source, "Failed to delete instance. Response Code: " + responseCode);
-            }
-
-        } catch (Exception e) {
-            logger.error("Exception occurred while deleting instance.", e);
-            sendErrorMessage(source, "Exception occurred while deleting instance.");
-        }
-    }
-    public void gettemplates(ServerInfo externalServer, CommandSource source) {
-        try {
-            String urlString = "http://" + externalServer.getIp() + ":" + externalServer.getPort() + "/gettemplates";
-            URL url = new URL(urlString);
-
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json; utf-8");
-            connection.setRequestProperty("Accept", "application/json");
-            connection.setDoOutput(true);
-
-            JsonObject jsonRequest = new JsonObject();
-            jsonRequest.addProperty("password", externalServer.getPassword().trim());
-
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonRequest.toString().getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
-            }
-
-            int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                List<String> newtemplates = new ArrayList<>();
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
-                    StringBuilder response = new StringBuilder();
-                    String responseLine;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
-                    }
-                    JsonObject jsonResponse = JsonParser.parseString(response.toString()).getAsJsonObject();
-                    if (jsonResponse.has("success") && jsonResponse.get("success").getAsBoolean()) {
-                        newtemplates.addAll(List.of(jsonResponse.get("message").getAsString().split(",")));
-                    }
-                }
-                sendSuccessMessage(source, "Instance Templates received.");
-                for (String t : newtemplates) {
-                    if(!Messages.templates.contains(t)) {
-                        Messages.templates.add(t);
-                    }
-                }
-            } else {
-                logger.error("Failed to get Templates. Response Code: " + responseCode);
-                sendErrorMessage(source, "Failed to get Templates. Response Code: " + responseCode);
-            }
-
-        } catch (Exception e) {
-            logger.error("Exception occurred while deleting instance.", e);
-            sendErrorMessage(source, "Exception occurred while deleting instance.");
-        }
+        kill(externalServer, servername, source);
+        String command = "docker rm -f " + servername;
+        executeSSHCommand(externalServer, command, source, "Docker container deleted: " + servername, "Failed to delete Docker container.");
     }
 
     private void sendSuccessMessage(CommandSource source, String message) {
@@ -252,18 +112,6 @@ public class ExternalServerManager {
         logger.error(message);
         if (source != null) {
             source.sendMessage(Component.text(message, NamedTextColor.RED));
-        }
-    }
-
-    public void disconnectAll(String backendServer, String reason) {
-        logger.info("Sending all to default server. Server: " + backendServer);
-        Optional<RegisteredServer> r = server.getServer(backendServer);
-        if (r.isPresent()) {
-            for (Player player : r.get().getPlayersConnected()) {
-                if (dataHolder.getState(dataHolder.defaultServer)) {
-                    player.disconnect(Component.text(reason, NamedTextColor.RED));
-                }
-            }
         }
     }
 }
