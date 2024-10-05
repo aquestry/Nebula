@@ -32,12 +32,12 @@ public class AdminCommand implements SimpleCommand {
         String subcommand = args[0].toLowerCase();
 
         switch (subcommand) {
-            case "stop":
+            case "kill":
                 if (args.length < 3) {
                     source.sendMessage(Component.text("Usage: /admin stop <externalServerName> <InstanceName>", NamedTextColor.GOLD));
                     return;
                 }
-                handleStopCommand(source, args);
+                handleKillCommand(source, args);
                 break;
             case "delete":
                 if (args.length < 3) {
@@ -59,13 +59,13 @@ public class AdminCommand implements SimpleCommand {
     }
 
 
-    private void handleStopCommand(CommandSource source, String[] args) {
+    private void handleKillCommand(CommandSource source, String[] args) {
         String externalServerName = args[1];
         String instanceName = args[2];
         ServerInfo temp = findServerInfo(externalServerName);
 
         if (temp != null && ServerHandlerProxy.dataHolder.getBackendServer(instanceName) != null) {
-            source.sendMessage(Component.text("Stopping server instance...", NamedTextColor.AQUA));
+            source.sendMessage(Component.text("Killing server instance...", NamedTextColor.AQUA));
             ServerHandlerProxy.externalServerManager.kill(temp, instanceName, source);
         } else {
             source.sendMessage(Component.text("Server not found.", NamedTextColor.GOLD));
@@ -116,14 +116,14 @@ public class AdminCommand implements SimpleCommand {
         String[] args = invocation.arguments();
 
         if (args.length == 1) {
-            return CompletableFuture.completedFuture(List.of("stop", "delete", "template"));
+            return CompletableFuture.completedFuture(List.of("kill", "delete", "template"));
         } else if (args.length == 2) {
             return CompletableFuture.completedFuture(ServerHandlerProxy.dataHolder.serverInfoMap.stream()
                     .map(ServerInfo::getServerName)
                     .toList());
         } else if (args.length == 3) {
             switch (args[0]) {
-                case "stop" -> {
+                case "kill" -> {
                     return CompletableFuture.completedFuture(ServerHandlerProxy.dataHolder.backendInfoMap.stream()
                             .filter(BackendServer::getState)
                             .filter(server -> server.getHoldServer().equals(args[1]))

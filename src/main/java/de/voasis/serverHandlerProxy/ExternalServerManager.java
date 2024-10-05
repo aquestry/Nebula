@@ -82,7 +82,8 @@ public class ExternalServerManager {
                 }
             }
             int tempPort = dataHolder.getServerInfo(externalServer.getServerName()).getFreePort();
-            String command =  "docker run -d -p " + tempPort + ":25565 " + templateName + " SECRET=" + Messages.vsecret;
+            String command = String.format("docker run -d -p %d:25565 --name %s %s SECRET=%s", tempPort, newName, templateName, Messages.vsecret);
+
             executeSSHCommand(externalServer, command, source,
                     "Docker container created from Docker Hub template: " + templateName,
                     "Failed to create Docker container from Docker Hub template.");
