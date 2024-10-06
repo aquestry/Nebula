@@ -67,6 +67,22 @@ public class EventManager {
         }
         logger.info("Default-Server is offline, disconnecting player...");
         player.disconnect(Component.text("Default-Server is not online"));
+        event.setInitialServer(null);
+    }
+    private void createDefaultServer() {
+        logger.info("Creating Default-Server");
+        de.voasis.serverHandlerProxy.Maps.ServerInfo serverInfo = dataHolder.serverInfoMap.getFirst();
+        if (serverInfo == null) {
+            logger.error("No Server Registered! - Shutdown!");
+            server.shutdown();
+            return;
+        }
+        externalServerManager.createFromTemplate(
+                serverInfo,
+                dataHolder.defaultServerTemplate,
+                "default",
+                null
+        );
     }
     @Subscribe
     public void preConnect(ServerPreConnectEvent event) {

@@ -58,7 +58,7 @@ public class ServerHandlerProxy {
         logStartup();
         registerCommands();
         server.getEventManager().register(this, new EventManager(server, dataHolder, logger, externalServerManager, permissionManager));
-        createDefaultServer();
+
 
         server.getScheduler()
                 .buildTask(this, pingUtil::updateState)

@@ -13,9 +13,7 @@ import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
-
 import java.io.InputStream;
-import java.net.InetSocketAddress;
 import java.util.Properties;
 
 public class ExternalServerManager {
@@ -58,6 +56,7 @@ public class ExternalServerManager {
                 if (channelExec.isClosed()) {
                     if (channelExec.getExitStatus() == 0) {
                         sendSuccessMessage(source, successMessage);
+
                     } else {
                         sendErrorMessage(source, errorMessage);
                     }
@@ -88,12 +87,9 @@ public class ExternalServerManager {
                     "Docker container created from Docker Hub template: " + templateName,
                     "Failed to create Docker container from Docker Hub template.");
 
-            com.velocitypowered.api.proxy.server.ServerInfo newInfo = new com.velocitypowered.api.proxy.server.ServerInfo(
-                    newName, new InetSocketAddress(externalServer.getIp(), tempPort));
-            server.registerServer(newInfo);
-            dataHolder.backendInfoMap.add(new BackendServer(newInfo.getName(), externalServer.getServerName(), externalServer.getFreePort(), false, source));
-            pingUtil.updateFreePort(dataHolder.getServerInfo(externalServer.getServerName()));
+
     }
+
 
     public void kill(ServerInfo externalServer, String servername, CommandSource source) {
         String command = "docker kill " + servername;
