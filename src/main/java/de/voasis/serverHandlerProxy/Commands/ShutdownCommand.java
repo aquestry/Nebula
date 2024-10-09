@@ -14,8 +14,10 @@ public class ShutdownCommand implements SimpleCommand {
 
     @Override
     public void execute(Invocation invocation) {
-        server.shutdown(Component.text("Shutdown! Reason:" + invocation.arguments()[0]).color(NamedTextColor.WHITE));
+        String reason = invocation.arguments().length > 0 ? invocation.arguments()[0] : "No reason provided";
+        server.shutdown(Component.text("Shutdown! Reason: " + reason).color(NamedTextColor.WHITE));
     }
+
 
     @Override
     public boolean hasPermission(Invocation invocation) {
