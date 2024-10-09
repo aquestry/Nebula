@@ -14,6 +14,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
 import java.util.Properties;
 
 public class ExternalServerManager {
@@ -74,20 +75,22 @@ public class ExternalServerManager {
     }
 
     public void createFromTemplate(ServerInfo externalServer, String templateName, String newName, CommandSource source) {
-            for (BackendServer backendServer : dataHolder.backendInfoMap) {
-                if(backendServer.getServerName().equals(newName)) {
-                    sendErrorMessage(source, "Server already exists.");
-                    return;
-                }
+        for (BackendServer backendServer : dataHolder.backendInfoMap) {
+            if(backendServer.getServerName().equals(newName)) {
+                sendErrorMessage(source, "Server already exists.");
+                return;
             }
-            int tempPort = dataHolder.getServerInfo(externalServer.getServerName()).getFreePort();
-            String command = String.format("docker run -d -p %d:25565 --name %s %s SECRET=%s", tempPort, newName, templateName, Messages.vsecret);
+        }
+        int tempPort = dataHolder.getServerInfo(externalServer.getServerName()).getFreePort();
+        String command = String.format("docker run -d -p %d:25565 --name %s %s SECRET=%s", tempPort, newName, templateName, Messages.vsecret);
 
-            executeSSHCommand(externalServer, command, source,
-                    "Docker container created from Docker Hub template: " + templateName,
-                    "Failed to create Docker container from Docker Hub template.");
+        executeSSHCommand(externalServer, command, source,
+                "Docker container created from Docker Hub template: " + templateName,
+                "Failed to create Docker container from Docker Hub template.");
 
-
+        com.velocitypowered.api.proxy.server.ServerInfo newInfo = new com.velocitypowered.api.proxy.server.ServerInfo(newName, new InetSocketAddress(externalServer.getIp(), tempPort));
+        server.registerServer(newInfo);
+        pingUtil.updateFreePort(externalServer);
     }
 
 

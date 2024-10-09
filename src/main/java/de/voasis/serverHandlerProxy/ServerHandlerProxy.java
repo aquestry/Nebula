@@ -9,6 +9,7 @@ import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.serverHandlerProxy.Commands.AdminCommand;
+import de.voasis.serverHandlerProxy.Commands.ShutdownCommand;
 import de.voasis.serverHandlerProxy.Events.EventManager;
 import de.voasis.serverHandlerProxy.Helper.DataHolder;
 import de.voasis.serverHandlerProxy.Helper.PingUtil;
@@ -58,7 +59,7 @@ public class ServerHandlerProxy {
         logStartup();
         registerCommands();
         server.getEventManager().register(this, new EventManager(server, dataHolder, logger, externalServerManager, permissionManager));
-
+        createDefaultServer();
 
         server.getScheduler()
                 .buildTask(this, pingUtil::updateState)
@@ -84,6 +85,7 @@ public class ServerHandlerProxy {
     private void registerCommands() {
         CommandManager commandManager = server.getCommandManager();
         commandManager.register("admin", new AdminCommand(logger));
+        commandManager.register("shutdown", new ShutdownCommand(server));
         logger.info("Commands registered.");
     }
 
