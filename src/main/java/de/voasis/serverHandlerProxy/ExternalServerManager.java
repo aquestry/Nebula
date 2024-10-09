@@ -90,6 +90,7 @@ public class ExternalServerManager {
 
         com.velocitypowered.api.proxy.server.ServerInfo newInfo = new com.velocitypowered.api.proxy.server.ServerInfo(newName, new InetSocketAddress(externalServer.getIp(), tempPort));
         server.registerServer(newInfo);
+        dataHolder.backendInfoMap.add(new BackendServer(newName, externalServer.getServerName(), tempPort, false, source));
         pingUtil.updateFreePort(externalServer);
     }
 
