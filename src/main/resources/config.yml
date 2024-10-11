@@ -2,11 +2,15 @@ file-version: 1
 default-template: anton691/simple-lobby:latest
 admins: 74401e14-f69c-48f3-b393-64be488dff8f,069a79f4-44e9-4726-a5be-fca90e38aaf5
 vsecret: <VELOCITY-SECRET>
+
 manager-servers:
   server-1:
     ip: localhost
     username: notrootpls
     password: 1234
 
-
+gamemodes:
+  duels:
+    templateName: anton691/simple-duels:latest
+    neededPlayers: 2
 

@@ -8,7 +8,8 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.serverHandlerProxy.Helper.DataHolder;
 import de.voasis.serverHandlerProxy.Helper.PingUtil;
 import de.voasis.serverHandlerProxy.Maps.BackendServer;
-import de.voasis.serverHandlerProxy.Maps.Messages;
+import de.voasis.serverHandlerProxy.Helper.Messages;
+import de.voasis.serverHandlerProxy.Maps.QueueInfo;
 import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -81,7 +82,7 @@ public class ExternalServerManager {
                 return;
             }
         }
-        int tempPort = dataHolder.getServerInfo(externalServer.getServerName()).getFreePort();
+        int tempPort = externalServer.getFreePort();
         String command = String.format("docker run -d -p %d:25565 --name %s %s SECRET=%s", tempPort, newName, templateName, Messages.vsecret);
 
         executeSSHCommand(externalServer, command, source,
@@ -90,10 +91,15 @@ public class ExternalServerManager {
 
         com.velocitypowered.api.proxy.server.ServerInfo newInfo = new com.velocitypowered.api.proxy.server.ServerInfo(newName, new InetSocketAddress(externalServer.getIp(), tempPort));
         server.registerServer(newInfo);
-        dataHolder.backendInfoMap.add(new BackendServer(newName, externalServer.getServerName(), tempPort, false, source));
+        dataHolder.backendInfoMap.add(new BackendServer(newName, externalServer, tempPort, false, source, templateName));
         pingUtil.updateFreePort(externalServer);
-    }
+        for(QueueInfo q : dataHolder.queues) {
+            if(q.getGamemode().getTemplateName().equals(templateName)) {
+                q.setUsed(false);
+            }
+        }
 
+    }
 
     public void kill(ServerInfo externalServer, String servername, CommandSource source) {
         String command = "docker kill " + servername;
@@ -105,6 +111,8 @@ public class ExternalServerManager {
         kill(externalServer, servername, source);
         String command = "docker rm -f " + servername;
         executeSSHCommand(externalServer, command, source, "Docker container deleted: " + servername, "Failed to delete Docker container.");
+        server.unregisterServer(new com.velocitypowered.api.proxy.server.ServerInfo(servername, new InetSocketAddress(externalServer.getIp(), dataHolder.getBackendServer(servername).getPort())));
+        dataHolder.backendInfoMap.remove(dataHolder.getBackendServer(servername));
     }
 
     private void sendSuccessMessage(CommandSource source, String message) {

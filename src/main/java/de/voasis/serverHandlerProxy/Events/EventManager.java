@@ -15,7 +15,7 @@ import com.velocitypowered.api.proxy.server.ServerInfo;
 import de.voasis.serverHandlerProxy.Helper.DataHolder;
 import de.voasis.serverHandlerProxy.ExternalServerManager;
 import de.voasis.serverHandlerProxy.Maps.BackendServer;
-import de.voasis.serverHandlerProxy.Maps.Messages;
+import de.voasis.serverHandlerProxy.Helper.Messages;
 import de.voasis.serverHandlerProxy.Permission.PermissionManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -58,7 +58,7 @@ public class EventManager {
         if (defaultServer != null) {
             BackendServer info = dataHolder.getBackendServer(defaultServer.getServerInfo().getName());
             if(info != null) {
-                if(info.getState()) {
+                if(info.isOnline()) {
                     event.setInitialServer(defaultServer);
                     logger.info("Default-Server is online, connecting player...");
                     return;
@@ -88,7 +88,7 @@ public class EventManager {
     public void preConnect(ServerPreConnectEvent event) {
         Player player = event.getPlayer();
         RegisteredServer target = event.getOriginalServer();
-        if(!dataHolder.getState(target.getServerInfo().getName())) {
+        if(!dataHolder.getBackendServer(target.getServerInfo().getName()).isOnline()) {
             event.setResult(ServerPreConnectEvent.ServerResult.denied());
             player.sendMessage(Component.text(Messages.offline, NamedTextColor.GOLD));
         }

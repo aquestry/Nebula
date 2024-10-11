@@ -125,7 +125,7 @@ public class AdminCommand implements SimpleCommand {
             switch (args[0]) {
                 case "kill" -> {
                     return CompletableFuture.completedFuture(ServerHandlerProxy.dataHolder.backendInfoMap.stream()
-                            .filter(BackendServer::getState)
+                            .filter(BackendServer::isOnline)
                             .filter(server -> server.getHoldServer().equals(args[1]))
                             .map(BackendServer::getServerName)
                             .toList());

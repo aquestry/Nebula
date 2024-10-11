@@ -4,6 +4,7 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.serverHandlerProxy.Maps.BackendServer;
@@ -11,6 +12,7 @@ import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.util.Optional;
@@ -20,17 +22,16 @@ import java.util.concurrent.Callable;
 public class PingUtil {
     static DataHolder dataHolder;
     static ProxyServer server;
-    static Logger logger;
+    static final Logger logger = LoggerFactory.getLogger("serverhandlerproxy");
     static Object plugin;
 
-    public PingUtil(DataHolder dataHolder, ProxyServer server, Logger logger, Object plugin) {
+    public PingUtil(DataHolder dataHolder, ProxyServer server, Object plugin) {
         PingUtil.dataHolder = dataHolder;
         PingUtil.server = server;
-        PingUtil.logger = logger;
         PingUtil.plugin = plugin;
     }
 
-    // Method to update free port using SSH
+
     public void updateFreePort(ServerInfo externalServer) {
         int freePort = -1;
         try {
@@ -86,10 +87,16 @@ public class PingUtil {
         return () -> {
             for (BackendServer backendServer : dataHolder.backendInfoMap) {
                 if (registeredServer.getServerInfo().getName().equals(backendServer.getServerName())) {
-                    if (!backendServer.getState()) {
-                        backendServer.setState(true);
+                    if (!backendServer.isOnline()) {
+                        backendServer.setOnline(true);
                         logger.info("Server: " + backendServer.getServerName() + ", is now online.");
                         CommandSource creator = backendServer.getCreator();
+                        for(Player p : backendServer.getPendingPlayerConnections()) {
+                            RegisteredServer target = server.getServer(backendServer.getServerName()).get();
+                            if(target != null) {
+                                p.createConnectionRequest(target).fireAndForget();
+                            }
+                        }
                         if (creator != null) {
                             creator.sendMessage(Component.text("Server: " + backendServer.getServerName() + " is now online.", NamedTextColor.GREEN));
                         }
@@ -104,8 +111,8 @@ public class PingUtil {
         return () -> {
             for (BackendServer backendServer : dataHolder.backendInfoMap) {
                 if (registeredServer.getServerInfo().getName().equals(backendServer.getServerName())) {
-                    if (backendServer.getState()) {
-                        backendServer.setState(false);
+                    if (backendServer.isOnline()) {
+                        backendServer.setOnline(false);
                         CommandSource creator = backendServer.getCreator();
                         logger.info("Server: " + backendServer.getServerName() + ", is now offline.");
                         if (creator != null) {

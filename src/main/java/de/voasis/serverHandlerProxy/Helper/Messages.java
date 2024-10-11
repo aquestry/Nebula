@@ -1,4 +1,4 @@
-package de.voasis.serverHandlerProxy.Maps;
+package de.voasis.serverHandlerProxy.Helper;
 
 import java.util.Arrays;
 import java.util.List;

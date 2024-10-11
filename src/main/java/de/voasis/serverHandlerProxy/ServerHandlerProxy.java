@@ -9,11 +9,13 @@ import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.serverHandlerProxy.Commands.AdminCommand;
+import de.voasis.serverHandlerProxy.Commands.QueueCommand;
 import de.voasis.serverHandlerProxy.Commands.ShutdownCommand;
 import de.voasis.serverHandlerProxy.Events.EventManager;
 import de.voasis.serverHandlerProxy.Helper.DataHolder;
 import de.voasis.serverHandlerProxy.Helper.PingUtil;
-import de.voasis.serverHandlerProxy.Maps.Messages;
+import de.voasis.serverHandlerProxy.Helper.Messages;
+import de.voasis.serverHandlerProxy.Helper.QueueProcessor;
 import de.voasis.serverHandlerProxy.Maps.ServerInfo;
 import de.voasis.serverHandlerProxy.Permission.PermissionManager;
 import dev.dejvokep.boostedyaml.YamlDocument;
@@ -41,6 +43,7 @@ public class ServerHandlerProxy {
     public static YamlDocument config;
     public static DataHolder dataHolder;
     public static ExternalServerManager externalServerManager;
+    public static QueueProcessor queueProcessor;
     public PermissionManager permissionManager;
     public static PingUtil pingUtil;
 
@@ -48,10 +51,11 @@ public class ServerHandlerProxy {
     public ServerHandlerProxy(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         dataHolder = new DataHolder();
         loadConfig(dataDirectory);
-        pingUtil = new PingUtil(dataHolder, server, logger, this);
+        pingUtil = new PingUtil(dataHolder, server, this);
         externalServerManager = new ExternalServerManager(logger, server, dataHolder, pingUtil);
         dataHolder.Refresh(config, server, logger);
         permissionManager  = new PermissionManager();
+        queueProcessor = new QueueProcessor(server, dataHolder);
     }
 
     @Subscribe
@@ -62,9 +66,14 @@ public class ServerHandlerProxy {
         createDefaultServer();
 
         server.getScheduler()
-                .buildTask(this, pingUtil::updateState)
+                .buildTask(this, this::Update)
                 .repeat(1L, TimeUnit.SECONDS)
                 .schedule();
+    }
+
+    private void Update() {
+        pingUtil.updateState();
+        queueProcessor.process();
     }
 
     private void shutdownPlugin() {
@@ -86,6 +95,7 @@ public class ServerHandlerProxy {
         CommandManager commandManager = server.getCommandManager();
         commandManager.register("admin", new AdminCommand(logger));
         commandManager.register("shutdown", new ShutdownCommand(server));
+        commandManager.register("queue", new QueueCommand(dataHolder));
         logger.info("Commands registered.");
     }
 
