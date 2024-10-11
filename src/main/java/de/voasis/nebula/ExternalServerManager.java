@@ -4,6 +4,7 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.nebula.Helper.DataHolder;
 import de.voasis.nebula.Helper.PingUtil;
@@ -102,6 +103,10 @@ public class ExternalServerManager {
     }
 
     public void kill(ServerInfo externalServer, String servername, CommandSource source) {
+        for(Player p : server.getServer(servername).get().getPlayersConnected()) {
+            p.createConnectionRequest(dataHolder.defaultRegisteredServer).fireAndForget();
+            p.sendMessage(Component.text(Messages.killed, NamedTextColor.GOLD));
+        }
         String command = "docker kill " + servername;
         executeSSHCommand(externalServer, command, source, "Docker container stopped: " + servername, "Failed to stop Docker container.");
 
