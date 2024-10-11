@@ -38,7 +38,7 @@ public class QueueCommand implements SimpleCommand {
                     return;
                 }
             }
-            source.sendMessage(Component.text("Usage: /queue join <queue name> Or: /queue leave"));
+            source.sendMessage(Component.text("You are in no queue."));
             return;
         }
         if (args.length != 2 || !args[0].equalsIgnoreCase("join") ) {
@@ -72,7 +72,7 @@ public class QueueCommand implements SimpleCommand {
         String[] args = invocation.arguments();
 
         if (args.length == 1) {
-            return List.of("join");
+            return List.of("join","leave");
         } else if (args.length == 2 && args[0].equalsIgnoreCase("join")) {
             return dataHolder.queues.stream()
                     .map(queue -> queue.getGamemode().getName())

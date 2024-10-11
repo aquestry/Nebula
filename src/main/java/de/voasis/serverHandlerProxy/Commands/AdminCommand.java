@@ -126,13 +126,13 @@ public class AdminCommand implements SimpleCommand {
                 case "kill" -> {
                     return CompletableFuture.completedFuture(ServerHandlerProxy.dataHolder.backendInfoMap.stream()
                             .filter(BackendServer::isOnline)
-                            .filter(server -> server.getHoldServer().equals(args[1]))
+                            .filter(server -> server.getHoldServer().getServerName().startsWith(args[1]))
                             .map(BackendServer::getServerName)
                             .toList());
                 }
                 case "delete" -> {
                     return CompletableFuture.completedFuture(ServerHandlerProxy.dataHolder.backendInfoMap.stream()
-                            .filter(server -> server.getHoldServer().equals(args[1]))
+                            .filter(server -> server.getHoldServer().getServerName().startsWith(args[1]))
                             .map(BackendServer::getServerName)
                             .toList());
                 }
