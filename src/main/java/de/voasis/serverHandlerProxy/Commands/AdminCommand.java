@@ -138,7 +138,6 @@ public class AdminCommand implements SimpleCommand {
                 }
             }
         }
-
         return CompletableFuture.completedFuture(List.of());
     }
 
