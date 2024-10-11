@@ -1,6 +1,6 @@
-# ServerHandlerProxy
+# Nebula
 
-**ServerHandlerProxy** is a server management tool built with Java and integrated with Velocity, designed to handle the dynamic creation, management, and control of Minecraft server instances. It uses Docker on Hold-Servers to manage Backend-Servers.
+**Nebula** is a server management tool built with Java and integrated with Velocity, designed to handle the dynamic creation, management, and control of Minecraft server instances. It uses Docker on Hold-Servers to manage Backend-Servers.
 
 ## Key Features:
 - **Simple Permissions**: Simply define admins via there UUID in the config.
@@ -23,7 +23,7 @@
 On start, Velocity will try to create a server on the first backend server via the Default-Template in the config and name it "default".
 
 ## In-Game Commands
-ServerHandlerProxy also supports in-game commands for admins to manage server instances directly within Minecraft. Here are the available commands:
+Nebula also supports in-game commands for admins to manage server instances directly within Minecraft. Here are the available commands:
 
 ### **Admin Commands:**
 
