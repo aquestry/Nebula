@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.voasis</groupId>
-    <artifactId>serverhandlerproxy</artifactId>
+    <artifactId>nebula</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
 
-    <name>serverhandlerproxy</name>
+    <name>nebula</name>
 
     <properties>
         <java.version>17</java.version>
@@ -46,7 +46,7 @@
                     <relocations>
                         <relocation>
                             <pattern>dev.dejvokep.boostedyaml</pattern>
-                            <shadedPattern>de.voasis.serverHandlerProxy.libs.boostedyaml</shadedPattern>
+                            <shadedPattern>de.voasis.nebula.libs.boostedyaml</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>

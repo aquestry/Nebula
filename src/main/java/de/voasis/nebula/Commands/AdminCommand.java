@@ -1,10 +1,10 @@
-package de.voasis.serverHandlerProxy.Commands;
+package de.voasis.nebula.Commands;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
-import de.voasis.serverHandlerProxy.Maps.BackendServer;
-import de.voasis.serverHandlerProxy.Maps.ServerInfo;
-import de.voasis.serverHandlerProxy.ServerHandlerProxy;
+import de.voasis.nebula.Maps.BackendServer;
+import de.voasis.nebula.Maps.ServerInfo;
+import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class AdminCommand implements SimpleCommand {
 
-    private Logger logger;
+    private final Logger logger;
     public AdminCommand(Logger logger) {
         this.logger = logger;
     }
@@ -64,9 +64,9 @@ public class AdminCommand implements SimpleCommand {
         String instanceName = args[2];
         ServerInfo temp = findServerInfo(externalServerName);
 
-        if (temp != null && ServerHandlerProxy.dataHolder.getBackendServer(instanceName) != null) {
+        if (temp != null && Nebula.dataHolder.getBackendServer(instanceName) != null) {
             source.sendMessage(Component.text("Killing server instance...", NamedTextColor.AQUA));
-            ServerHandlerProxy.externalServerManager.kill(temp, instanceName, source);
+            Nebula.externalServerManager.kill(temp, instanceName, source);
         } else {
             source.sendMessage(Component.text("Server not found.", NamedTextColor.GOLD));
         }
@@ -77,9 +77,9 @@ public class AdminCommand implements SimpleCommand {
         String instanceName = args[2];
         ServerInfo temp = findServerInfo(externalServerName);
 
-        if (temp != null && ServerHandlerProxy.dataHolder.getBackendServer(instanceName) != null) {
+        if (temp != null && Nebula.dataHolder.getBackendServer(instanceName) != null) {
             source.sendMessage(Component.text("Deleting server instance...", NamedTextColor.AQUA));
-            ServerHandlerProxy.externalServerManager.delete(temp, instanceName, source);
+            Nebula.externalServerManager.delete(temp, instanceName, source);
         } else {
             source.sendMessage(Component.text("Server not found.", NamedTextColor.GOLD));
         }
@@ -91,9 +91,9 @@ public class AdminCommand implements SimpleCommand {
         String newName = args[3];
         ServerInfo temp = findServerInfo(externalServerName);
         if (temp != null) {
-            if(ServerHandlerProxy.dataHolder.getBackendServer(newName) == null) {
+            if(Nebula.dataHolder.getBackendServer(newName) == null) {
                 source.sendMessage(Component.text("Creating server instance from template...", NamedTextColor.AQUA));
-                ServerHandlerProxy.externalServerManager.createFromTemplate(temp, templateName, newName, source);
+                Nebula.externalServerManager.createFromTemplate(temp, templateName, newName, source);
             } else {
                 source.sendMessage(Component.text("Server already exists.", NamedTextColor.GOLD));
             }
@@ -103,7 +103,7 @@ public class AdminCommand implements SimpleCommand {
     }
 
     private ServerInfo findServerInfo(String serverName) {
-        for (ServerInfo info : ServerHandlerProxy.dataHolder.serverInfoMap) {
+        for (ServerInfo info : Nebula.dataHolder.serverInfoMap) {
             if (serverName.equals(info.getServerName())) {
                 return info;
             }
@@ -118,20 +118,20 @@ public class AdminCommand implements SimpleCommand {
         if (args.length == 1) {
             return CompletableFuture.completedFuture(List.of("kill", "delete", "template"));
         } else if (args.length == 2) {
-            return CompletableFuture.completedFuture(ServerHandlerProxy.dataHolder.serverInfoMap.stream()
+            return CompletableFuture.completedFuture(Nebula.dataHolder.serverInfoMap.stream()
                     .map(ServerInfo::getServerName)
                     .toList());
         } else if (args.length == 3) {
             switch (args[0]) {
                 case "kill" -> {
-                    return CompletableFuture.completedFuture(ServerHandlerProxy.dataHolder.backendInfoMap.stream()
+                    return CompletableFuture.completedFuture(Nebula.dataHolder.backendInfoMap.stream()
                             .filter(BackendServer::isOnline)
                             .filter(server -> server.getHoldServer().getServerName().startsWith(args[1]))
                             .map(BackendServer::getServerName)
                             .toList());
                 }
                 case "delete" -> {
-                    return CompletableFuture.completedFuture(ServerHandlerProxy.dataHolder.backendInfoMap.stream()
+                    return CompletableFuture.completedFuture(Nebula.dataHolder.backendInfoMap.stream()
                             .filter(server -> server.getHoldServer().getServerName().startsWith(args[1]))
                             .map(BackendServer::getServerName)
                             .toList());

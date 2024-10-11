@@ -1,12 +1,12 @@
-package de.voasis.serverHandlerProxy.Helper;
+package de.voasis.nebula.Helper;
 
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import de.voasis.serverHandlerProxy.Maps.BackendServer;
-import de.voasis.serverHandlerProxy.Maps.GamemodeInfo;
-import de.voasis.serverHandlerProxy.Maps.QueueInfo;
-import de.voasis.serverHandlerProxy.Maps.ServerInfo;
-import de.voasis.serverHandlerProxy.ServerHandlerProxy;
+import de.voasis.nebula.Maps.BackendServer;
+import de.voasis.nebula.Maps.GamemodeInfo;
+import de.voasis.nebula.Maps.QueueInfo;
+import de.voasis.nebula.Maps.ServerInfo;
+import de.voasis.nebula.Nebula;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +15,7 @@ import java.util.*;
 
 
 public class DataHolder {
-    static final Logger logger = LoggerFactory.getLogger("serverhandlerproxy");
+    private final Logger logger = LoggerFactory.getLogger("nebula");
     public String defaultServerTemplate = null;
     public RegisteredServer defaultRegisteredServer = null;
     public List<String> admins = new ArrayList<>();
@@ -42,7 +42,7 @@ public class DataHolder {
             ServerInfo serverInfo = new ServerInfo(name, ip, password, 0, username);
             serverInfoMap.add(serverInfo);
             logger.info("Added Server to pool: " + name);
-            ServerHandlerProxy.pingUtil.updateFreePort(serverInfo);
+            Nebula.pingUtil.updateFreePort(serverInfo);
         }
 
         logger.info("Loading Gamemodes from config...");

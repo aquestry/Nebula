@@ -1,10 +1,10 @@
-package de.voasis.serverHandlerProxy.Commands;
+package de.voasis.nebula.Commands;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
-import de.voasis.serverHandlerProxy.Helper.DataHolder;
-import de.voasis.serverHandlerProxy.Maps.QueueInfo;
+import de.voasis.nebula.Helper.DataHolder;
+import de.voasis.nebula.Maps.QueueInfo;
 import net.kyori.adventure.text.Component;
 
 import java.util.ArrayList;

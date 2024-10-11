@@ -1,4 +1,4 @@
-package de.voasis.serverHandlerProxy.Events;
+package de.voasis.nebula.Events;
 
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
@@ -12,11 +12,11 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
-import de.voasis.serverHandlerProxy.Helper.DataHolder;
-import de.voasis.serverHandlerProxy.ExternalServerManager;
-import de.voasis.serverHandlerProxy.Maps.BackendServer;
-import de.voasis.serverHandlerProxy.Helper.Messages;
-import de.voasis.serverHandlerProxy.Permission.PermissionManager;
+import de.voasis.nebula.Helper.DataHolder;
+import de.voasis.nebula.ExternalServerManager;
+import de.voasis.nebula.Maps.BackendServer;
+import de.voasis.nebula.Helper.Messages;
+import de.voasis.nebula.Permission.PermissionManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
@@ -71,7 +71,7 @@ public class EventManager {
     }
     private void createDefaultServer() {
         logger.info("Creating Default-Server");
-        de.voasis.serverHandlerProxy.Maps.ServerInfo serverInfo = dataHolder.serverInfoMap.getFirst();
+        de.voasis.nebula.Maps.ServerInfo serverInfo = dataHolder.serverInfoMap.getFirst();
         if (serverInfo == null) {
             logger.error("No Server Registered! - Shutdown!");
             server.shutdown();

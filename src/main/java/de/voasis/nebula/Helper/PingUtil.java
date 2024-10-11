@@ -1,4 +1,4 @@
-package de.voasis.serverHandlerProxy.Helper;
+package de.voasis.nebula.Helper;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
@@ -7,13 +7,11 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import de.voasis.serverHandlerProxy.Maps.BackendServer;
-import de.voasis.serverHandlerProxy.Maps.ServerInfo;
+import de.voasis.nebula.Maps.BackendServer;
+import de.voasis.nebula.Maps.ServerInfo;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.InputStream;
 import java.util.Optional;
 import java.util.Properties;
@@ -22,13 +20,14 @@ import java.util.concurrent.Callable;
 public class PingUtil {
     static DataHolder dataHolder;
     static ProxyServer server;
-    static final Logger logger = LoggerFactory.getLogger("serverhandlerproxy");
+    static Logger logger;
     static Object plugin;
 
-    public PingUtil(DataHolder dataHolder, ProxyServer server, Object plugin) {
+    public PingUtil(DataHolder dataHolder, ProxyServer server, Object plugin, Logger logger) {
         PingUtil.dataHolder = dataHolder;
         PingUtil.server = server;
         PingUtil.plugin = plugin;
+        PingUtil.logger = logger;
     }
 
 
@@ -93,9 +92,7 @@ public class PingUtil {
                         CommandSource creator = backendServer.getCreator();
                         for(Player p : backendServer.getPendingPlayerConnections()) {
                             RegisteredServer target = server.getServer(backendServer.getServerName()).get();
-                            if(target != null) {
-                                p.createConnectionRequest(target).fireAndForget();
-                            }
+                            p.createConnectionRequest(target).fireAndForget();
                         }
                         if (creator != null) {
                             creator.sendMessage(Component.text("Server: " + backendServer.getServerName() + " is now online.", NamedTextColor.GREEN));

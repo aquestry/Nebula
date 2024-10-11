@@ -1,10 +1,10 @@
-package de.voasis.serverHandlerProxy.Helper;
+package de.voasis.nebula.Helper;
 
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import de.voasis.serverHandlerProxy.Maps.BackendServer;
-import de.voasis.serverHandlerProxy.Maps.QueueInfo;
-import de.voasis.serverHandlerProxy.ServerHandlerProxy;
+import de.voasis.nebula.Maps.BackendServer;
+import de.voasis.nebula.Maps.QueueInfo;
+import de.voasis.nebula.Nebula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +14,7 @@ import java.util.Random;
 public class QueueProcessor {
     static DataHolder dataHolder;
     static ProxyServer server;
-    static final Logger logger = LoggerFactory.getLogger("serverhandlerproxy");
+    static final Logger logger = LoggerFactory.getLogger("nebula");
 
     public QueueProcessor(ProxyServer server, DataHolder dataHolder) {
         QueueProcessor.server = server;
@@ -28,7 +28,7 @@ public class QueueProcessor {
                 queue.setUsed(true);
                 logger.info("Enough players, creating server...");
                 String newName = queue.getGamemode().getName() + "-" + (dataHolder.backendInfoMap.size() + 1);
-                ServerHandlerProxy.externalServerManager.createFromTemplate(
+                Nebula.externalServerManager.createFromTemplate(
                         getRandomElement(dataHolder.serverInfoMap),
                         queue.getGamemode().getTemplateName(),
                         newName,

@@ -1,4 +1,4 @@
-package de.voasis.serverHandlerProxy.Maps;
+package de.voasis.nebula.Maps;
 
 public class ServerInfo {
 

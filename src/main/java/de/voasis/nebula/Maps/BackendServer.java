@@ -1,4 +1,4 @@
-package de.voasis.serverHandlerProxy.Maps;
+package de.voasis.nebula.Maps;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;

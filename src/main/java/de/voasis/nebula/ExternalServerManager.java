@@ -1,16 +1,16 @@
-package de.voasis.serverHandlerProxy;
+package de.voasis.nebula;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ProxyServer;
-import de.voasis.serverHandlerProxy.Helper.DataHolder;
-import de.voasis.serverHandlerProxy.Helper.PingUtil;
-import de.voasis.serverHandlerProxy.Maps.BackendServer;
-import de.voasis.serverHandlerProxy.Helper.Messages;
-import de.voasis.serverHandlerProxy.Maps.QueueInfo;
-import de.voasis.serverHandlerProxy.Maps.ServerInfo;
+import de.voasis.nebula.Helper.DataHolder;
+import de.voasis.nebula.Helper.PingUtil;
+import de.voasis.nebula.Maps.BackendServer;
+import de.voasis.nebula.Helper.Messages;
+import de.voasis.nebula.Maps.QueueInfo;
+import de.voasis.nebula.Maps.ServerInfo;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;

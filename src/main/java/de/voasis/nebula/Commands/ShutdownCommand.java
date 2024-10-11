@@ -1,4 +1,4 @@
-package de.voasis.serverHandlerProxy.Commands;
+package de.voasis.nebula.Commands;
 
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ProxyServer;

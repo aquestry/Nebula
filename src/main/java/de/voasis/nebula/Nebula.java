@@ -1,4 +1,4 @@
-package de.voasis.serverHandlerProxy;
+package de.voasis.nebula;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.command.CommandManager;
@@ -8,16 +8,16 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
-import de.voasis.serverHandlerProxy.Commands.AdminCommand;
-import de.voasis.serverHandlerProxy.Commands.QueueCommand;
-import de.voasis.serverHandlerProxy.Commands.ShutdownCommand;
-import de.voasis.serverHandlerProxy.Events.EventManager;
-import de.voasis.serverHandlerProxy.Helper.DataHolder;
-import de.voasis.serverHandlerProxy.Helper.PingUtil;
-import de.voasis.serverHandlerProxy.Helper.Messages;
-import de.voasis.serverHandlerProxy.Helper.QueueProcessor;
-import de.voasis.serverHandlerProxy.Maps.ServerInfo;
-import de.voasis.serverHandlerProxy.Permission.PermissionManager;
+import de.voasis.nebula.Commands.AdminCommand;
+import de.voasis.nebula.Commands.QueueCommand;
+import de.voasis.nebula.Commands.ShutdownCommand;
+import de.voasis.nebula.Events.EventManager;
+import de.voasis.nebula.Helper.DataHolder;
+import de.voasis.nebula.Helper.PingUtil;
+import de.voasis.nebula.Helper.Messages;
+import de.voasis.nebula.Helper.QueueProcessor;
+import de.voasis.nebula.Maps.ServerInfo;
+import de.voasis.nebula.Permission.PermissionManager;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.dvs.versioning.BasicVersioning;
 import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
@@ -32,8 +32,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-@Plugin(id = "serverhandlerproxy", name = "ServerHandlerProxy", version = "1.0", authors = "Aquestry")
-public class ServerHandlerProxy {
+@Plugin(id = "nebula", name = "Nebula", version = "1.0", authors = "Aquestry")
+public class Nebula {
 
     @Inject
     private Logger logger;
@@ -48,10 +48,10 @@ public class ServerHandlerProxy {
     public static PingUtil pingUtil;
 
     @Inject
-    public ServerHandlerProxy(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
+    public Nebula(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         dataHolder = new DataHolder();
         loadConfig(dataDirectory);
-        pingUtil = new PingUtil(dataHolder, server, this);
+        pingUtil = new PingUtil(dataHolder, server, this, logger);
         externalServerManager = new ExternalServerManager(logger, server, dataHolder, pingUtil);
         dataHolder.Refresh(config, server, logger);
         permissionManager  = new PermissionManager();
@@ -77,13 +77,12 @@ public class ServerHandlerProxy {
     }
 
     private void shutdownPlugin() {
-        Optional<PluginContainer> container = server.getPluginManager().getPlugin("serverhandlerproxy");
+        Optional<PluginContainer> container = server.getPluginManager().getPlugin("nebula");
         container.ifPresent(pluginContainer -> pluginContainer.getExecutorService().shutdown());
     }
 
     private void logStartup() {
         logger.info(Messages.logo);
-        logger.info("ServerHandlerProxy is starting...");
         logger.info("Default-Server-Template: " + dataHolder.defaultServerTemplate);
         logger.info("External Servers:");
         for (ServerInfo s : dataHolder.serverInfoMap) {
@@ -120,7 +119,7 @@ public class ServerHandlerProxy {
         try {
             config = YamlDocument.create(
                     new File(dataDirectory.toFile(), "config.yml"),
-                    Objects.requireNonNull(ServerHandlerProxy.class.getResourceAsStream("/config.yml")),
+                    Objects.requireNonNull(Nebula.class.getResourceAsStream("/config.yml")),
                     GeneralSettings.DEFAULT,
                     LoaderSettings.builder().setAutoUpdate(true).build(),
                     DumperSettings.DEFAULT,

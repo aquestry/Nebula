@@ -1,4 +1,4 @@
-package de.voasis.serverHandlerProxy.Permission;
+package de.voasis.nebula.Permission;
 
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.permission.PermissionFunction;
