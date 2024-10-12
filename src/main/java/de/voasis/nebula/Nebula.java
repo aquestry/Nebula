@@ -59,7 +59,7 @@ public class Nebula {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         registerCommands();
         logger.info(Icon.Icon);
-        server.getEventManager().register(this, new EventManager(server, dataHolder, logger, externalServerManager, permissionManager));
+        server.getEventManager().register(this, new EventManager(server, dataHolder, logger, externalServerManager, util, permissionManager));
         createDefaultServer();
         server.getScheduler()
                 .buildTask(this, this::Update)
@@ -90,7 +90,7 @@ public class Nebula {
         externalServerManager.createFromTemplate(
                 Util.getRandomElement(dataHolder.holdServerMap),
                 dataHolder.defaultServerTemplate,
-                "default",
+                "default-" + Util.getDefaultsCount(),
                 server.getConsoleCommandSource()
         );
     }

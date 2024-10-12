@@ -7,16 +7,14 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import de.voasis.nebula.ExternalServerManager;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.HoldServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
 import java.io.InputStream;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 public class Util {
@@ -137,5 +135,44 @@ public class Util {
         Random r = new Random();
         int i = r.nextInt(list.size());
         return list.get(i);
+    }
+    public RegisteredServer getDefaultServer(ExternalServerManager externalServerManager) {
+        List<BackendServer> defaults = new ArrayList<>();
+        for(BackendServer backendServer : dataHolder.backendInfoMap) {
+            if(backendServer.isOnline() && backendServer.getTemplate().equals(dataHolder.defaultServerTemplate))  {
+                defaults.add(backendServer);
+            }
+        }
+        for(BackendServer defaultBackendServer : defaults) {
+            if(server.getServer(defaultBackendServer.getServerName()).get().getPlayersConnected().size() < dataHolder.newCreateCount) {
+                if(server.getServer(defaultBackendServer.getServerName()).get().getPlayersConnected().size() == dataHolder.newCreateCount -1) {
+                    for (BackendServer d : defaults) {
+                        if(!d.equals(defaultBackendServer) && server.getServer(d.getServerName()).get().getPlayersConnected().size() < dataHolder.newCreateCount) {
+                            return server.getServer(d.getServerName()).get();
+                        }
+                    }
+
+                    externalServerManager.createFromTemplate(
+                            Util.getRandomElement(dataHolder.holdServerMap),
+                            dataHolder.defaultServerTemplate,
+                            "default-" + getDefaultsCount(),
+                            server.getConsoleCommandSource()
+                    );
+                }
+                return server.getServer(defaultBackendServer.getServerName()).get();
+            }
+        }
+
+        return null;
+    }
+
+    public static int getDefaultsCount() {
+        List<BackendServer> defaults = new ArrayList<>();
+        for(BackendServer backendServer : dataHolder.backendInfoMap) {
+            if(backendServer.getTemplate().equals(dataHolder.defaultServerTemplate))  {
+                defaults.add(backendServer);
+            }
+        }
+        return defaults.size();
     }
 }

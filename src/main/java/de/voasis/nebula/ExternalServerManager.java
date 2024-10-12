@@ -52,6 +52,7 @@ public class ExternalServerManager {
             if (channelExec.getExitStatus() == 0) {
                 source.sendMessage(Component.text(successMessage, NamedTextColor.GREEN));
             } else {
+
                 source.sendMessage(Component.text(errorMessage, NamedTextColor.GOLD));
             }
             channelExec.disconnect();
@@ -89,7 +90,7 @@ public class ExternalServerManager {
 
     public void kill(HoldServer externalServer, String servername, CommandSource source) {
         for(Player p : server.getServer(servername).get().getPlayersConnected()) {
-            p.createConnectionRequest(dataHolder.defaultRegisteredServer).fireAndForget();
+            p.createConnectionRequest(util.getDefaultServer(this)).fireAndForget();
             p.sendMessage(Component.text(Messages.killed, NamedTextColor.GOLD));
         }
         String command = "docker kill " + servername;

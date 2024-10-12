@@ -1,7 +1,6 @@
 package de.voasis.nebula.Helper;
 
 import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.GamemodeInfo;
 import de.voasis.nebula.Maps.QueueInfo;
@@ -14,9 +13,8 @@ import java.util.*;
 
 public class DataHolder {
     public String defaultServerTemplate = null;
-    public RegisteredServer defaultRegisteredServer = null;
     public List<String> admins = new ArrayList<>();
-
+    public int newCreateCount;
     public List<HoldServer> holdServerMap = new ArrayList<>();
     public List<BackendServer> backendInfoMap = new ArrayList<>();
     public List<GamemodeInfo> gamemodeInfoMap = new ArrayList<>();
@@ -24,6 +22,7 @@ public class DataHolder {
 
     public void Refresh(YamlDocument config, ProxyServer server, Logger logger) {
         defaultServerTemplate = config.getString("default-template");
+        newCreateCount = config.getInt("default-new-create-count");
         Messages.vsecret = config.getString("vsecret");
         holdServerMap.clear();
         admins.clear();

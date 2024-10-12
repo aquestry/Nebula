@@ -1,14 +1,21 @@
 file-version: 1
-default-template: anton691/simple-lobby:latest
+# UUID's of the Player that should have admins perms.
 admins: 74401e14-f69c-48f3-b393-64be488dff8f,069a79f4-44e9-4726-a5be-fca90e38aaf5
+# Velocity Secret
 vsecret: <VELOCITY-SECRET>
+# Docherhub Template for the Default-Servers.
+default-template: anton691/simple-lobby:latest
+# Number of players at which an additional default server should be created.
+# So when there a 4 people on a default server another one will be created for the next person.
+default-new-create-count: 5
 
+# Hold-Servers, at least one.
 manager-servers:
   server-1:
     ip: localhost
     username: notrootpls
     password: 1234
-
+# Gamemodes which players can join.
 gamemodes:
   duels:
     templateName: anton691/simple-duels:latest

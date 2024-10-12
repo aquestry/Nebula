@@ -3,27 +3,23 @@ package de.voasis.nebula.Event.Events;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import de.voasis.nebula.ExternalServerManager;
 import de.voasis.nebula.Helper.DataHolder;
-import de.voasis.nebula.Maps.BackendServer;
+import de.voasis.nebula.Helper.Util;
 import net.kyori.adventure.text.Component;
 import org.slf4j.Logger;
 
 public class PlayerChooseInitialServer {
-    public PlayerChooseInitialServer(PlayerChooseInitialServerEvent event, DataHolder dataHolder, Logger logger) {
+    public PlayerChooseInitialServer(PlayerChooseInitialServerEvent event, DataHolder dataHolder, Logger logger, Util util, ExternalServerManager externalServerManager) {
         Player player = event.getPlayer();
-        RegisteredServer defaultServer = dataHolder.defaultRegisteredServer;
+        RegisteredServer defaultServer = util.getDefaultServer(externalServerManager);
         if (defaultServer != null) {
-            BackendServer info = dataHolder.getBackendServer(defaultServer.getServerInfo().getName());
-            if(info != null) {
-                if(info.isOnline()) {
-                    event.setInitialServer(defaultServer);
-                    logger.info("Default-Server is online, connecting player...");
-                    return;
-                }
-            }
+            event.setInitialServer(defaultServer);
+            logger.info("Connecting player...");
+            return;
         }
-        logger.info("Default-Server is offline, disconnecting player...");
-        player.disconnect(Component.text("Default-Server is not online"));
+        logger.info("No server found, disconnecting player...");
+        player.disconnect(Component.text("No server found!"));
         event.setInitialServer(null);
     }
 }

@@ -7,7 +7,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 
 public class ShutdownCommand implements SimpleCommand {
-    private ProxyServer server;
+    private final ProxyServer server;
     public ShutdownCommand(ProxyServer server) {
         this.server = server;
     }
