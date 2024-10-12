@@ -1,14 +1,14 @@
 package de.voasis.nebula.Maps;
 
-public class ServerInfo {
+public class HoldServer {
 
-    private String serverName;
-    private String ip;
-    private String password;
+    private final String serverName;
+    private final String ip;
+    private final String password;
     private int freePort;
-    private String username;
+    private final String username;
 
-    public ServerInfo(String serverName, String ip, String password, int freePort, String username) {
+    public HoldServer(String serverName, String ip, String password, int freePort, String username) {
         this.serverName = serverName;
         this.password = password;
         this.freePort = freePort;

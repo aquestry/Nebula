@@ -9,13 +9,4 @@ public class Messages {
     public static String already = "You are already connected to this server.";
     public static String vsecret = "secret";
     public static List<String> adminRights = Arrays.asList("velocity.admin",  "velocity.command.plugins", "velocity.command.info", "velocity.command.send", "velocity.command.glist", "velocity.command.server");
-    public static String logo = """
-                \n
-        ███╗░░██╗███████╗██████╗░██╗░░░██╗██╗░░░░░░█████╗░
-        ████╗░██║██╔════╝██╔══██╗██║░░░██║██║░░░░░██╔══██╗
-        ██╔██╗██║█████╗░░██████╦╝██║░░░██║██║░░░░░███████║
-        ██║╚████║██╔══╝░░██╔══██╗██║░░░██║██║░░░░░██╔══██║
-        ██║░╚███║███████╗██████╦╝╚██████╔╝███████╗██║░░██║
-        ╚═╝░░╚══╝╚══════╝╚═════╝░░╚═════╝░╚══════╝╚═╝░░╚═╝
-               \s""";
 }

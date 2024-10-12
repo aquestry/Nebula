@@ -3,7 +3,7 @@ package de.voasis.nebula.Commands;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import de.voasis.nebula.Maps.BackendServer;
-import de.voasis.nebula.Maps.ServerInfo;
+import de.voasis.nebula.Maps.HoldServer;
 import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -14,10 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class AdminCommand implements SimpleCommand {
 
-    private final Logger logger;
-    public AdminCommand(Logger logger) {
-        this.logger = logger;
-    }
+    public AdminCommand(Logger logger) {}
 
     @Override
     public void execute(Invocation invocation) {
@@ -62,7 +59,7 @@ public class AdminCommand implements SimpleCommand {
     private void handleKillCommand(CommandSource source, String[] args) {
         String externalServerName = args[1];
         String instanceName = args[2];
-        ServerInfo temp = findServerInfo(externalServerName);
+        HoldServer temp = findServerInfo(externalServerName);
 
         if (temp != null && Nebula.dataHolder.getBackendServer(instanceName) != null) {
             source.sendMessage(Component.text("Killing server instance...", NamedTextColor.AQUA));
@@ -75,7 +72,7 @@ public class AdminCommand implements SimpleCommand {
     private void handleDeleteCommand(CommandSource source, String[] args) {
         String externalServerName = args[1];
         String instanceName = args[2];
-        ServerInfo temp = findServerInfo(externalServerName);
+        HoldServer temp = findServerInfo(externalServerName);
 
         if (temp != null && Nebula.dataHolder.getBackendServer(instanceName) != null) {
             source.sendMessage(Component.text("Deleting server instance...", NamedTextColor.AQUA));
@@ -89,7 +86,7 @@ public class AdminCommand implements SimpleCommand {
         String externalServerName = args[1];
         String templateName = args[2];
         String newName = args[3];
-        ServerInfo temp = findServerInfo(externalServerName);
+        HoldServer temp = findServerInfo(externalServerName);
         if (temp != null) {
             if(Nebula.dataHolder.getBackendServer(newName) == null) {
                 source.sendMessage(Component.text("Creating server instance from template...", NamedTextColor.AQUA));
@@ -102,8 +99,8 @@ public class AdminCommand implements SimpleCommand {
         }
     }
 
-    private ServerInfo findServerInfo(String serverName) {
-        for (ServerInfo info : Nebula.dataHolder.serverInfoMap) {
+    private HoldServer findServerInfo(String serverName) {
+        for (HoldServer info : Nebula.dataHolder.holdServerMap) {
             if (serverName.equals(info.getServerName())) {
                 return info;
             }
@@ -118,8 +115,8 @@ public class AdminCommand implements SimpleCommand {
         if (args.length == 1) {
             return CompletableFuture.completedFuture(List.of("kill", "delete", "template"));
         } else if (args.length == 2) {
-            return CompletableFuture.completedFuture(Nebula.dataHolder.serverInfoMap.stream()
-                    .map(ServerInfo::getServerName)
+            return CompletableFuture.completedFuture(Nebula.dataHolder.holdServerMap.stream()
+                    .map(HoldServer::getServerName)
                     .toList());
         } else if (args.length == 3) {
             switch (args[0]) {

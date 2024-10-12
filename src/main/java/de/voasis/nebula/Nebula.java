@@ -5,18 +5,16 @@ import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
-import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.nebula.Commands.AdminCommand;
 import de.voasis.nebula.Commands.QueueCommand;
 import de.voasis.nebula.Commands.ShutdownCommand;
-import de.voasis.nebula.Events.EventManager;
+import de.voasis.nebula.Data.Icon;
+import de.voasis.nebula.Event.EventManager;
 import de.voasis.nebula.Helper.DataHolder;
-import de.voasis.nebula.Helper.PingUtil;
-import de.voasis.nebula.Helper.Messages;
+import de.voasis.nebula.Helper.Util;
 import de.voasis.nebula.Helper.QueueProcessor;
-import de.voasis.nebula.Maps.ServerInfo;
 import de.voasis.nebula.Permission.PermissionManager;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.dvs.versioning.BasicVersioning;
@@ -29,10 +27,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-@Plugin(id = "nebula", name = "Nebula", version = "1.0", authors = "Aquestry")
+@Plugin(id = "nebula", name = "Nebula", description = "Nebula can create servers on demand using Docker on multiple machines.", version = "1.0", authors = "Aquestry")
 public class Nebula {
 
     @Inject
@@ -44,27 +41,26 @@ public class Nebula {
     public static DataHolder dataHolder;
     public static ExternalServerManager externalServerManager;
     public static QueueProcessor queueProcessor;
-    public PermissionManager permissionManager;
-    public static PingUtil pingUtil;
+    public static PermissionManager permissionManager;
+    public static Util util;
 
     @Inject
     public Nebula(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
-        dataHolder = new DataHolder();
         loadConfig(dataDirectory);
-        pingUtil = new PingUtil(dataHolder, server, this, logger);
-        externalServerManager = new ExternalServerManager(logger, server, dataHolder, pingUtil);
-        dataHolder.Refresh(config, server, logger);
+        dataHolder = new DataHolder();
+        util = new Util(dataHolder, server, this, logger);
+        externalServerManager = new ExternalServerManager(logger, server, dataHolder, util);
         permissionManager  = new PermissionManager();
-        queueProcessor = new QueueProcessor(server, dataHolder);
+        queueProcessor = new QueueProcessor(server, dataHolder, logger);
+        dataHolder.Refresh(config, server, logger);
     }
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
-        logStartup();
-        registerCommands();
-        server.getEventManager().register(this, new EventManager(server, dataHolder, logger, externalServerManager, permissionManager));
         createDefaultServer();
-
+        registerCommands();
+        logger.info(Icon.Icon);
+        server.getEventManager().register(this, new EventManager(server, dataHolder, logger, externalServerManager, permissionManager));
         server.getScheduler()
                 .buildTask(this, this::Update)
                 .repeat(1L, TimeUnit.SECONDS)
@@ -72,22 +68,8 @@ public class Nebula {
     }
 
     private void Update() {
-        pingUtil.updateState();
+        util.updateState();
         queueProcessor.process();
-    }
-
-    private void shutdownPlugin() {
-        Optional<PluginContainer> container = server.getPluginManager().getPlugin("nebula");
-        container.ifPresent(pluginContainer -> pluginContainer.getExecutorService().shutdown());
-    }
-
-    private void logStartup() {
-        logger.info(Messages.logo);
-        logger.info("Default-Server-Template: " + dataHolder.defaultServerTemplate);
-        logger.info("External Servers:");
-        for (ServerInfo s : dataHolder.serverInfoMap) {
-            logger.info(s.getServerName());
-        }
     }
 
     private void registerCommands() {
@@ -100,18 +82,16 @@ public class Nebula {
 
     private void createDefaultServer() {
         logger.info("Creating Default-Server");
-        ServerInfo serverInfo = dataHolder.serverInfoMap.getFirst();
-        if (serverInfo == null) {
-            logger.error("No Server Registered! - Shutdown!");
-            shutdownPlugin();
+        if (dataHolder.holdServerMap.isEmpty()) {
+            logger.error("No Hold-Server Registered! - Shutdown!");
             server.shutdown();
             return;
         }
         externalServerManager.createFromTemplate(
-                serverInfo,
+                Util.getRandomElement(dataHolder.holdServerMap),
                 dataHolder.defaultServerTemplate,
                 "default",
-                null
+                server.getConsoleCommandSource()
         );
     }
 
@@ -133,7 +113,7 @@ public class Nebula {
         } catch (IOException e) {
             logger.error("Could not load config! Plugin will shutdown!");
             try {
-                shutdownPlugin();
+                server.shutdown();
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }

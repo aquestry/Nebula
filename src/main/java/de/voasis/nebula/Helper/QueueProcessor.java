@@ -6,19 +6,17 @@ import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.QueueInfo;
 import de.voasis.nebula.Nebula;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
-import java.util.Random;
 
 public class QueueProcessor {
     static DataHolder dataHolder;
     static ProxyServer server;
-    static final Logger logger = LoggerFactory.getLogger("nebula");
+    static Logger logger;
 
-    public QueueProcessor(ProxyServer server, DataHolder dataHolder) {
+    public QueueProcessor(ProxyServer server, DataHolder dataHolder, Logger logger) {
         QueueProcessor.server = server;
         QueueProcessor.dataHolder = dataHolder;
+        QueueProcessor.logger = logger;
     }
 
     public void process() {
@@ -29,10 +27,10 @@ public class QueueProcessor {
                 logger.info("Enough players, creating server...");
                 String newName = queue.getGamemode().getName() + "-" + (dataHolder.backendInfoMap.size() + 1);
                 Nebula.externalServerManager.createFromTemplate(
-                        getRandomElement(dataHolder.serverInfoMap),
+                        Util.getRandomElement(dataHolder.holdServerMap),
                         queue.getGamemode().getTemplateName(),
                         newName,
-                        null
+                        server.getConsoleCommandSource()
                 );
                 BackendServer backendServer = dataHolder.getBackendServer(newName);
                 if (backendServer != null) {
@@ -46,14 +44,5 @@ public class QueueProcessor {
 
             }
         }
-    }
-
-    public <T> T getRandomElement(List<T> list) {
-        if (list == null || list.isEmpty()) {
-            return null;
-        }
-        Random r = new Random();
-        int i = r.nextInt(list.size());
-        return list.get(i);
     }
 }

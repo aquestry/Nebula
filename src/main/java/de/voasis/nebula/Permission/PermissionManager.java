@@ -14,7 +14,6 @@ import java.util.Set;
 public class PermissionManager implements PermissionProvider {
 
     private final Map<Player, Set<String>> playerPermissions;
-
     public PermissionManager() {
         playerPermissions = new HashMap<>();
     }

@@ -5,12 +5,11 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.GamemodeInfo;
 import de.voasis.nebula.Maps.QueueInfo;
-import de.voasis.nebula.Maps.ServerInfo;
+import de.voasis.nebula.Maps.HoldServer;
 import de.voasis.nebula.Nebula;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.*;
 
 
@@ -20,7 +19,7 @@ public class DataHolder {
     public RegisteredServer defaultRegisteredServer = null;
     public List<String> admins = new ArrayList<>();
 
-    public List<ServerInfo> serverInfoMap = new ArrayList<>();
+    public List<HoldServer> holdServerMap = new ArrayList<>();
     public List<BackendServer> backendInfoMap = new ArrayList<>();
     public List<GamemodeInfo> gamemodeInfoMap = new ArrayList<>();
     public List<QueueInfo> queues = new ArrayList<>();
@@ -28,7 +27,7 @@ public class DataHolder {
     public void Refresh(YamlDocument config, ProxyServer server, Logger logger) {
         defaultServerTemplate = config.getString("default-template");
         Messages.vsecret = config.getString("vsecret");
-        serverInfoMap.clear();
+        holdServerMap.clear();
         admins.clear();
         admins = List.of(config.getString("admins").split(","));
 
@@ -39,10 +38,10 @@ public class DataHolder {
             String ip = config.getString("manager-servers." + name + ".ip");
             String password = config.getString("manager-servers." + name + ".password");
             String username = config.getString("manager-servers." + name + ".username");
-            ServerInfo serverInfo = new ServerInfo(name, ip, password, 0, username);
-            serverInfoMap.add(serverInfo);
-            logger.info("Added Server to pool: " + name);
-            Nebula.pingUtil.updateFreePort(serverInfo);
+            HoldServer holdServer = new HoldServer(name, ip, password, 0, username);
+            holdServerMap.add(holdServer);
+            logger.info("Added Server to pool: {}", name);
+            Nebula.util.updateFreePort(holdServer);
         }
 
         logger.info("Loading Gamemodes from config...");
@@ -51,7 +50,7 @@ public class DataHolder {
             String name = (String) gamemode;
             String templateName = config.getString("gamemodes." + name + ".templateName");
             int neededPlayers = config.getInt("gamemodes." + name + ".neededPlayers");
-            logger.info("Registered Gamemode: " + name);
+            logger.info("Registered Gamemode: {}", name);
             GamemodeInfo newGamemode = new GamemodeInfo(name, neededPlayers, templateName);
             gamemodeInfoMap.add(newGamemode);
             queues.add(new QueueInfo(newGamemode));
