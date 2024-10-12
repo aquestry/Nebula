@@ -12,8 +12,8 @@
 ## Requirements:
 - **Java 21**: Required for running the Proxy instance.
 - **Velocity Proxy**: No predefined servers are required; servers are dynamically registered.
-- **Docker on Hold-Server**: Necessary for running the backend servers.
-- **User on Hold-Server**: Necessary for interacting with Docker, make sure he has the right permissions.
+- **Docker and Ruby on hold server**: Necessary for running the backend servers.
+- **User on hold server**: Necessary for interacting with Docker, make sure he has the right permissions.
 
 ## Usage:
 1. Clone the repository.
