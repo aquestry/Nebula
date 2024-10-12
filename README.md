@@ -1,5 +1,7 @@
 # Nebula
 
+![Velocity](https://flat.badgen.net/badge/Velocity/3.3.0/1197d1?icon=dockbit)
+
 **Nebula** is a server management tool built with Java and integrated with Velocity, designed to handle the dynamic creation, management, and control of Minecraft server instances. It uses Docker on Hold-Servers to manage Backend-Servers.
 
 ## Key Features:
@@ -10,7 +12,8 @@
 ## Requirements:
 - **Java 21**: Required for running the Proxy instance.
 - **Velocity Proxy**: No predefined servers are required; servers are dynamically registered.
-- **Ruby & Docker on Hold-Server**: Necessary for running the Flask backend that handles server requests.
+- **Docker on Hold-Server**: Necessary for running the backend servers.
+- **User on Hold-Server**: Necessary for interacting with Docker, make sure he has the right permissions.
 
 ## Usage:
 1. Clone the repository.
