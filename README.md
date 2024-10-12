@@ -12,8 +12,8 @@
 ## Requirements:
 - **Java 21**: Required for running the Proxy instance.
 - **Velocity Proxy**: No predefined servers are required; servers are dynamically registered.
-- **Docker on Hold-Server**: Necessary for running the backend servers.
-- **User on Hold-Server**: Necessary for interacting with Docker, make sure he has the right permissions.
+- **Docker and Ruby on hold server**: Necessary for running the backend servers.
+- **User on hold server**: Necessary for interacting with Docker, make sure he has the right permissions.
 
 ## Usage:
 1. Clone the repository.
@@ -23,8 +23,8 @@
 6. Stop and configure and then start again.
    
 ## Important Info:
-On start, Velocity will try to create a server on the first backend server via the Default-Template in the config and name it "default".
-
+On start, Velocity will try to create a server on the first backend server via the Default-Template in the config and name it "default-0".
+Later on, it will create more default servers according to the player count.
 ## In-Game Commands
 Nebula also supports in-game commands for admins to manage server instances directly within Minecraft. Here are the available commands:
 
