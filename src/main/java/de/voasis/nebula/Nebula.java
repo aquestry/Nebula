@@ -57,10 +57,10 @@ public class Nebula {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
-        createDefaultServer();
         registerCommands();
         logger.info(Icon.Icon);
         server.getEventManager().register(this, new EventManager(server, dataHolder, logger, externalServerManager, permissionManager));
+        createDefaultServer();
         server.getScheduler()
                 .buildTask(this, this::Update)
                 .repeat(1L, TimeUnit.SECONDS)

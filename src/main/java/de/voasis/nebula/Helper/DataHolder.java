@@ -9,12 +9,10 @@ import de.voasis.nebula.Maps.HoldServer;
 import de.voasis.nebula.Nebula;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.*;
 
 
 public class DataHolder {
-    private final Logger logger = LoggerFactory.getLogger("nebula");
     public String defaultServerTemplate = null;
     public RegisteredServer defaultRegisteredServer = null;
     public List<String> admins = new ArrayList<>();

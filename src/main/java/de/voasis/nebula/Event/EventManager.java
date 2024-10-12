@@ -46,7 +46,7 @@ public class EventManager {
     }
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
-        new ProxyShutdown(event, dataHolder, externalServerManager, logger);
+        new ProxyShutdown(event, dataHolder, externalServerManager, logger, server);
     }
     @Subscribe
     public void Perm(PermissionsSetupEvent event) {
