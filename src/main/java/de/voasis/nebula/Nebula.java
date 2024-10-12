@@ -12,6 +12,7 @@ import de.voasis.nebula.Commands.QueueCommand;
 import de.voasis.nebula.Commands.ShutdownCommand;
 import de.voasis.nebula.Data.Icon;
 import de.voasis.nebula.Event.EventManager;
+import de.voasis.nebula.Helper.Data;
 import de.voasis.nebula.Helper.DataHolder;
 import de.voasis.nebula.Helper.Util;
 import de.voasis.nebula.Helper.QueueProcessor;
@@ -47,19 +48,19 @@ public class Nebula {
     @Inject
     public Nebula(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         loadConfig(dataDirectory);
-        dataHolder = new DataHolder();
+        dataHolder = new DataHolder(config, server, logger);
         util = new Util(dataHolder, server, this, logger);
         externalServerManager = new ExternalServerManager(logger, server, dataHolder, util);
-        permissionManager  = new PermissionManager();
+        permissionManager  = new PermissionManager(logger);
         queueProcessor = new QueueProcessor(server, dataHolder, logger);
-        dataHolder.Refresh(config, server, logger);
+        dataHolder.Refresh();
     }
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         registerCommands();
         logger.info(Icon.Icon);
-        server.getEventManager().register(this, new EventManager(server, dataHolder, logger, externalServerManager, util, permissionManager));
+        server.getEventManager().register(this, new EventManager(server, dataHolder, logger, externalServerManager, permissionManager));
         createDefaultServer();
         server.getScheduler()
                 .buildTask(this, this::Update)
@@ -89,7 +90,7 @@ public class Nebula {
         }
         externalServerManager.createFromTemplate(
                 Util.getRandomElement(dataHolder.holdServerMap),
-                dataHolder.defaultServerTemplate,
+                Data.defaultServerTemplate,
                 "default-" + Util.getDefaultsCount(),
                 server.getConsoleCommandSource()
         );

@@ -12,24 +12,23 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.nebula.Event.Events.*;
 import de.voasis.nebula.Helper.DataHolder;
 import de.voasis.nebula.ExternalServerManager;
-import de.voasis.nebula.Helper.Util;
 import de.voasis.nebula.Permission.PermissionManager;
 import org.slf4j.Logger;
 
 public class EventManager {
+
     Logger logger;
     ProxyServer server;
     DataHolder dataHolder;
     PermissionManager permissionManager;
     ExternalServerManager externalServerManager;
-    Util util;
-    public EventManager(ProxyServer server, DataHolder dataHolder, Logger logger, ExternalServerManager externalServerManager, Util util, PermissionManager permissionManager) {
+
+    public EventManager(ProxyServer server, DataHolder dataHolder, Logger logger, ExternalServerManager externalServerManager, PermissionManager permissionManager) {
         this.logger = logger;
         this.dataHolder = dataHolder;
         this.server = server;
         this.permissionManager = permissionManager;
         this.externalServerManager = externalServerManager;
-        this.util = util;
     }
     @Subscribe
     public void onServerRegistered(ServerRegisteredEvent event) {
@@ -41,7 +40,7 @@ public class EventManager {
     }
     @Subscribe
     public void onChooseServer(PlayerChooseInitialServerEvent event) {
-        new PlayerChooseInitialServer(event, dataHolder, logger, util, externalServerManager);
+        new PlayerChooseInitialServer(event, dataHolder, logger, externalServerManager);
     }
     @Subscribe
     public void preConnect(ServerPreConnectEvent event) {

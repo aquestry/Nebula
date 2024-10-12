@@ -10,7 +10,7 @@ import com.velocitypowered.api.proxy.server.ServerInfo;
 import de.voasis.nebula.Helper.DataHolder;
 import de.voasis.nebula.Helper.Util;
 import de.voasis.nebula.Maps.BackendServer;
-import de.voasis.nebula.Helper.Messages;
+import de.voasis.nebula.Helper.Data;
 import de.voasis.nebula.Maps.QueueInfo;
 import de.voasis.nebula.Maps.HoldServer;
 import net.kyori.adventure.text.Component;
@@ -72,7 +72,7 @@ public class ExternalServerManager {
             }
         }
         int tempPort = externalServer.getFreePort();
-        String command = String.format("docker run -d -p %d:25565 --name %s %s SECRET=%s", tempPort, newName, templateName, Messages.vsecret);
+        String command = String.format("docker run -d -p %d:25565 --name %s %s SECRET=%s", tempPort, newName, templateName, Data.vsecret);
         executeSSHCommand(externalServer, command, source,
                 "Container created from template: " + templateName,
                 "Failed to create container.");
@@ -91,10 +91,10 @@ public class ExternalServerManager {
     public void kill(HoldServer externalServer, String servername, CommandSource source) {
         for(Player p : server.getServer(servername).get().getPlayersConnected()) {
             p.createConnectionRequest(util.getDefaultServer(this)).fireAndForget();
-            p.sendMessage(Component.text(Messages.killed, NamedTextColor.GOLD));
+            p.sendMessage(Component.text("The server you were on was killed.", NamedTextColor.GOLD));
         }
         String command = "docker kill " + servername;
-        executeSSHCommand(externalServer, command, source, "Docker container stopped: " + servername, "Failed to stop Docker container.");
+        executeSSHCommand(externalServer, command, source, "Docker container killed: " + servername, "Failed to kill Docker container.");
     }
 
     public void delete(HoldServer externalServer, String servername, CommandSource source) {

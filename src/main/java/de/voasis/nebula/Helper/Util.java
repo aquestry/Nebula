@@ -139,22 +139,22 @@ public class Util {
     public RegisteredServer getDefaultServer(ExternalServerManager externalServerManager) {
         List<BackendServer> defaults = new ArrayList<>();
         for(BackendServer backendServer : dataHolder.backendInfoMap) {
-            if(backendServer.isOnline() && backendServer.getTemplate().equals(dataHolder.defaultServerTemplate))  {
+            if(backendServer.isOnline() && backendServer.getTemplate().equals(Data.defaultServerTemplate))  {
                 defaults.add(backendServer);
             }
         }
         for(BackendServer defaultBackendServer : defaults) {
-            if(server.getServer(defaultBackendServer.getServerName()).get().getPlayersConnected().size() < dataHolder.newCreateCount) {
-                if(server.getServer(defaultBackendServer.getServerName()).get().getPlayersConnected().size() == dataHolder.newCreateCount -1) {
+            if(server.getServer(defaultBackendServer.getServerName()).get().getPlayersConnected().size() < Data.newCreateCount) {
+                if(server.getServer(defaultBackendServer.getServerName()).get().getPlayersConnected().size() == Data.newCreateCount -1) {
                     for (BackendServer d : defaults) {
-                        if(!d.equals(defaultBackendServer) && server.getServer(d.getServerName()).get().getPlayersConnected().size() < dataHolder.newCreateCount) {
+                        if(!d.equals(defaultBackendServer) && server.getServer(d.getServerName()).get().getPlayersConnected().size() < Data.newCreateCount) {
                             return server.getServer(d.getServerName()).get();
                         }
                     }
 
                     externalServerManager.createFromTemplate(
                             Util.getRandomElement(dataHolder.holdServerMap),
-                            dataHolder.defaultServerTemplate,
+                            Data.defaultServerTemplate,
                             "default-" + getDefaultsCount(),
                             server.getConsoleCommandSource()
                     );
@@ -169,7 +169,7 @@ public class Util {
     public static int getDefaultsCount() {
         List<BackendServer> defaults = new ArrayList<>();
         for(BackendServer backendServer : dataHolder.backendInfoMap) {
-            if(backendServer.getTemplate().equals(dataHolder.defaultServerTemplate))  {
+            if(backendServer.getTemplate().equals(Data.defaultServerTemplate))  {
                 defaults.add(backendServer);
             }
         }

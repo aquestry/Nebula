@@ -6,6 +6,8 @@ import com.velocitypowered.api.permission.Tristate;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.permission.PermissionProvider;
 import com.velocitypowered.api.permission.PermissionSubject;
+import org.slf4j.Logger;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -13,9 +15,11 @@ import java.util.Set;
 
 public class PermissionManager implements PermissionProvider {
 
-    private final Map<Player, Set<String>> playerPermissions;
-    public PermissionManager() {
-        playerPermissions = new HashMap<>();
+    private final Map<Player, Set<String>> playerPermissions = new HashMap<>();
+    private final Logger logger;
+
+    public PermissionManager(Logger logger) {
+        this.logger = logger;
     }
 
     public void addPermission(Player player, String permission) {
@@ -29,10 +33,29 @@ public class PermissionManager implements PermissionProvider {
         }
     }
 
+
     public boolean hasPermission(Player player, String permission) {
         Set<String> permissions = playerPermissions.get(player);
-        return permissions != null && permissions.contains(permission);
+        if (permissions == null) {
+            return false;
+        }
+        if (permissions.contains(permission)) {
+            return true;
+        }
+        String[] parts = permission.split("\\.");
+        StringBuilder wildcardBuilder = new StringBuilder();
+        for (int i = 0; i < parts.length; i++) {
+            wildcardBuilder.append(parts[i]);
+            if (permissions.contains(wildcardBuilder + ".*")) {
+                return true;
+            }
+            if (i < parts.length - 1) {
+                wildcardBuilder.append(".");
+            }
+        }
+        return false;
     }
+
 
     @Subscribe
     public boolean hasPermission(PermissionSubject subject, String permission) {
