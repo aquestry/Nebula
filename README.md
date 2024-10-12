@@ -23,8 +23,8 @@
 6. Stop and configure and then start again.
    
 ## Important Info:
-On start, Velocity will try to create a server on the first backend server via the Default-Template in the config and name it "default".
-
+On start, Velocity will try to create a server on the first backend server via the Default-Template in the config and name it "default-0".
+Later on, it will create more default servers according to the player count.
 ## In-Game Commands
 Nebula also supports in-game commands for admins to manage server instances directly within Minecraft. Here are the available commands:
 
