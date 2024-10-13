@@ -32,10 +32,6 @@ public class DefaultManager {
     }
 
     public void refresh() {
-        String[] splitConfig = Data.newCreateCount.split("/");
-        int min = Integer.parseInt(splitConfig[0]);
-        int max = Integer.parseInt(splitConfig[1]);
-
         for (BackendServer backendServer : dataHolder.backendInfoMap) {
             if (backendServer.getTag().equals("default") && !defaults.contains(backendServer)) {
                 defaults.add(backendServer);
@@ -58,8 +54,6 @@ public class DefaultManager {
             createNewDefaultServer();
             logger.info("Creating new default server.");
         }
-
-
     }
 
     public void createNewDefaultServer() {
