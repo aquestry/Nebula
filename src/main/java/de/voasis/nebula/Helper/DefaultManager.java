@@ -90,7 +90,7 @@ public class DefaultManager {
                     .get()
                     .getPlayersConnected()
                     .size();
-            if (playerCount < min) {
+            if (playerCount <= min) {
                 return backendServer;
             }
         }
