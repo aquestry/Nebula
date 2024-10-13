@@ -53,15 +53,7 @@ public class DefaultManager {
             logger.info("Creating new default server.");
         }
 
-        for(BackendServer backendServer : defaults) {
 
-            if(server.getServer(backendServer.getServerName()).get().getPlayersConnected().isEmpty() && !backendServer.getServerName().equals("default-0")) {
-                defaults.remove(backendServer);
-                available.remove(backendServer);
-                externalServerManager.delete(backendServer.getHoldServer(), backendServer.getServerName(), server.getConsoleCommandSource());
-                logger.info("Deleting server due to inactivity.");
-            }
-        }
     }
 
     public void createNewDefaultServer() {
