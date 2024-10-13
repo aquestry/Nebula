@@ -42,6 +42,7 @@ public class DefaultManager {
             }
         }
         if(getServerBetweenMinAndMaxPlayers() != null) {
+            createNewDefaultServer();
             return server.getServer(getServerBetweenMinAndMaxPlayers().getServerName()).get();
         }
         if(getServerUnderMin() != null) {
