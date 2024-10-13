@@ -51,9 +51,8 @@ public class Nebula {
         externalServerManager = new ExternalServerManager(logger, server, dataHolder, util);
         permissionManager  = new PermissionManager(logger);
         queueProcessor = new QueueProcessor(server, dataHolder, logger);
-        defaultManager = new DefaultManager(dataHolder, server, externalServerManager, logger);
         dataHolder.Refresh();
-
+        defaultManager = new DefaultManager(dataHolder, server, externalServerManager, logger);
     }
 
     @Subscribe
