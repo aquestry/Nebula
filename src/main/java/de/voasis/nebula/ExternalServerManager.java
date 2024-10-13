@@ -90,7 +90,7 @@ public class ExternalServerManager {
 
     public void kill(HoldServer externalServer, String servername, CommandSource source) {
         for(Player p : server.getServer(servername).get().getPlayersConnected()) {
-            Nebula.defaultManager.connectPlayerToDefaultServer(p);
+            p.createConnectionRequest(Nebula.defaultManager.getDefault()).fireAndForget();
             p.sendMessage(Component.text("The server you were on was killed.", NamedTextColor.GOLD));
         }
         String command = "docker kill " + servername;

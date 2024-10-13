@@ -1,6 +1,5 @@
 package de.voasis.nebula.Helper;
 
-import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.Data.Data;
@@ -31,70 +30,60 @@ public class DefaultManager {
         max = Integer.parseInt(splitConfig[1]);
     }
 
-    public void refresh() {
-        for (BackendServer backendServer : dataHolder.backendInfoMap) {
-            if (backendServer.getTag().equals("default") && !defaults.contains(backendServer)) {
+    public RegisteredServer getDefault() {
+        for(BackendServer backendServer : dataHolder.backendInfoMap) {
+            if(backendServer.getTag().equals("default") && !defaults.contains(backendServer)) {
                 defaults.add(backendServer);
-                logger.info("Added {} to default servers list.", backendServer.getServerName());
+            }
+        }
+        for(BackendServer backendServer : defaults) {
+            if(backendServer.isOnline() && !available.contains(backendServer)) {
+                available.add(backendServer);
+            }
+        }
+        for(BackendServer backendServer : available) {
+            if(server.getServer(backendServer.getServerName()).get().getPlayersConnected().size() < min) {
+                return server.getServer(backendServer.getServerName()).get();
+            }
+        }
+        createNewDefaultServer();
+        return server.getServer(getServerWithLowestPlayerCount().getServerName()).get();
+    }
+    public BackendServer getServerWithLowestPlayerCount() {
+        if (available.isEmpty()) {
+            return null;
+        }
+
+        BackendServer serverWithLowestCount = available.get(0);
+        int lowestPlayerCount = server.getServer(serverWithLowestCount.getServerName())
+                .get()
+                .getPlayersConnected()
+                .size();
+
+        for (BackendServer backendServer : available) {
+            int playerCount = server.getServer(backendServer.getServerName())
+                    .get()
+                    .getPlayersConnected()
+                    .size();
+
+            if (playerCount < lowestPlayerCount) {
+                serverWithLowestCount = backendServer;
+                lowestPlayerCount = playerCount;
             }
         }
 
-        boolean serverUnder = false;
-        for (BackendServer backendServer : defaults) {
-            int playerCount = server.getServer(backendServer.getServerName()).get().getPlayersConnected().size();
-            if(playerCount < max && backendServer.isOnline() && !available.contains(backendServer)) {
-                available.add(backendServer);
-                logger.info("Added {} to available servers list.", backendServer.getServerName());
-            }
-            if(playerCount < min) {
-                serverUnder = true;
-            }
-        }
-        if(!serverUnder) {
-            createNewDefaultServer();
-            logger.info("Creating new default server.");
-        }
+        return serverWithLowestCount;
     }
 
-    public void createNewDefaultServer() {
+    public BackendServer createNewDefaultServer() {
+        String name = "default-" + defaults.size();
         externalServerManager.createFromTemplate(
                 Util.getRandomElement(dataHolder.holdServerMap),
                 Data.defaultServerTemplate,
-                "default-" + defaults.size(),
+                name,
                 server.getConsoleCommandSource(),
                 "default"
         );
-    }
-
-    public RegisteredServer getDefaultServer() {
-        BackendServer fullestServer = null;
-        int highestPlayerCount = -1;
-        for (BackendServer backendServer : available) {
-            RegisteredServer registeredServer = server.getServer(backendServer.getServerName()).orElse(null);
-            if (registeredServer != null) {
-                int playerCount = registeredServer.getPlayersConnected().size();
-                if (playerCount < max && playerCount > highestPlayerCount) {
-                    highestPlayerCount = playerCount;
-                    fullestServer = backendServer;
-                }
-            }
-        }
-        if (fullestServer != null) {
-            refresh();
-            return server.getServer(fullestServer.getServerName()).orElse(null);
-        }
-        refresh();
-        return null;
-    }
-
-    public void connectPlayerToDefaultServer(Player player) {
-        RegisteredServer targetServer = getDefaultServer();
-        if (targetServer != null) {
-            player.createConnectionRequest(targetServer).fireAndForget();
-            logger.info("Connecting player {} to server {}", player.getUsername(), targetServer.getServerInfo().getName());
-        } else {
-            logger.error("No default server available to connect player {}", player.getUsername());
-        }
-        refresh();
+        return dataHolder.getBackendServer("default-" + defaults.size());
     }
 }

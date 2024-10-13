@@ -3,7 +3,6 @@ package de.voasis.nebula.Event;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
-import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
@@ -54,9 +53,5 @@ public class EventManager {
     @Subscribe
     public void onPlayerJoin(LoginEvent event) {
         new Login(event, logger);
-    }
-    @Subscribe
-    public void onServerLink(KickedFromServerEvent event) {
-        new KickedFromServer(event, server);
     }
 }
