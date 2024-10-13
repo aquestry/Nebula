@@ -136,15 +136,14 @@ public class Util {
         int i = r.nextInt(list.size());
         return list.get(i);
     }
+
     public RegisteredServer getDefaultServer(ExternalServerManager externalServerManager) {
         List<BackendServer> defaults = new ArrayList<>();
-
         for (BackendServer backendServer : dataHolder.backendInfoMap) {
             if (backendServer.isOnline() && backendServer.getTemplate().equals(Data.defaultServerTemplate)) {
                 defaults.add(backendServer);
             }
         }
-
         String[] splitConfig = Data.newCreateCount.split("/");
         int newCreateThreshold = Integer.parseInt(splitConfig[0]);
         int maxPlayersPerServer = Integer.parseInt(splitConfig[1]);
