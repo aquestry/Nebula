@@ -39,23 +39,20 @@ public class DefaultManager {
             }
         }
 
-        int underThresholdServers = 0;
+        boolean serverUnder = false;
         for (BackendServer backendServer : defaults) {
             int playerCount = server.getServer(backendServer.getServerName()).get().getPlayersConnected().size();
             if(playerCount < max && backendServer.isOnline() && !available.contains(backendServer)) {
                 available.add(backendServer);
                 logger.info("Added {} to available servers list.", backendServer.getServerName());
             }
-            if(playerCount >= min) {
-                underThresholdServers++;
-            }
             if(playerCount < min) {
-                underThresholdServers--;
+                serverUnder = true;
             }
         }
-        if(underThresholdServers > 0) {
+        if(!serverUnder) {
             createNewDefaultServer();
-            logger.info("Creating new default server, because {} is over 0.", underThresholdServers);
+            logger.info("Creating new default server");
         }
 
         available.removeIf(backendServer -> !dataHolder.backendInfoMap.contains(backendServer));
