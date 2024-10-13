@@ -10,12 +10,10 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.nebula.Commands.AdminCommand;
 import de.voasis.nebula.Commands.QueueCommand;
 import de.voasis.nebula.Commands.ShutdownCommand;
+import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Data.Icon;
 import de.voasis.nebula.Event.EventManager;
-import de.voasis.nebula.Helper.Data;
-import de.voasis.nebula.Helper.DataHolder;
-import de.voasis.nebula.Helper.Util;
-import de.voasis.nebula.Helper.QueueProcessor;
+import de.voasis.nebula.Helper.*;
 import de.voasis.nebula.Permission.PermissionManager;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.dvs.versioning.BasicVersioning;
@@ -43,6 +41,7 @@ public class Nebula {
     public static ExternalServerManager externalServerManager;
     public static QueueProcessor queueProcessor;
     public static PermissionManager permissionManager;
+    public static DefaultManager defaultManager;
     public static Util util;
 
     @Inject
@@ -53,14 +52,16 @@ public class Nebula {
         externalServerManager = new ExternalServerManager(logger, server, dataHolder, util);
         permissionManager  = new PermissionManager(logger);
         queueProcessor = new QueueProcessor(server, dataHolder, logger);
+        defaultManager = new DefaultManager(dataHolder, server, externalServerManager, logger);
         dataHolder.Refresh();
+
     }
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         registerCommands();
         logger.info(Icon.Icon);
-        server.getEventManager().register(this, new EventManager(server, dataHolder, logger, externalServerManager, permissionManager));
+        server.getEventManager().register(this, new EventManager(server, dataHolder, logger, permissionManager));
         createDefaultServer();
         server.getScheduler()
                 .buildTask(this, this::Update)
@@ -91,7 +92,7 @@ public class Nebula {
         externalServerManager.createFromTemplate(
                 Util.getRandomElement(dataHolder.holdServerMap),
                 Data.defaultServerTemplate,
-                "default-" + Util.getDefaultsCount(),
+                "default-" + defaultManager.getDefaultsCount(),
                 server.getConsoleCommandSource()
         );
     }

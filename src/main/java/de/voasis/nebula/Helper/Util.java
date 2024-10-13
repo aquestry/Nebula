@@ -7,7 +7,6 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import de.voasis.nebula.ExternalServerManager;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.HoldServer;
 import net.kyori.adventure.text.Component;
@@ -135,71 +134,5 @@ public class Util {
         Random r = new Random();
         int i = r.nextInt(list.size());
         return list.get(i);
-    }
-
-    public RegisteredServer getDefaultServer(ExternalServerManager externalServerManager) {
-        List<BackendServer> defaults = new ArrayList<>();
-
-        for (BackendServer backendServer : dataHolder.backendInfoMap) {
-            if (backendServer.isOnline() && backendServer.getTemplate().equals(Data.defaultServerTemplate)) {
-                defaults.add(backendServer);
-            }
-        }
-
-        String[] splitConfig = Data.newCreateCount.split("/");
-        int newCreateThreshold = Integer.parseInt(splitConfig[0]);
-        int maxPlayersPerServer = Integer.parseInt(splitConfig[1]);
-
-        defaults.sort((a, b) -> {
-            int playerCountA = server.getServer(a.getServerName()).get().getPlayersConnected().size();
-            int playerCountB = server.getServer(b.getServerName()).get().getPlayersConnected().size();
-            return Integer.compare(playerCountB, playerCountA);
-        });
-
-        for (BackendServer defaultBackendServer : defaults) {
-            int playerCount = server.getServer(defaultBackendServer.getServerName())
-                    .get().getPlayersConnected().size();
-            if (playerCount < maxPlayersPerServer) {
-
-                if (playerCount == newCreateThreshold) {
-                    logger.info("Threshold reached: Creating a new server in the background...");
-
-                    externalServerManager.createFromTemplate(
-                            Util.getRandomElement(dataHolder.holdServerMap),
-                            Data.defaultServerTemplate,
-                            "default-" + getDefaultsCount(),
-                            server.getConsoleCommandSource()
-                    );
-                }
-                return server.getServer(defaultBackendServer.getServerName()).get();
-            }
-        }
-
-        for (BackendServer defaultBackendServer : defaults) {
-            int playerCount = server.getServer(defaultBackendServer.getServerName())
-                    .get().getPlayersConnected().size();
-
-            if (playerCount == maxPlayersPerServer) {
-                logger.info("All servers are full, connecting to the newly created server...");
-
-                for (BackendServer newBackendServer : dataHolder.backendInfoMap) {
-                    if (newBackendServer.isOnline() && newBackendServer.getServerName().startsWith("default-")) {
-                        return server.getServer(newBackendServer.getServerName()).get();
-                    }
-                }
-            }
-        }
-        logger.warn("No available server found for player connection!");
-        return null;
-    }
-
-    public static int getDefaultsCount() {
-        List<BackendServer> defaults = new ArrayList<>();
-        for(BackendServer backendServer : dataHolder.backendInfoMap) {
-            if(backendServer.getTemplate().equals(Data.defaultServerTemplate))  {
-                defaults.add(backendServer);
-            }
-        }
-        return defaults.size();
     }
 }

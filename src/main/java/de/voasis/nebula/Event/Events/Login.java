@@ -3,7 +3,7 @@ package de.voasis.nebula.Event.Events;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Helper.DataHolder;
-import de.voasis.nebula.Helper.Data;
+import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Permission.PermissionManager;
 import org.slf4j.Logger;
 

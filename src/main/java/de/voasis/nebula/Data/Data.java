@@ -1,4 +1,4 @@
-package de.voasis.nebula.Helper;
+package de.voasis.nebula.Data;
 
 
 import java.util.ArrayList;

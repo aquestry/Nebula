@@ -10,7 +10,7 @@ import com.velocitypowered.api.proxy.server.ServerInfo;
 import de.voasis.nebula.Helper.DataHolder;
 import de.voasis.nebula.Helper.Util;
 import de.voasis.nebula.Maps.BackendServer;
-import de.voasis.nebula.Helper.Data;
+import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Maps.QueueInfo;
 import de.voasis.nebula.Maps.HoldServer;
 import net.kyori.adventure.text.Component;
@@ -90,7 +90,7 @@ public class ExternalServerManager {
 
     public void kill(HoldServer externalServer, String servername, CommandSource source) {
         for(Player p : server.getServer(servername).get().getPlayersConnected()) {
-            p.createConnectionRequest(util.getDefaultServer(this)).fireAndForget();
+            p.createConnectionRequest(Nebula.defaultManager.getDefaultServer()).fireAndForget();
             p.sendMessage(Component.text("The server you were on was killed.", NamedTextColor.GOLD));
         }
         String command = "docker kill " + servername;
