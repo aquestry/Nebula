@@ -4,7 +4,6 @@ import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.Helper.DataHolder;
-import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -20,7 +19,6 @@ public class ServerPreConnect {
             event.setResult(ServerPreConnectEvent.ServerResult.denied());
             player.sendMessage(Component.text("You are already connected to that server.", NamedTextColor.GOLD));
         }
-        Nebula.defaultManager.refresh();
     }
 
 }

@@ -71,6 +71,7 @@ public class Nebula {
     private void Update() {
         util.updateState();
         queueProcessor.process();
+        defaultManager.refresh();
     }
 
     private void registerCommands() {
