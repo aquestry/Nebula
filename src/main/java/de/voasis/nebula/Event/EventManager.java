@@ -3,6 +3,7 @@ package de.voasis.nebula.Event;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
+import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
@@ -21,31 +22,30 @@ public class EventManager {
     DataHolder dataHolder;
     PermissionManager permissionManager;
 
-    public EventManager(ProxyServer server, DataHolder dataHolder, Logger logger, PermissionManager permissionManager) {
+    public EventManager(ProxyServer server, DataHolder dataHolder, Logger logger) {
         this.logger = logger;
         this.dataHolder = dataHolder;
         this.server = server;
-        this.permissionManager = permissionManager;
     }
     @Subscribe
     public void onServerRegistered(ServerRegisteredEvent event) {
-        new ServerRegistered(event, dataHolder, logger, server);
+        new ServerRegistered(event, logger, server);
     }
     @Subscribe
     public void onServerUnregistered(ServerUnregisteredEvent event) {
-        new ServerUnregistered(event, dataHolder, logger);
+        new ServerUnregistered(event, logger);
     }
     @Subscribe
     public void onChooseServer(PlayerChooseInitialServerEvent event) {
-        new PlayerChooseInitialServer(event, dataHolder, logger);
+        new PlayerChooseInitialServer(event, logger);
     }
     @Subscribe
     public void preConnect(ServerPreConnectEvent event) {
-        new ServerPreConnect(event, dataHolder);
+        new ServerPreConnect(event);
     }
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
-        new ProxyShutdown(event, dataHolder, logger, server);
+        new ProxyShutdown(event, logger, server);
     }
     @Subscribe
     public void Perm(PermissionsSetupEvent event) {
@@ -53,6 +53,10 @@ public class EventManager {
     }
     @Subscribe
     public void onPlayerJoin(LoginEvent event) {
-        new Login(event, dataHolder, permissionManager, logger);
+        new Login(event, logger);
+    }
+    @Subscribe
+    public void onServerLink(KickedFromServerEvent event) {
+        new KickedFromServer(event, server);
     }
 }

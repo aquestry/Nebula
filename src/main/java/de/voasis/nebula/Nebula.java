@@ -60,18 +60,18 @@ public class Nebula {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         registerCommands();
         logger.info(Icon.Icon);
-        server.getEventManager().register(this, new EventManager(server, dataHolder, logger, permissionManager));
+        server.getEventManager().register(this, new EventManager(server, dataHolder, logger));
         defaultManager.createNewDefaultServer();
         server.getScheduler()
                 .buildTask(this, this::Update)
-                .repeat(500L, TimeUnit.MILLISECONDS)
+                .repeat(1, TimeUnit.SECONDS)
                 .schedule();
+
     }
 
     private void Update() {
         util.updateState();
         queueProcessor.process();
-        defaultManager.refresh();
     }
 
     private void registerCommands() {

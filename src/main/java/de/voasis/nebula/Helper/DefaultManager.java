@@ -17,12 +17,18 @@ public class DefaultManager {
     private final Logger logger;
     private final List<BackendServer> defaults = new ArrayList<>();
     private final List<BackendServer> available = new ArrayList<>();
+    private final int min;
+    private final int max;
+
 
     public DefaultManager(DataHolder dataHolder, ProxyServer server, ExternalServerManager externalServerManager, Logger logger) {
         this.dataHolder = dataHolder;
         this.server = server;
         this.externalServerManager = externalServerManager;
         this.logger = logger;
+        String[] splitConfig = Data.newCreateCount.split("/");
+        min = Integer.parseInt(splitConfig[0]);
+        max = Integer.parseInt(splitConfig[1]);
     }
 
     public void refresh() {
@@ -68,16 +74,16 @@ public class DefaultManager {
 
 
     public RegisteredServer getDefaultServer() {
-        BackendServer lowest = available.getFirst();
-
+        BackendServer target = available.getFirst();
         for(BackendServer backendServer : available) {
-            int lowestCount = server.getServer(lowest.getServerName()).get().getPlayersConnected().size();
+            int targetCount = server.getServer(target.getServerName()).get().getPlayersConnected().size();
             int playerCount = server.getServer(backendServer.getServerName()).get().getPlayersConnected().size();
-            if(playerCount < lowestCount) {
-                lowest = backendServer;
+            if(playerCount > targetCount && playerCount < max) {
+                target = backendServer;
             }
         }
-        return server.getServer(lowest.getServerName()).get();
+        refresh();
+        return server.getServer(target.getServerName()).get();
     }
 
     public void connectPlayerToDefaultServer(Player player) {
@@ -88,5 +94,6 @@ public class DefaultManager {
         } else {
             logger.error("No default server available to connect player {}", player.getUsername());
         }
+        refresh();
     }
 }
