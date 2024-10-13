@@ -54,10 +54,8 @@ public class DefaultManager {
         }
 
         for(BackendServer backendServer : defaults) {
-            if(server.getServer(backendServer.getServerName()).get().getPlayersConnected().isEmpty()) {
-                if(backendServer.getTag().equals("default-0")) {
-                    return;
-                }
+
+            if(server.getServer(backendServer.getServerName()).get().getPlayersConnected().isEmpty() && backendServer.getServerName().equals("default-0")) {
                 defaults.remove(backendServer);
                 available.remove(backendServer);
                 externalServerManager.delete(backendServer.getHoldServer(), backendServer.getServerName(), server.getConsoleCommandSource());
