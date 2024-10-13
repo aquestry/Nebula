@@ -32,7 +32,6 @@ public class DefaultManager {
         int min = Integer.parseInt(splitConfig[0]);
         int max = Integer.parseInt(splitConfig[1]);
 
-        defaults.clear();
         for (BackendServer backendServer : dataHolder.backendInfoMap) {
             if (backendServer.getTag().equals("default") && !defaults.contains(backendServer)) {
                 defaults.add(backendServer);
@@ -58,6 +57,9 @@ public class DefaultManager {
             createNewDefaultServer();
             logger.info("Creating new default server, because {} is over 0.", underThresholdServers);
         }
+
+        available.removeIf(backendServer -> !dataHolder.backendInfoMap.contains(backendServer));
+        defaults.removeIf(backendServer -> !dataHolder.backendInfoMap.contains(backendServer));
     }
 
     public void createNewDefaultServer() {
