@@ -46,13 +46,12 @@ public class Nebula {
     @Inject
     public Nebula(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         loadConfig(dataDirectory);
-        dataHolder = new DataHolder(config, server, logger);
-        dataHolder.Refresh();
-        util = new Util(dataHolder, server, this, logger);
-        externalServerManager = new ExternalServerManager(logger, server, dataHolder, util);
         permissionManager  = new PermissionManager(logger);
+        dataHolder = new DataHolder(config, server, logger);
+        util = new Util(dataHolder, server, this, logger);
+        dataHolder.Refresh();
+        externalServerManager = new ExternalServerManager(logger, server, dataHolder, util);
         queueProcessor = new QueueProcessor(server, dataHolder, logger);
-
         defaultManager = new DefaultManager(dataHolder, server, externalServerManager, logger);
     }
 
