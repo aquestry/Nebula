@@ -34,7 +34,7 @@ public class DefaultManager {
 
         defaults.clear();
         for (BackendServer backendServer : dataHolder.backendInfoMap) {
-            if (backendServer.getTag().equals("default")) {
+            if (backendServer.getTag().equals("default") && !defaults.contains(backendServer)) {
                 defaults.add(backendServer);
                 logger.info("Added {} to default servers list.", backendServer.getServerName());
             }
@@ -43,11 +43,9 @@ public class DefaultManager {
         int underThresholdServers = 0;
         for (BackendServer backendServer : defaults) {
             int playerCount = server.getServer(backendServer.getServerName()).get().getPlayersConnected().size();
-            if(playerCount < max && backendServer.isOnline()) {
-                if(!available.contains(backendServer)) {
-                    available.add(backendServer);
-                    logger.info("Added {} to available servers list.", backendServer.getServerName());
-                }
+            if(playerCount < max && backendServer.isOnline() && !available.contains(backendServer)) {
+                available.add(backendServer);
+                logger.info("Added {} to available servers list.", backendServer.getServerName());
             }
             if(playerCount >= min) {
                 underThresholdServers++;
@@ -79,7 +77,6 @@ public class DefaultManager {
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .min(Comparator.comparingInt(s -> s.getPlayersConnected().size()));
-
         return lowestPopulationServer.orElse(null);
     }
 
