@@ -45,6 +45,7 @@ public class DefaultManager {
             return server.getServer(getServerBetweenMinAndMaxPlayers().getServerName()).get();
         }
         if(getServerUnderMin() != null) {
+            createNewDefaultServer();
             return server.getServer(getServerUnderMin().getServerName()).get();
         }
         createNewDefaultServer();
@@ -77,7 +78,7 @@ public class DefaultManager {
                     .get()
                     .getPlayersConnected()
                     .size();
-            if (playerCount >= min && playerCount <= max) {
+            if (playerCount >= min && playerCount < max) {
                 return backendServer;
             }
         }
