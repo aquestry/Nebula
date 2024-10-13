@@ -41,11 +41,13 @@ public class DefaultManager {
                 available.add(backendServer);
             }
         }
-        if(getServerBetweenMinAndMaxPlayers() != null) {
+        BackendServer between = getServerBetweenMinAndMaxPlayers();
+        if(between != null) {
             createNewDefaultServer();
             return server.getServer(getServerBetweenMinAndMaxPlayers().getServerName()).get();
         }
-        if(getServerUnderMin() != null) {
+        BackendServer under = getServerUnderMin();
+        if(under != null) {
             return server.getServer(getServerUnderMin().getServerName()).get();
         }
         createNewDefaultServer();
