@@ -72,18 +72,25 @@ public class DefaultManager {
         );
     }
 
-
     public RegisteredServer getDefaultServer() {
-        BackendServer target = available.getFirst();
-        for(BackendServer backendServer : available) {
-            int targetCount = server.getServer(target.getServerName()).get().getPlayersConnected().size();
-            int playerCount = server.getServer(backendServer.getServerName()).get().getPlayersConnected().size();
-            if(playerCount > targetCount && playerCount < max) {
-                target = backendServer;
+        BackendServer fullestServer = null;
+        int highestPlayerCount = -1;
+        for (BackendServer backendServer : available) {
+            RegisteredServer registeredServer = server.getServer(backendServer.getServerName()).orElse(null);
+            if (registeredServer != null) {
+                int playerCount = registeredServer.getPlayersConnected().size();
+                if (playerCount < max && playerCount > highestPlayerCount) {
+                    highestPlayerCount = playerCount;
+                    fullestServer = backendServer;
+                }
             }
         }
+        if (fullestServer != null) {
+            refresh();
+            return server.getServer(fullestServer.getServerName()).orElse(null);
+        }
         refresh();
-        return server.getServer(target.getServerName()).get();
+        return null;
     }
 
     public void connectPlayerToDefaultServer(Player player) {
