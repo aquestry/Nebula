@@ -51,7 +51,7 @@ public class DefaultManager {
         createNewDefaultServer();
         return server.getServer(getServerWithLowestPlayerCount().getServerName()).get();
     }
-    public BackendServer getServerWithLowestPlayerCount() {
+    private BackendServer getServerWithLowestPlayerCount() {
         if (available.isEmpty()) {
             return null;
         }
@@ -72,7 +72,7 @@ public class DefaultManager {
         }
         return serverWithLowestCount;
     }
-    public BackendServer getServerBetweenMinAndMaxPlayers() {
+    private BackendServer getServerBetweenMinAndMaxPlayers() {
         for (BackendServer backendServer : available) {
             int playerCount = server.getServer(backendServer.getServerName())
                     .get()
@@ -84,7 +84,7 @@ public class DefaultManager {
         }
         return null;
     }
-    public BackendServer getServerUnderMin() {
+    private BackendServer getServerUnderMin() {
         for (BackendServer backendServer : available) {
             int playerCount = server.getServer(backendServer.getServerName())
                     .get()
@@ -108,4 +108,5 @@ public class DefaultManager {
         );
         return dataHolder.getBackendServer("default-" + defaults.size());
     }
+    public int getMax() { return max; }
 }
