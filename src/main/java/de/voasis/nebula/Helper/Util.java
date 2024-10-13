@@ -138,20 +138,29 @@ public class Util {
     }
     public RegisteredServer getDefaultServer(ExternalServerManager externalServerManager) {
         List<BackendServer> defaults = new ArrayList<>();
-        for(BackendServer backendServer : dataHolder.backendInfoMap) {
-            if(backendServer.isOnline() && backendServer.getTemplate().equals(Data.defaultServerTemplate))  {
+
+        for (BackendServer backendServer : dataHolder.backendInfoMap) {
+            if (backendServer.isOnline() && backendServer.getTemplate().equals(Data.defaultServerTemplate)) {
                 defaults.add(backendServer);
             }
         }
-        for(BackendServer defaultBackendServer : defaults) {
-            if(server.getServer(defaultBackendServer.getServerName()).get().getPlayersConnected().size() < Data.newCreateCount) {
-                if(server.getServer(defaultBackendServer.getServerName()).get().getPlayersConnected().size() == Data.newCreateCount -1) {
-                    for (BackendServer d : defaults) {
-                        if(!d.equals(defaultBackendServer) && server.getServer(d.getServerName()).get().getPlayersConnected().size() < Data.newCreateCount) {
-                            return server.getServer(d.getServerName()).get();
-                        }
-                    }
 
+        String[] splitConfig = Data.newCreateCount.split("/");
+        int newCreateThreshold = Integer.parseInt(splitConfig[0]);
+        int maxPlayersPerServer = Integer.parseInt(splitConfig[1]);
+
+        defaults.sort((a, b) -> {
+            int playerCountA = server.getServer(a.getServerName()).get().getPlayersConnected().size();
+            int playerCountB = server.getServer(b.getServerName()).get().getPlayersConnected().size();
+            return Integer.compare(playerCountB, playerCountA);
+        });
+
+        for (BackendServer defaultBackendServer : defaults) {
+            int playerCount = server.getServer(defaultBackendServer.getServerName())
+                    .get().getPlayersConnected().size();
+
+            if (playerCount < maxPlayersPerServer) {
+                if (playerCount == newCreateThreshold) {
                     externalServerManager.createFromTemplate(
                             Util.getRandomElement(dataHolder.holdServerMap),
                             Data.defaultServerTemplate,
@@ -165,6 +174,9 @@ public class Util {
 
         return null;
     }
+
+
+
 
     public static int getDefaultsCount() {
         List<BackendServer> defaults = new ArrayList<>();

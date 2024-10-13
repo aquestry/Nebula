@@ -8,5 +8,5 @@ public class Data {
     public static String vsecret = "secret";
     public static String defaultServerTemplate;
     public static List<String> adminUUIDs = new ArrayList<>();
-    public static int newCreateCount;
+    public static String newCreateCount;
 }

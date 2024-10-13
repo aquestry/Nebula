@@ -30,7 +30,7 @@ public class DataHolder {
         holdServerMap.clear();
         Data.adminUUIDs.clear();
         Data.defaultServerTemplate = config.getString("default-template");
-        Data.newCreateCount = config.getInt("default-new-create-count");
+        Data.newCreateCount = config.getString("default-new-create-count");
         Data.vsecret = config.getString("vsecret");
         Data.adminUUIDs = List.of(config.getString("admins").split(","));
 
