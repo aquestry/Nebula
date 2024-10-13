@@ -8,9 +8,7 @@ import de.voasis.nebula.ExternalServerManager;
 import de.voasis.nebula.Maps.BackendServer;
 import org.slf4j.Logger;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 public class DefaultManager {
     private final ProxyServer server;
@@ -52,11 +50,17 @@ public class DefaultManager {
         }
         if(!serverUnder) {
             createNewDefaultServer();
-            logger.info("Creating new default server");
+            logger.info("Creating new default server.");
         }
 
-        available.removeIf(backendServer -> !dataHolder.backendInfoMap.contains(backendServer));
-        defaults.removeIf(backendServer -> !dataHolder.backendInfoMap.contains(backendServer));
+        for(BackendServer backendServer : defaults) {
+            if(server.getServer(backendServer.getServerName()).get().getPlayersConnected().isEmpty() && !backendServer.getTag().equals("default-0")) {
+                defaults.remove(backendServer);
+                available.remove(backendServer);
+                externalServerManager.delete(backendServer.getHoldServer(), backendServer.getServerName(), server.getConsoleCommandSource());
+                logger.info("Deleting server due to inactivity.");
+            }
+        }
     }
 
     public void createNewDefaultServer() {
@@ -71,12 +75,16 @@ public class DefaultManager {
 
 
     public RegisteredServer getDefaultServer() {
-        Optional<RegisteredServer> lowestPopulationServer = available.stream()
-                .map(backendServer -> server.getServer(backendServer.getServerName()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .min(Comparator.comparingInt(s -> s.getPlayersConnected().size()));
-        return lowestPopulationServer.orElse(null);
+        BackendServer lowest = available.getFirst();
+
+        for(BackendServer backendServer : available) {
+            int lowestCount = server.getServer(lowest.getServerName()).get().getPlayersConnected().size();
+            int playerCount = server.getServer(backendServer.getServerName()).get().getPlayersConnected().size();
+            if(playerCount < lowestCount) {
+                lowest = backendServer;
+            }
+        }
+        return server.getServer(lowest.getServerName()).get();
     }
 
     public void connectPlayerToDefaultServer(Player player) {
