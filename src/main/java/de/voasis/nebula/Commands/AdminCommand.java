@@ -90,7 +90,7 @@ public class AdminCommand implements SimpleCommand {
         if (temp != null) {
             if(Nebula.dataHolder.getBackendServer(newName) == null) {
                 source.sendMessage(Component.text("Creating server instance from template...", NamedTextColor.AQUA));
-                Nebula.externalServerManager.createFromTemplate(temp, templateName, newName, source);
+                Nebula.externalServerManager.createFromTemplate(temp, templateName, newName, source, "custom");
             } else {
                 source.sendMessage(Component.text("Server already exists.", NamedTextColor.GOLD));
             }

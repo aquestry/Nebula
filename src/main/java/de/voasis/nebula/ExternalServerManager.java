@@ -64,7 +64,7 @@ public class ExternalServerManager {
     }
 
 
-    public void createFromTemplate(HoldServer externalServer, String templateName, String newName, CommandSource source) {
+    public void createFromTemplate(HoldServer externalServer, String templateName, String newName, CommandSource source, String tag) {
         for (BackendServer backendServer : dataHolder.backendInfoMap) {
             if(backendServer.getServerName().equals(newName)) {
                 source.sendMessage(Component.text("Server already exists.", NamedTextColor.GOLD));
@@ -79,7 +79,7 @@ public class ExternalServerManager {
 
         ServerInfo newInfo = new ServerInfo(newName, new InetSocketAddress(externalServer.getIp(), tempPort));
         server.registerServer(newInfo);
-        dataHolder.backendInfoMap.add(new BackendServer(newName, externalServer, tempPort, false, source, templateName));
+        dataHolder.backendInfoMap.add(new BackendServer(newName, externalServer, tempPort, false, source, templateName, tag));
         util.updateFreePort(externalServer);
         for(QueueInfo q : dataHolder.queues) {
             if(q.getGamemode().getTemplateName().equals(templateName)) {
@@ -90,7 +90,7 @@ public class ExternalServerManager {
 
     public void kill(HoldServer externalServer, String servername, CommandSource source) {
         for(Player p : server.getServer(servername).get().getPlayersConnected()) {
-            p.createConnectionRequest(Nebula.defaultManager.getDefaultServer()).fireAndForget();
+            Nebula.defaultManager.connectPlayerToDefaultServer(p);
             p.sendMessage(Component.text("The server you were on was killed.", NamedTextColor.GOLD));
         }
         String command = "docker kill " + servername;

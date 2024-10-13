@@ -30,7 +30,8 @@ public class QueueProcessor {
                         Util.getRandomElement(dataHolder.holdServerMap),
                         queue.getGamemode().getTemplateName(),
                         newName,
-                        server.getConsoleCommandSource()
+                        server.getConsoleCommandSource(),
+                        "queue"
                 );
                 BackendServer backendServer = dataHolder.getBackendServer(newName);
                 if (backendServer != null) {

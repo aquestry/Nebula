@@ -10,7 +10,6 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.nebula.Commands.AdminCommand;
 import de.voasis.nebula.Commands.QueueCommand;
 import de.voasis.nebula.Commands.ShutdownCommand;
-import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Data.Icon;
 import de.voasis.nebula.Event.EventManager;
 import de.voasis.nebula.Helper.*;
@@ -62,7 +61,7 @@ public class Nebula {
         registerCommands();
         logger.info(Icon.Icon);
         server.getEventManager().register(this, new EventManager(server, dataHolder, logger, permissionManager));
-        createDefaultServer();
+        defaultManager.createNewDefaultServer();
         server.getScheduler()
                 .buildTask(this, this::Update)
                 .repeat(500L, TimeUnit.MILLISECONDS)
@@ -83,20 +82,6 @@ public class Nebula {
         logger.info("Commands registered.");
     }
 
-    private void createDefaultServer() {
-        logger.info("Creating Default-Server");
-        if (dataHolder.holdServerMap.isEmpty()) {
-            logger.error("No Hold-Server Registered! - Shutdown!");
-            server.shutdown();
-            return;
-        }
-        externalServerManager.createFromTemplate(
-                Util.getRandomElement(dataHolder.holdServerMap),
-                Data.defaultServerTemplate,
-                "default-" + defaultManager.getDefaultsCount(),
-                server.getConsoleCommandSource()
-        );
-    }
 
     public void loadConfig(Path dataDirectory) {
         try {

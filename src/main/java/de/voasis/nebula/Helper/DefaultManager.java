@@ -1,23 +1,24 @@
 package de.voasis.nebula.Helper;
 
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.ExternalServerManager;
 import de.voasis.nebula.Maps.BackendServer;
-import de.voasis.nebula.Nebula;
 import org.slf4j.Logger;
-
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 public class DefaultManager {
-
     private final ProxyServer server;
     private final ExternalServerManager externalServerManager;
     private final DataHolder dataHolder;
     private final Logger logger;
     private final List<BackendServer> defaults = new ArrayList<>();
+    private final List<BackendServer> available = new ArrayList<>();
 
     public DefaultManager(DataHolder dataHolder, ProxyServer server, ExternalServerManager externalServerManager, Logger logger) {
         this.dataHolder = dataHolder;
@@ -26,53 +27,66 @@ public class DefaultManager {
         this.logger = logger;
     }
 
-    public RegisteredServer getDefaultServer() {
-        return server.getServer(Nebula.util.getRandomElement(defaults).getServerName()).get();
-    }
-
     public void refresh() {
         String[] splitConfig = Data.newCreateCount.split("/");
-        int newCreateThreshold = Integer.parseInt(splitConfig[0]);
-        int maxPlayersPerServer = Integer.parseInt(splitConfig[1]);
+        int min = Integer.parseInt(splitConfig[0]);
+        int max = Integer.parseInt(splitConfig[1]);
 
-        boolean onebelowCreateThreshold = false;
         defaults.clear();
         for (BackendServer backendServer : dataHolder.backendInfoMap) {
-            int pCount = server.getServer(backendServer.getServerName()).get().getPlayersConnected().size();
-            if (backendServer.isOnline() && backendServer.getTemplate().equals(Data.defaultServerTemplate) && pCount < maxPlayersPerServer) {
-                defaults.add(backendServer);
-            }
-        }
-        for(BackendServer backendServer : defaults) {
-            int pCount = server.getServer(backendServer.getServerName()).get().getPlayersConnected().size();
-            boolean foundOtherone = false;
-            if(pCount >= newCreateThreshold) {
-                for(BackendServer b : defaults) {
-                    int OtherPlayerCount = server.getServer(b.getServerName()).get().getPlayersConnected().size();
-                    if(!b.getServerName().equals(backendServer.getServerName()) && OtherPlayerCount > newCreateThreshold) {
-                        foundOtherone = true;
-                    }
-                }
-            }
-            if(!foundOtherone) {
-                externalServerManager.createFromTemplate(
-                        Util.getRandomElement(dataHolder.holdServerMap),
-                        Data.defaultServerTemplate,
-                        "default-" + getDefaultsCount(),
-                        server.getConsoleCommandSource());
+            if (backendServer.isOnline() && backendServer.getTag().equals("default")) {
+                server.getServer(backendServer.getServerName()).ifPresent(registeredServer -> defaults.add(backendServer));
             }
         }
 
-
-
+        int underThresholdServers = 0;
+        available.clear();
+        for (BackendServer backendServer : defaults) {
+            int playerCount = server.getServer(backendServer.getServerName()).get().getPlayersConnected().size();
+            if(playerCount < max) {
+                available.add(backendServer);
+            }
+            if(playerCount >= min) {
+                underThresholdServers++;
+            }
+            if(playerCount < min) {
+                underThresholdServers--;
+            }
+        }
+        if(underThresholdServers > 0) {
+            createNewDefaultServer();
+            logger.info("Creating new default server, because {} is over 0.", underThresholdServers);
+        }
     }
-    public int getDefaultsCount() {
-        List<BackendServer> defaults = new ArrayList<>();
-        for(BackendServer backendServer : dataHolder.backendInfoMap) {
-            if(backendServer.getTemplate().equals(Data.defaultServerTemplate))  {
-                defaults.add(backendServer);
-            }
+
+    public void createNewDefaultServer() {
+        externalServerManager.createFromTemplate(
+                Util.getRandomElement(dataHolder.holdServerMap),
+                Data.defaultServerTemplate,
+                "default-" + defaults.size(),
+                server.getConsoleCommandSource(),
+                "default"
+        );
+    }
+
+
+    public RegisteredServer getDefaultServer() {
+        Optional<RegisteredServer> lowestPopulationServer = available.stream()
+                .map(backendServer -> server.getServer(backendServer.getServerName()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .min(Comparator.comparingInt(s -> s.getPlayersConnected().size()));
+
+        return lowestPopulationServer.orElse(null);
+    }
+
+    public void connectPlayerToDefaultServer(Player player) {
+        RegisteredServer targetServer = getDefaultServer();
+        if (targetServer != null) {
+            player.createConnectionRequest(targetServer).fireAndForget();
+            logger.info("Connecting player {} to server {}", player.getUsername(), targetServer.getServerInfo().getName());
+        } else {
+            logger.error("No default server available to connect player {}", player.getUsername());
         }
-        return defaults.size();
     }
 }
