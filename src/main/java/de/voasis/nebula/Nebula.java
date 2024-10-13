@@ -65,13 +65,14 @@ public class Nebula {
         createDefaultServer();
         server.getScheduler()
                 .buildTask(this, this::Update)
-                .repeat(1L, TimeUnit.SECONDS)
+                .repeat(500L, TimeUnit.MILLISECONDS)
                 .schedule();
     }
 
     private void Update() {
         util.updateState();
         queueProcessor.process();
+        defaultManager.refresh();
     }
 
     private void registerCommands() {
