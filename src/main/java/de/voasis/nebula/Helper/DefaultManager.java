@@ -34,7 +34,7 @@ public class DefaultManager {
 
         defaults.clear();
         for (BackendServer backendServer : dataHolder.backendInfoMap) {
-            if (backendServer.isOnline() && backendServer.getTag().equals("default")) {
+            if (backendServer.getTag().equals("default")) {
                 server.getServer(backendServer.getServerName()).ifPresent(registeredServer -> defaults.add(backendServer));
             }
         }
@@ -43,7 +43,7 @@ public class DefaultManager {
         available.clear();
         for (BackendServer backendServer : defaults) {
             int playerCount = server.getServer(backendServer.getServerName()).get().getPlayersConnected().size();
-            if(playerCount < max) {
+            if(playerCount < max && backendServer.isOnline()) {
                 available.add(backendServer);
             }
             if(playerCount >= min) {
