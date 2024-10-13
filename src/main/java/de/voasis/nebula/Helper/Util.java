@@ -139,11 +139,13 @@ public class Util {
 
     public RegisteredServer getDefaultServer(ExternalServerManager externalServerManager) {
         List<BackendServer> defaults = new ArrayList<>();
+
         for (BackendServer backendServer : dataHolder.backendInfoMap) {
             if (backendServer.isOnline() && backendServer.getTemplate().equals(Data.defaultServerTemplate)) {
                 defaults.add(backendServer);
             }
         }
+
         String[] splitConfig = Data.newCreateCount.split("/");
         int newCreateThreshold = Integer.parseInt(splitConfig[0]);
         int maxPlayersPerServer = Integer.parseInt(splitConfig[1]);
@@ -157,9 +159,11 @@ public class Util {
         for (BackendServer defaultBackendServer : defaults) {
             int playerCount = server.getServer(defaultBackendServer.getServerName())
                     .get().getPlayersConnected().size();
-
             if (playerCount < maxPlayersPerServer) {
+
                 if (playerCount == newCreateThreshold) {
+                    logger.info("Threshold reached: Creating a new server in the background...");
+
                     externalServerManager.createFromTemplate(
                             Util.getRandomElement(dataHolder.holdServerMap),
                             Data.defaultServerTemplate,
@@ -171,11 +175,23 @@ public class Util {
             }
         }
 
+        for (BackendServer defaultBackendServer : defaults) {
+            int playerCount = server.getServer(defaultBackendServer.getServerName())
+                    .get().getPlayersConnected().size();
+
+            if (playerCount == maxPlayersPerServer) {
+                logger.info("All servers are full, connecting to the newly created server...");
+
+                for (BackendServer newBackendServer : dataHolder.backendInfoMap) {
+                    if (newBackendServer.isOnline() && newBackendServer.getServerName().startsWith("default-")) {
+                        return server.getServer(newBackendServer.getServerName()).get();
+                    }
+                }
+            }
+        }
+        logger.warn("No available server found for player connection!");
         return null;
     }
-
-
-
 
     public static int getDefaultsCount() {
         List<BackendServer> defaults = new ArrayList<>();
