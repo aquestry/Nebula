@@ -19,7 +19,6 @@ public class DefaultManager {
     private final int min;
     private final int max;
 
-
     public DefaultManager(DataHolder dataHolder, ProxyServer server, ExternalServerManager externalServerManager, Logger logger) {
         this.dataHolder = dataHolder;
         this.server = server;
