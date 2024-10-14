@@ -15,7 +15,7 @@ manager-servers:
     password: 1234
 # Gamemodes which players can join.
 gamemodes:
-  duels:
+  Duels:
     templateName: anton691/simple-duels:latest
     neededPlayers: 2
 
