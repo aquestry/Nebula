@@ -5,7 +5,7 @@ admins: 74401e14-f69c-48f3-b393-64be488dff8f,069a79f4-44e9-4726-a5be-fca90e38aaf
 vsecret: <VELOCITY-SECRET>
 # Docherhub Template for the Default-Servers.
 default-template: anton691/simple-lobby:latest
-# 5 is the player limit for the default servers, Nebula will automatically create new default server when other de .
+# 5 is the player limit for the default servers, and 3 is the threshold for creating a new server.
 default-new-create-count: 3/5
 # Hold-Servers, at least one.
 manager-servers:
