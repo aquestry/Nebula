@@ -5,6 +5,7 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.ExternalServerManager;
 import de.voasis.nebula.Maps.BackendServer;
+import de.voasis.nebula.Nebula;
 import org.slf4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +20,10 @@ public class DefaultManager {
     private final int min;
     private final int max;
 
-    public DefaultManager(DataHolder dataHolder, ProxyServer server, ExternalServerManager externalServerManager, Logger logger) {
-        this.dataHolder = dataHolder;
+    public DefaultManager(ProxyServer server,  Logger logger) {
+        this.dataHolder = Nebula.dataHolder;
+        this.externalServerManager = Nebula.serverManager;
         this.server = server;
-        this.externalServerManager = externalServerManager;
         this.logger = logger;
         String[] splitConfig = Data.newCreateCount.split("/");
         min = Integer.parseInt(splitConfig[0]);

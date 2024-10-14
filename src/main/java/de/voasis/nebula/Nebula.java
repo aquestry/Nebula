@@ -37,7 +37,7 @@ public class Nebula {
 
     public static YamlDocument config;
     public static DataHolder dataHolder;
-    public static ExternalServerManager externalServerManager;
+    public static ExternalServerManager serverManager;
     public static QueueProcessor queueProcessor;
     public static PermissionManager permissionManager;
     public static DefaultManager defaultManager;
@@ -48,11 +48,11 @@ public class Nebula {
         loadConfig(dataDirectory);
         permissionManager  = new PermissionManager(logger);
         dataHolder = new DataHolder(config, server, logger);
-        util = new Util(dataHolder, server, this, logger);
-        externalServerManager = new ExternalServerManager(logger, server, dataHolder, util);
+        util = new Util(server, this, logger);
+        serverManager = new ExternalServerManager(server, logger);
         dataHolder.Refresh();
-        queueProcessor = new QueueProcessor(server, dataHolder, logger);
-        defaultManager = new DefaultManager(dataHolder, server, externalServerManager, logger);
+        queueProcessor = new QueueProcessor(server, logger);
+        defaultManager = new DefaultManager(server, logger);
     }
 
     @Subscribe
@@ -65,7 +65,6 @@ public class Nebula {
                 .buildTask(this, this::Update)
                 .repeat(1, TimeUnit.SECONDS)
                 .schedule();
-
     }
 
     private void Update() {
@@ -80,7 +79,6 @@ public class Nebula {
         commandManager.register("queue", new QueueCommand(dataHolder));
         logger.info("Commands registered.");
     }
-
 
     public void loadConfig(Path dataDirectory) {
         try {
@@ -97,13 +95,9 @@ public class Nebula {
             );
             config.update();
             config.save();
-        } catch (IOException e) {
+        } catch (IOException ignore) {
             logger.error("Could not load config! Plugin will shutdown!");
-            try {
-                server.shutdown();
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
+            server.shutdown();
         }
     }
 }

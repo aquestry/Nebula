@@ -46,7 +46,7 @@ public class DataHolder {
             holdServerMap.add(holdServer);
             Nebula.util.updateFreePort(holdServer);
             logger.info("Added Server to pool: {}", name);
-            Nebula.externalServerManager.executeSSHCommand(holdServer, "docker pull " + Data.defaultServerTemplate, server.getConsoleCommandSource(),
+            Nebula.serverManager.executeSSHCommand(holdServer, "docker pull " + Data.defaultServerTemplate, server.getConsoleCommandSource(),
                     "Successfully pulled default docker image.",
                     "Error pulling default docker image."
             );

@@ -13,7 +13,7 @@ public class ProxyShutdown {
         logger.info("Deleting Servers...");
         List<BackendServer> serversToDelete = new ArrayList<>(Nebula.dataHolder.backendInfoMap);
         for (BackendServer backendServer : serversToDelete) {
-            Nebula.externalServerManager.delete(backendServer.getHoldServer(), backendServer.getServerName(), server.getConsoleCommandSource());
+            Nebula.serverManager.delete(backendServer.getHoldServer(), backendServer.getServerName(), server.getConsoleCommandSource());
         }
     }
 }

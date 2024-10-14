@@ -13,9 +13,9 @@ public class QueueProcessor {
     static ProxyServer server;
     static Logger logger;
 
-    public QueueProcessor(ProxyServer server, DataHolder dataHolder, Logger logger) {
+    public QueueProcessor(ProxyServer server, Logger logger) {
         QueueProcessor.server = server;
-        QueueProcessor.dataHolder = dataHolder;
+        QueueProcessor.dataHolder = Nebula.dataHolder;
         QueueProcessor.logger = logger;
     }
 
@@ -26,7 +26,7 @@ public class QueueProcessor {
                 queue.setUsed(true);
                 logger.info("Enough players, creating server...");
                 String newName = queue.getGamemode().getName() + "-" + (dataHolder.backendInfoMap.size() + 1);
-                Nebula.externalServerManager.createFromTemplate(
+                Nebula.serverManager.createFromTemplate(
                         Util.getRandomElement(dataHolder.holdServerMap),
                         queue.getGamemode().getTemplateName(),
                         newName,

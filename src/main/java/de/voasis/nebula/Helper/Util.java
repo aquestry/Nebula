@@ -9,6 +9,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.HoldServer;
+import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
@@ -22,13 +23,12 @@ public class Util {
     static Logger logger;
     static Object plugin;
 
-    public Util(DataHolder dataHolder, ProxyServer server, Object plugin, Logger logger) {
-        Util.dataHolder = dataHolder;
+    public Util(ProxyServer server, Object plugin, Logger logger) {
+        Util.dataHolder = Nebula.dataHolder;
         Util.server = server;
         Util.plugin = plugin;
         Util.logger = logger;
     }
-
 
     public void updateFreePort(HoldServer externalServer) {
         int freePort = -1;

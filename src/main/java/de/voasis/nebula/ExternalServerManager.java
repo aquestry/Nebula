@@ -25,11 +25,11 @@ public class ExternalServerManager {
     private final DataHolder dataHolder;
     private final Util util;
 
-    public ExternalServerManager(Logger logger, ProxyServer proxyServer, DataHolder dataHolder, Util util) {
+    public ExternalServerManager( ProxyServer proxyServer, Logger logger) {
         this.logger = logger;
         this.server = proxyServer;
-        this.dataHolder = dataHolder;
-        this.util = util;
+        this.dataHolder = Nebula.dataHolder;
+        this.util = Nebula.util;
     }
 
     public void executeSSHCommand(HoldServer externalServer, String command, CommandSource source, String successMessage, String errorMessage) {
