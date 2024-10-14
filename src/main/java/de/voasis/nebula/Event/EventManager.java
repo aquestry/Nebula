@@ -19,9 +19,9 @@ public class EventManager {
     ProxyServer server;
     DataHolder dataHolder;
 
-    public EventManager(ProxyServer server, DataHolder dataHolder, Logger logger) {
+    public EventManager(ProxyServer server, Logger logger) {
         this.logger = logger;
-        this.dataHolder = dataHolder;
+        this.dataHolder = Nebula.dataHolder;
         this.server = server;
     }
     @Subscribe
