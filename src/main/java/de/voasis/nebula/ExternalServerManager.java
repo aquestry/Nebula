@@ -32,7 +32,7 @@ public class ExternalServerManager {
         this.util = util;
     }
 
-    private void executeSSHCommand(HoldServer externalServer, String command, CommandSource source, String successMessage, String errorMessage) {
+    public void executeSSHCommand(HoldServer externalServer, String command, CommandSource source, String successMessage, String errorMessage) {
         try {
             Session session = new JSch().getSession(externalServer.getUsername(), externalServer.getIp(), 22);
             session.setPassword(externalServer.getPassword());
