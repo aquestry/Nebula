@@ -44,11 +44,11 @@ public class DefaultManager {
         BackendServer between = getServerBetweenMinAndMaxPlayers();
         if(between != null) {
             createNewDefaultServer();
-            return server.getServer(getServerBetweenMinAndMaxPlayers().getServerName()).get();
+            return server.getServer(between.getServerName()).get();
         }
         BackendServer under = getServerUnderMin();
         if(under != null) {
-            return server.getServer(getServerUnderMin().getServerName()).get();
+            return server.getServer(under.getServerName()).get();
         }
         createNewDefaultServer();
         return server.getServer(getServerWithLowestPlayerCount().getServerName()).get();

@@ -1,9 +1,11 @@
 package de.voasis.nebula.Event;
 
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
+import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.event.proxy.server.ServerRegisteredEvent;
@@ -49,9 +51,5 @@ public class EventManager {
     @Subscribe
     public void Perm(PermissionsSetupEvent event) {
         event.setProvider(permissionManager);
-    }
-    @Subscribe
-    public void onPlayerJoin(LoginEvent event) {
-        new Login(event, logger);
     }
 }
