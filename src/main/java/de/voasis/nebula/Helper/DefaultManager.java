@@ -31,33 +31,41 @@ public class DefaultManager {
     }
 
     public RegisteredServer getDefault() {
+        logger.info("Get default server Method");
+        logger.info("default-0 server is on? : " + server.getServer("default-0").isPresent());
         for(BackendServer backendServer : dataHolder.backendInfoMap) {
             if(backendServer.getTag().equals("default") && !defaults.contains(backendServer)) {
                 defaults.add(backendServer);
+                logger.info("Added backend server default list: {}", backendServer.getServerName());
             }
         }
         for(BackendServer backendServer : defaults) {
             if(backendServer.isOnline() && !available.contains(backendServer)) {
                 available.add(backendServer);
+                logger.info("Added backend server available list: {}", backendServer.getServerName());
             }
         }
         BackendServer between = getServerBetweenMinAndMaxPlayers();
         if(between != null) {
             createNewDefaultServer();
+            logger.info("Creating new server and returning: ", between.getServerName());
             return server.getServer(between.getServerName()).get();
         }
         BackendServer under = getServerUnderMin();
         if(under != null) {
+            logger.info("Returning: ", under.getServerName());
             return server.getServer(under.getServerName()).get();
         }
+        logger.info("Creating new server and returning: ", getServerWithLowestPlayerCount().getServerName());
         createNewDefaultServer();
         return server.getServer(getServerWithLowestPlayerCount().getServerName()).get();
     }
     private BackendServer getServerWithLowestPlayerCount() {
         if (available.isEmpty()) {
-            return null;
+            logger.info("Available list is empty, trying default-0");
+            return dataHolder.getBackendServer("default-0");
         }
-        BackendServer serverWithLowestCount = available.get(0);
+        BackendServer serverWithLowestCount = available.getFirst();
         int lowestPlayerCount = server.getServer(serverWithLowestCount.getServerName())
                 .get()
                 .getPlayersConnected()
@@ -84,19 +92,21 @@ public class DefaultManager {
                 return backendServer;
             }
         }
-        return null;
+        return dataHolder.getBackendServer("default-0");
     }
     private BackendServer getServerUnderMin() {
+        logger.info("getServerUnderMin Method");
         for (BackendServer backendServer : available) {
             int playerCount = server.getServer(backendServer.getServerName())
                     .get()
                     .getPlayersConnected()
                     .size();
             if (playerCount <= min) {
+                logger.info("returning: ", backendServer.getServerName());
                 return backendServer;
             }
         }
-        return null;
+        return dataHolder.getBackendServer("default-0");
     }
 
     public BackendServer createNewDefaultServer() {

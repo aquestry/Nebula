@@ -72,14 +72,13 @@ public class ExternalServerManager {
             }
         }
         int tempPort = externalServer.getFreePort();
+        ServerInfo newInfo = new ServerInfo(newName, new InetSocketAddress(externalServer.getIp(), tempPort));
+        server.registerServer(newInfo);
+        dataHolder.backendInfoMap.add(new BackendServer(newName, externalServer, tempPort, false, source, templateName, tag));
         String command = "docker run -d -p " + tempPort + ":25565 --name " + newName + " " + templateName + " SECRET=" + Data.vsecret;
         executeSSHCommand(externalServer, command, source,
                 "Container created from template: " + templateName,
                 "Failed to create container.");
-
-        ServerInfo newInfo = new ServerInfo(newName, new InetSocketAddress(externalServer.getIp(), tempPort));
-        server.registerServer(newInfo);
-        dataHolder.backendInfoMap.add(new BackendServer(newName, externalServer, tempPort, false, source, templateName, tag));
         util.updateFreePort(externalServer);
         for(QueueInfo q : dataHolder.queues) {
             if(q.getGamemode().getTemplateName().equals(templateName)) {
