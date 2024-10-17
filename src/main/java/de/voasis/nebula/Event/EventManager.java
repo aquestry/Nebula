@@ -1,5 +1,6 @@
 package de.voasis.nebula.Event;
 
+import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
@@ -33,7 +34,7 @@ public class EventManager {
     public void onServerUnregistered(ServerUnregisteredEvent event) {
         new ServerUnregistered(event, logger);
     }
-    @Subscribe
+    @Subscribe(order = PostOrder.LAST)
     public void onChooseServer(PlayerChooseInitialServerEvent event) {
         new PlayerChooseInitialServer(event, logger, server);
     }

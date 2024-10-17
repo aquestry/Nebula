@@ -29,7 +29,6 @@ public class BackendServer {
         this.template = template;
         this.tag = tag;
     }
-    public String getServerNameDebug() { logger.info("Get server name: {}", serverName); return serverName; }
     public String getServerName() { return serverName; }
     public String getTemplate() { return template; }
     public int getPort() { return port; }

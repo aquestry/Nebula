@@ -8,7 +8,6 @@ import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Nebula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,22 +47,18 @@ public class DefaultManager {
         BackendServer between = getServerBetweenMinAndMaxPlayers();
         if(between != null) {
             createNewDefaultServer();
-            logger.info("Creating new server and returning: ", between.getServerName());
             return server.getServer(between.getServerName()).get();
         }
         BackendServer under = getServerUnderMin();
         if(under != null) {
-            logger.info("Returning: ", under.getServerNameDebug());
             return server.getServer(under.getServerName()).get();
         }
-        logger.info("Creating new server and returning: ", getServerWithLowestPlayerCount().getServerName());
         createNewDefaultServer();
         return server.getServer(getServerWithLowestPlayerCount().getServerName()).get();
     }
     private BackendServer getServerWithLowestPlayerCount() {
         if (available.isEmpty()) {
-            logger.info("Available list is empty, trying default-0");
-            return dataHolder.getBackendServer("default-0");
+            return null;
         }
         BackendServer serverWithLowestCount = available.getFirst();
         int lowestPlayerCount = server.getServer(serverWithLowestCount.getServerName())
@@ -102,7 +97,6 @@ public class DefaultManager {
                     .getPlayersConnected()
                     .size();
             if (playerCount <= min) {
-                logger.info("returning: ", backendServer.getServerNameDebug());
                 return backendServer;
             }
         }
