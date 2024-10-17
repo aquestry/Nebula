@@ -2,12 +2,15 @@ package de.voasis.nebula.Maps;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BackendServer {
 
+    private static final Logger log = LoggerFactory.getLogger(BackendServer.class);
     private final HoldServer holdServer;
     private final int port;
     private final String serverName;
@@ -26,7 +29,7 @@ public class BackendServer {
         this.template = template;
         this.tag = tag;
     }
-    public String getServerName() { return serverName; }
+    public String getServerName() { log.info("Get server name: {}", serverName); return serverName; }
     public String getTemplate() { return template; }
     public int getPort() { return port; }
     public HoldServer getHoldServer() { return holdServer; }

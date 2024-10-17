@@ -80,6 +80,7 @@ public class Util {
                         for(Player p : backendServer.getPendingPlayerConnections()) {
                             RegisteredServer target = server.getServer(backendServer.getServerName()).get();
                             p.createConnectionRequest(target).fireAndForget();
+                            backendServer.removePendingPlayerConnection(p);
                         }
                         creator.sendMessage(Component.text("Server: " + backendServer.getServerName() + " is now online.", NamedTextColor.GREEN));
                     }
