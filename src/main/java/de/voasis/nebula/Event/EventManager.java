@@ -13,15 +13,15 @@ import de.voasis.nebula.Event.Events.*;
 import de.voasis.nebula.Helper.DataHolder;
 import de.voasis.nebula.Nebula;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EventManager {
 
-    Logger logger;
-    ProxyServer server;
-    DataHolder dataHolder;
+    private static final Logger logger = LoggerFactory.getLogger("nebula");
+    private final ProxyServer server;
+    private final DataHolder dataHolder;
 
-    public EventManager(ProxyServer server, Logger logger) {
-        this.logger = logger;
+    public EventManager(ProxyServer server) {
         this.dataHolder = Nebula.dataHolder;
         this.server = server;
     }
