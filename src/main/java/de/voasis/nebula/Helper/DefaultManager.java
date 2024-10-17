@@ -32,7 +32,6 @@ public class DefaultManager {
 
     public RegisteredServer getDefault() {
         logger.info("Get default server Method");
-        logger.info("default-0 server is on? : " + server.getServer("default-0").isPresent());
         for(BackendServer backendServer : dataHolder.backendInfoMap) {
             if(backendServer.getTag().equals("default") && !defaults.contains(backendServer)) {
                 defaults.add(backendServer);
