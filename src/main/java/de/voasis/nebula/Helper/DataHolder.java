@@ -24,17 +24,21 @@ public class DataHolder {
     private static final Logger logger = LoggerFactory.getLogger("nebula");
     private final ProxyServer server;
 
+
     public DataHolder(YamlDocument config, ProxyServer server) {
         this.config = config;
         this.server = server;
     }
     public void Refresh() {
+
         holdServerMap.clear();
         Data.adminUUIDs.clear();
         Data.defaultServerTemplate = config.getString("default-template");
         Data.newCreateCount = config.getString("default-new-create-count");
         Data.vsecret = config.getString("vsecret");
         Data.adminUUIDs = List.of(config.getString("admins").split(","));
+        List<String> topull = new ArrayList<>();
+        topull.add(Data.defaultServerTemplate);
 
         logger.info("Loading servers from config...");
         Set<Object> managerServerKeys = config.getSection("manager-servers").getKeys();
@@ -47,10 +51,6 @@ public class DataHolder {
             holdServerMap.add(holdServer);
             Nebula.util.updateFreePort(holdServer);
             logger.info("Added Server to pool: {}", name);
-            Nebula.serverManager.executeSSHCommand(holdServer, "docker pull " + Data.defaultServerTemplate, server.getConsoleCommandSource(),
-                    "Successfully pulled default docker image.",
-                    "Error pulling default docker image."
-            );
         }
 
         logger.info("Loading Gamemodes from config...");
@@ -63,6 +63,13 @@ public class DataHolder {
             GamemodeInfo newGamemode = new GamemodeInfo(name, neededPlayers, templateName);
             gamemodeInfoMap.add(newGamemode);
             queues.add(new QueueInfo(newGamemode));
+            topull.add(templateName);
+        }
+        // Pull Templates
+        for (HoldServer holdServer : holdServerMap) {
+            for(String templateName : topull) {
+                Nebula.serverManager.pull(holdServer, templateName);
+            }
         }
     }
 

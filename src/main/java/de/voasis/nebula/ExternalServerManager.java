@@ -63,7 +63,11 @@ public class ExternalServerManager {
             source.sendMessage(Component.text(errorMessage, NamedTextColor.GOLD));
         }
     }
-
+    public void pull(HoldServer holdServer, String template) {
+        Nebula.serverManager.executeSSHCommand(holdServer, "docker pull " + template, server.getConsoleCommandSource(),
+                "Successfully pulled " + template + " docker image.",
+                "Error pulling " + template + " docker image.");
+    }
 
     public void createFromTemplate(HoldServer externalServer, String templateName, String newName, CommandSource source, String tag) {
         for (BackendServer backendServer : dataHolder.backendInfoMap) {

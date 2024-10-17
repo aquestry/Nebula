@@ -1,10 +1,8 @@
 package de.voasis.nebula.Event;
 
-import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
-import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.event.proxy.server.ServerRegisteredEvent;
@@ -33,10 +31,6 @@ public class EventManager {
     @Subscribe
     public void onServerUnregistered(ServerUnregisteredEvent event) {
         new ServerUnregistered(event, logger);
-    }
-    @Subscribe(order = PostOrder.LAST)
-    public void onChooseServer(PlayerChooseInitialServerEvent event) {
-        new PlayerChooseInitialServer(event, logger, server);
     }
     @Subscribe
     public void preConnect(ServerPreConnectEvent event) {

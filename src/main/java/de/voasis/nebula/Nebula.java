@@ -3,6 +3,7 @@ package de.voasis.nebula;
 import com.google.inject.Inject;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
@@ -57,7 +58,7 @@ public class Nebula {
         defaultManager = new DefaultManager(server);
     }
 
-    @Subscribe()
+    @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         registerCommands();
         logger.info(Icon.Icon);
@@ -67,6 +68,11 @@ public class Nebula {
                 .buildTask(this, this::Update)
                 .repeat(1, TimeUnit.SECONDS)
                 .schedule();
+    }
+
+    @Subscribe
+    public void PlayerChooseInitialServer(PlayerChooseInitialServerEvent event) {
+        event.setInitialServer(defaultManager.getDefault());
     }
 
     private void Update() {
