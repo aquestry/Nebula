@@ -90,7 +90,6 @@ public class DefaultManager {
         return null;
     }
     private BackendServer getServerUnderMin() {
-        logger.info("getServerUnderMin Method");
         for (BackendServer backendServer : available) {
             int playerCount = server.getServer(backendServer.getServerName())
                     .get()
