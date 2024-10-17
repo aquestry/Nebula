@@ -21,6 +21,8 @@ import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -33,12 +35,9 @@ import java.util.concurrent.TimeUnit;
         version = "1.0",
         authors = "Aquestry")
 public class Nebula {
-
-    @Inject
-    private Logger logger;
     @Inject
     private ProxyServer server;
-
+    private static final Logger logger = LoggerFactory.getLogger("nebula");
     public static YamlDocument config;
     public static DataHolder dataHolder;
     public static ExternalServerManager serverManager;
@@ -50,13 +49,13 @@ public class Nebula {
     @Inject
     public Nebula(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         loadConfig(dataDirectory);
-        permissionManager  = new PermissionManager(logger);
-        dataHolder = new DataHolder(config, server, logger);
-        util = new Util(server, this, logger);
-        serverManager = new ExternalServerManager(server, logger);
+        permissionManager  = new PermissionManager();
+        dataHolder = new DataHolder(config, server);
+        util = new Util(server, this);
+        serverManager = new ExternalServerManager(server);
         dataHolder.Refresh();
-        queueProcessor = new QueueProcessor(server, logger);
-        defaultManager = new DefaultManager(server, logger);
+        queueProcessor = new QueueProcessor(server);
+        defaultManager = new DefaultManager(server);
     }
 
     @Subscribe

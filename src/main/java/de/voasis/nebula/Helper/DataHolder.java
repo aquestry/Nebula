@@ -9,6 +9,8 @@ import de.voasis.nebula.Maps.HoldServer;
 import de.voasis.nebula.Nebula;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 public class DataHolder {
@@ -19,13 +21,12 @@ public class DataHolder {
     public List<QueueInfo> queues = new ArrayList<>();
 
     private final YamlDocument config;
-    private final Logger logger;
+    private static final Logger logger = LoggerFactory.getLogger("nebula");
     private final ProxyServer server;
 
-    public DataHolder(YamlDocument config, ProxyServer server, Logger logger) {
+    public DataHolder(YamlDocument config, ProxyServer server) {
         this.config = config;
         this.server = server;
-        this.logger = logger;
     }
     public void Refresh() {
         holdServerMap.clear();

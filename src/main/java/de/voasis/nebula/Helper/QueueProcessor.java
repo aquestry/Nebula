@@ -6,17 +6,18 @@ import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.QueueInfo;
 import de.voasis.nebula.Nebula;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 public class QueueProcessor {
     static DataHolder dataHolder;
     static ProxyServer server;
-    static Logger logger;
+    private static final Logger logger = LoggerFactory.getLogger("nebula");
 
-    public QueueProcessor(ProxyServer server, Logger logger) {
+    public QueueProcessor(ProxyServer server) {
         QueueProcessor.server = server;
         QueueProcessor.dataHolder = Nebula.dataHolder;
-        QueueProcessor.logger = logger;
     }
 
     public void process() {

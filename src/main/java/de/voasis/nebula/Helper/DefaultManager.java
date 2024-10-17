@@ -7,6 +7,8 @@ import de.voasis.nebula.ExternalServerManager;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Nebula;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,17 +16,16 @@ public class DefaultManager {
     private final ProxyServer server;
     private final ExternalServerManager externalServerManager;
     private final DataHolder dataHolder;
-    private final Logger logger;
+    private static final Logger logger = LoggerFactory.getLogger("nebula");
     private final List<BackendServer> defaults = new ArrayList<>();
     private final List<BackendServer> available = new ArrayList<>();
     private final int min;
     private final int max;
 
-    public DefaultManager(ProxyServer server,  Logger logger) {
+    public DefaultManager(ProxyServer server) {
         this.dataHolder = Nebula.dataHolder;
         this.externalServerManager = Nebula.serverManager;
         this.server = server;
-        this.logger = logger;
         String[] splitConfig = Data.newCreateCount.split("/");
         min = Integer.parseInt(splitConfig[0]);
         max = Integer.parseInt(splitConfig[1]);
@@ -52,7 +53,7 @@ public class DefaultManager {
         }
         BackendServer under = getServerUnderMin();
         if(under != null) {
-            logger.info("Returning: ", under.getServerName());
+            logger.info("Returning: ", under.getServerNameDebug());
             return server.getServer(under.getServerName()).get();
         }
         logger.info("Creating new server and returning: ", getServerWithLowestPlayerCount().getServerName());
@@ -101,7 +102,7 @@ public class DefaultManager {
                     .getPlayersConnected()
                     .size();
             if (playerCount <= min) {
-                logger.info("returning: ", backendServer.getServerName());
+                logger.info("returning: ", backendServer.getServerNameDebug());
                 return backendServer;
             }
         }

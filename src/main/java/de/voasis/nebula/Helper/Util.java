@@ -13,6 +13,8 @@ import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -20,14 +22,13 @@ import java.util.concurrent.Callable;
 public class Util {
     static DataHolder dataHolder;
     static ProxyServer server;
-    static Logger logger;
+    static final Logger logger = LoggerFactory.getLogger("nebula");
     static Object plugin;
 
-    public Util(ProxyServer server, Object plugin, Logger logger) {
+    public Util(ProxyServer server, Object plugin) {
         Util.dataHolder = Nebula.dataHolder;
         Util.server = server;
         Util.plugin = plugin;
-        Util.logger = logger;
     }
 
     public void updateFreePort(HoldServer externalServer) {

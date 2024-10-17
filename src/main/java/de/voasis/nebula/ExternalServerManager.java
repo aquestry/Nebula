@@ -16,17 +16,18 @@ import de.voasis.nebula.Maps.HoldServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 
 public class ExternalServerManager {
-    private final Logger logger;
+    private static final Logger logger = LoggerFactory.getLogger("nebula");
     private final ProxyServer server;
     private final DataHolder dataHolder;
     private final Util util;
 
-    public ExternalServerManager( ProxyServer proxyServer, Logger logger) {
-        this.logger = logger;
+    public ExternalServerManager( ProxyServer proxyServer) {
         this.server = proxyServer;
         this.dataHolder = Nebula.dataHolder;
         this.util = Nebula.util;
