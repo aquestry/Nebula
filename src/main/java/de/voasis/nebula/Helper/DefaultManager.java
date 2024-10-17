@@ -91,7 +91,7 @@ public class DefaultManager {
                 return backendServer;
             }
         }
-        return dataHolder.getBackendServer("default-0");
+        return null;
     }
     private BackendServer getServerUnderMin() {
         logger.info("getServerUnderMin Method");
@@ -105,7 +105,7 @@ public class DefaultManager {
                 return backendServer;
             }
         }
-        return dataHolder.getBackendServer("default-0");
+        return null;
     }
 
     public BackendServer createNewDefaultServer() {
