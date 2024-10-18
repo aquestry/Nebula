@@ -8,6 +8,7 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.Commands.AdminCommand;
 import de.voasis.nebula.Commands.QueueCommand;
 import de.voasis.nebula.Commands.ShutdownCommand;
@@ -73,6 +74,10 @@ public class Nebula {
     @Subscribe
     public void PlayerChooseInitialServer(PlayerChooseInitialServerEvent event) {
         event.setInitialServer(defaultManager.getDefault());
+        logger.info("Choose Event current registered servers: ");
+        for(RegisteredServer registeredServer : server.getAllServers()) {
+            logger.info(registeredServer.getServerInfo().getName());
+        }
     }
 
     private void Update() {

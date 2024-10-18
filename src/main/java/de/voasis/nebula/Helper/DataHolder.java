@@ -1,6 +1,7 @@
 package de.voasis.nebula.Helper;
 
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.GamemodeInfo;
@@ -76,6 +77,14 @@ public class DataHolder {
     public BackendServer getBackendServer(String name) {
         for (BackendServer server : backendInfoMap) {
             if (server.getServerName().equals(name)) {
+                return server;
+            }
+        }
+        return null;
+    }
+    public RegisteredServer getServer(String name) {
+        for (RegisteredServer server : server.getAllServers()) {
+            if (server.getServerInfo().getName().equals(name)) {
                 return server;
             }
         }
