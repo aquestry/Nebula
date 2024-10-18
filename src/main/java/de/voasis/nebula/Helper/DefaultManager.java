@@ -51,7 +51,7 @@ public class DefaultManager {
         }
         BackendServer under = getServerUnderMin();
         if(under != null) {
-            logger.info("Returning: {}", under.getServerNameDebug());
+            logger.info("Returning: {}", under.getServerName());
             return server.getServer(under.getServerName()).get();
         }
         createNewDefaultServer();
