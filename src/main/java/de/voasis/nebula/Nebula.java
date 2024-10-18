@@ -73,10 +73,13 @@ public class Nebula {
 
     @Subscribe
     public void PlayerChooseInitialServer(PlayerChooseInitialServerEvent event) {
-        event.setInitialServer(defaultManager.getDefault());
-        logger.info("Choose Event current registered servers: ");
-        for(RegisteredServer registeredServer : server.getAllServers()) {
-            logger.info(registeredServer.getServerInfo().getName());
+        RegisteredServer target = defaultManager.getDefault();
+        if(target != null) {
+            event.setInitialServer(target);
+            logger.info("Choose Event current registered servers: ");
+            for(RegisteredServer registeredServer : server.getAllServers()) {
+                logger.info(registeredServer.getServerInfo().getName());
+            }
         }
     }
 
