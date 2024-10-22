@@ -47,11 +47,11 @@ public class Nebula {
     public Nebula(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         loadConfig(dataDirectory);
         permissionManager  = new PermissionManager();
-        dataHolder = new DataHolder(config, server, logger);
+        dataHolder = new DataHolder(config, server);
         util = new Util(server, this);
         dataHolder.Refresh();
         serverManager = new ServerManager(server);
-        queueProcessor = new QueueProcessor(server, dataHolder, logger);
+        queueProcessor = new QueueProcessor(server);
         defaultManager = new DefaultManager(server);
     }
 
