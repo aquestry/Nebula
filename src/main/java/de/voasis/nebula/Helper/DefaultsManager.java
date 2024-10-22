@@ -37,16 +37,6 @@ public class DefaultsManager {
         return getServerWithLowestPlayerCount();
     }
 
-    public void checkForDelete() {
-        for(BackendServer target : Nebula.dataHolder.backendInfoMap.stream().filter(backendServer -> backendServer.getTag().equals("default")).toList()) {
-            int availables = Nebula.dataHolder.backendInfoMap.stream().filter(backendServer -> backendServer.getTag().equals("default") && backendServer.isOnline() && server.getServer(backendServer.getServerName()).get().getPlayersConnected().size() < max).toList().size();
-            int count = server.getServer(target.getServerName()).get().getPlayersConnected().size();
-            if(count == 0 && availables > 2 || count == 0 && isOtherEmpty(target)) {
-                Nebula.serverManager.delete(target.getHoldServer(), target.getServerName(), server.getConsoleCommandSource());
-            }
-        }
-    }
-
     private List<BackendServer> getAvailableServers() {
         List<BackendServer> servers = new ArrayList<>();
         for (BackendServer server : Nebula.dataHolder.backendInfoMap) {

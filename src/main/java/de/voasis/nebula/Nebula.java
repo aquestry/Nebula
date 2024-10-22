@@ -63,7 +63,6 @@ public class Nebula {
 
     private void Update() {
         util.updateState();
-        defaultsManager.checkForDelete();
     }
 
     private void registerCommands() {
