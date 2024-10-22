@@ -34,7 +34,6 @@ public class Nebula {
     private Logger logger;
     @Inject
     private ProxyServer server;
-
     public static YamlDocument config;
     public static DataHolder dataHolder;
     public static ServerManager serverManager;
