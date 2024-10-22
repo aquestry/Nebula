@@ -44,15 +44,18 @@ public class DefaultManager {
         BackendServer between = getServerBetweenMinAndMaxPlayers();
         if(between != null) {
             createNewDefaultServer();
+            logger.info("Sending to: {}", between.getServerName());
             return dataHolder.getServer(between.getServerName());
         }
         BackendServer under = getServerUnderMin();
         if(under != null) {
-            logger.info("Returning: {}", under.getServerName());
+            logger.info("Sending to: {}", under.getServerName());
             return dataHolder.getServer(under.getServerName());
         }
+        BackendServer target = getServerWithLowestPlayerCount();
         createNewDefaultServer();
-        return dataHolder.getServer(getServerWithLowestPlayerCount().getServerName());
+        logger.info("Sending to: {}", target.getServerName());
+        return dataHolder.getServer(target.getServerName());
     }
     private BackendServer getServerWithLowestPlayerCount() {
         if (available.isEmpty()) {
@@ -81,7 +84,7 @@ public class DefaultManager {
                     .get()
                     .getPlayersConnected()
                     .size();
-            if (playerCount >= min && playerCount < max) {
+            if (playerCount > min && playerCount < max) {
                 return backendServer;
             }
         }

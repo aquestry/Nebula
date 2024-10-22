@@ -16,6 +16,5 @@ public class PlayerChooseInitialServer {
             return;
         }
         player.disconnect(Component.text("No server found!"));
-        event.setInitialServer(null);
     }
 }
