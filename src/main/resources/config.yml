@@ -6,10 +6,9 @@ vsecret: <VELOCITY-SECRET>
 # Docherhub Template for the Default-Servers.
 default-template: anton691/simple-lobby:latest
 # Count of players at which an additional default server should be created.
-# So when there a 3 people on a default server another one will be created for the next person.
+# So when there a 3 people on a default server another one will be created for the person joins after the other server is full.
 # 5 is the player limit for the default servers.
 default-new-create-count: 3/5
-
 # Hold-Servers, at least one.
 manager-servers:
   server-1:
