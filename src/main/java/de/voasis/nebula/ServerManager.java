@@ -84,10 +84,16 @@ public class ServerManager {
     }
 
     public void delete(HoldServer externalServer, String servername, CommandSource source) {
-        Nebula.dataHolder.backendInfoMap.removeIf(backendServer -> backendServer.getServerName().equals(servername));
+        BackendServer backendServer = Nebula.dataHolder.getBackendServer(servername);
+        if (backendServer == null) {
+            source.sendMessage(Component.text("Server not found: " + servername, NamedTextColor.RED));
+            logger.error("Attempted to delete a server that does not exist: {}", servername);
+            return;
+        }
+        Nebula.dataHolder.backendInfoMap.removeIf(bs -> bs.getServerName().equals(servername));
         kill(externalServer, servername, source);
         String command = "docker rm -f " + servername;
         executeSSHCommand(externalServer, command, source, "Docker container deleted: " + servername, "Failed to delete Docker container.");
-        server.unregisterServer(new ServerInfo(servername, new InetSocketAddress(externalServer.getIp(), Nebula.dataHolder.getBackendServer(servername).getPort())));
+        server.unregisterServer(new ServerInfo(servername, new InetSocketAddress(externalServer.getIp(), backendServer.getPort())));
     }
 }
