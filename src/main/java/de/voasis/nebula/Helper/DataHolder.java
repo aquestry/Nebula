@@ -10,6 +10,7 @@ import de.voasis.nebula.Maps.HoldServer;
 import de.voasis.nebula.Nebula;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.*;
 
 public class DataHolder {
@@ -18,16 +19,15 @@ public class DataHolder {
     public List<BackendServer> backendInfoMap = new ArrayList<>();
     public List<GamemodeInfo> gamemodeInfoMap = new ArrayList<>();
     public List<QueueInfo> queues = new ArrayList<>();
-
     private final YamlDocument config;
-    private final Logger logger;
+    private final Logger logger = LoggerFactory.getLogger("nebula");
     private final ProxyServer server;
 
-    public DataHolder(YamlDocument config, ProxyServer server, Logger logger) {
+    public DataHolder(YamlDocument config, ProxyServer server) {
         this.config = config;
         this.server = server;
-        this.logger = logger;
     }
+
     public void Refresh() {
         holdServerMap.clear();
         Data.adminUUIDs.clear();
@@ -35,7 +35,6 @@ public class DataHolder {
         Data.newCreateCount = config.getString("default-new-create-count");
         Data.vsecret = config.getString("vsecret");
         Data.adminUUIDs = List.of(config.getString("admins").split(","));
-
         logger.info("Loading servers from config...");
         Set<Object> managerServerKeys = config.getSection("manager-servers").getKeys();
         for (Object serverName : managerServerKeys) {

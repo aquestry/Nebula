@@ -13,10 +13,8 @@ public class PlayerChooseInitialServer {
         RegisteredServer defaultServer = Nebula.defaultManager.getDefault();
         if (defaultServer != null) {
             event.setInitialServer(defaultServer);
-            logger.info("Connecting player...");
             return;
         }
-        logger.info("No server found, disconnecting player...");
         player.disconnect(Component.text("No server found!"));
         event.setInitialServer(null);
     }
