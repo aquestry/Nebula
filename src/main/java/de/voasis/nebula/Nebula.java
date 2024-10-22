@@ -55,7 +55,6 @@ public class Nebula {
         registerCommands();
         logger.info(Icon.Icon);
         server.getEventManager().register(this, new EventManager(server));
-        defaultsManager.createDefault();
         server.getScheduler()
                 .buildTask(this, this::Update)
                 .repeat(1, TimeUnit.SECONDS)

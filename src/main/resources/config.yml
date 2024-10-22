@@ -5,7 +5,13 @@ admins: 74401e14-f69c-48f3-b393-64be488dff8f,069a79f4-44e9-4726-a5be-fca90e38aaf
 vsecret: <VELOCITY-SECRET>
 # Docherhub Template for the Default-Servers.
 default-template: anton691/simple-lobby:latest
-
+# Player limit for default server.
+default-max: 5
+# Threshold for creating a new default server.
+# When a server reaches this player count, a new server will be prepared.
+# The current server will continue accepting players until it reaches the player limit (5),
+# at which point new players will start connecting to the newly created server.
+default-min: 3
 # Hold-Servers, at least one.
 manager-servers:
   server-1:
@@ -14,7 +20,7 @@ manager-servers:
     password: 1234
 # Gamemodes which players can join.
 gamemodes:
-  duels:
+  Duels:
     templateName: anton691/simple-duels:latest
     neededPlayers: 2
 

@@ -27,9 +27,12 @@ public class DataHolder {
         holdServerMap.clear();
         Data.adminUUIDs.clear();
         Data.defaultServerTemplate = config.getString("default-template");
+        Data.defaultmax = config.getInt("default-max");
+        Data.defaultmin = config.getInt("default-min");
         Data.vsecret = config.getString("vsecret");
         Data.adminUUIDs = List.of(config.getString("admins").split(","));
-
+        logger.info("Default-Max: {}", Data.defaultmax);
+        logger.info("Default-Min: {}", Data.defaultmin);
         logger.info("Loading servers from config...");
         Set<Object> managerServerKeys = config.getSection("manager-servers").getKeys();
         for (Object serverName : managerServerKeys) {

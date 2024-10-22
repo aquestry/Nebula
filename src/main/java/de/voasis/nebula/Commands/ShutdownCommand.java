@@ -18,7 +18,6 @@ public class ShutdownCommand implements SimpleCommand {
         server.shutdown(Component.text("Shutdown! Reason: " + reason).color(NamedTextColor.WHITE));
     }
 
-
     @Override
     public boolean hasPermission(Invocation invocation) {
         return invocation.source().hasPermission("velocity.admin");

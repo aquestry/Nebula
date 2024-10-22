@@ -7,9 +7,7 @@ import de.voasis.nebula.Nebula;
 
 public class PlayerChooseInitialServer {
     public PlayerChooseInitialServer(PlayerChooseInitialServerEvent event, ProxyServer server) {
-        BackendServer target = Nebula.dataHolder.backendInfoMap.stream().filter(backendServer -> backendServer.isOnline() && backendServer.getTag().equals("default")).findAny().get();
-        if(target != null) {
-            event.setInitialServer(server.getServer(target.getServerName()).get());
-        }
+        BackendServer target = Nebula.defaultsManager.getTarget();
+        event.setInitialServer(server.getServer(target.getServerName()).get());
     }
 }
