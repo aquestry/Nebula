@@ -31,17 +31,14 @@ public class DefaultManager {
     }
 
     public RegisteredServer getDefault() {
-        logger.info("Get default server Method");
         for(BackendServer backendServer : dataHolder.backendInfoMap) {
             if(backendServer.getTag().equals("default") && !defaults.contains(backendServer)) {
                 defaults.add(backendServer);
-                logger.info("Added backend server default list: {}", backendServer.getServerName());
             }
         }
         for(BackendServer backendServer : defaults) {
             if(backendServer.isOnline() && !available.contains(backendServer)) {
                 available.add(backendServer);
-                logger.info("Added backend server available list: {}", backendServer.getServerName());
             }
         }
         BackendServer between = getServerBetweenMinAndMaxPlayers();
