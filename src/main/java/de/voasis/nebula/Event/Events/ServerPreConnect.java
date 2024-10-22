@@ -15,14 +15,9 @@ public class ServerPreConnect {
             event.setResult(ServerPreConnectEvent.ServerResult.denied());
             player.sendMessage(Component.text("The server you are trying to connect to is offline", NamedTextColor.GOLD));
         }
-        if(Nebula.dataHolder.getBackendServer(target.getServerInfo().getName()).getTag().equals("default") && target.getPlayersConnected().size() < Nebula.defaultManager.getMax()) {
-            event.setResult(ServerPreConnectEvent.ServerResult.denied());
-            player.sendMessage(Component.text("The server you are trying to connect to is full", NamedTextColor.GOLD));
-        }
         if(player.getCurrentServer().equals(target)) {
             event.setResult(ServerPreConnectEvent.ServerResult.denied());
             player.sendMessage(Component.text("You are already connected to that server.", NamedTextColor.GOLD));
         }
     }
-
 }

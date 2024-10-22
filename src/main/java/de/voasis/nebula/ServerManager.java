@@ -9,7 +9,6 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Data.Data;
-import de.voasis.nebula.Maps.QueueInfo;
 import de.voasis.nebula.Maps.HoldServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -46,7 +45,6 @@ public class ServerManager {
             if (channelExec.getExitStatus() == 0) {
                 source.sendMessage(Component.text(successMessage, NamedTextColor.GREEN));
             } else {
-
                 source.sendMessage(Component.text(errorMessage, NamedTextColor.GOLD));
             }
             channelExec.disconnect();
@@ -75,17 +73,11 @@ public class ServerManager {
         server.registerServer(newInfo);
         Nebula.dataHolder.backendInfoMap.add(new BackendServer(newName, externalServer, tempPort, false, source, templateName, tag));
         Nebula.util.updateFreePort(externalServer);
-        for(QueueInfo q : Nebula.dataHolder.queues) {
-            if(q.getGamemode().getTemplateName().equals(templateName)) {
-                q.setUsed(false);
-            }
-        }
     }
 
     public void kill(HoldServer externalServer, String servername, CommandSource source) {
         for(Player p : server.getServer(servername).get().getPlayersConnected()) {
-            p.createConnectionRequest(Nebula.defaultManager.getDefault()).fireAndForget();
-            p.sendMessage(Component.text("The server you were on was killed.", NamedTextColor.GOLD));
+            p.disconnect(Component.text("The server you were on was killed.", NamedTextColor.GOLD));
         }
         String command = "docker kill " + servername;
         executeSSHCommand(externalServer, command, source, "Docker container killed: " + servername, "Failed to kill Docker container.");

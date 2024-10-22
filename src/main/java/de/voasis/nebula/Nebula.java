@@ -8,7 +8,6 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.nebula.Commands.AdminCommand;
-import de.voasis.nebula.Commands.QueueCommand;
 import de.voasis.nebula.Commands.ShutdownCommand;
 import de.voasis.nebula.Data.Icon;
 import de.voasis.nebula.Event.EventManager;
@@ -36,9 +35,8 @@ public class Nebula {
     public static YamlDocument config;
     public static DataHolder dataHolder;
     public static ServerManager serverManager;
-    public static QueueProcessor queueProcessor;
     public static PermissionManager permissionManager;
-    public static DefaultManager defaultManager;
+    public static DefaultsManager defaultsManager;
     public static Util util;
 
     @Inject
@@ -49,8 +47,7 @@ public class Nebula {
         util = new Util(server, this);
         dataHolder.Refresh();
         serverManager = new ServerManager(server);
-        queueProcessor = new QueueProcessor(server);
-        defaultManager = new DefaultManager(server);
+        defaultsManager = new DefaultsManager(server);
     }
 
     @Subscribe
@@ -58,24 +55,21 @@ public class Nebula {
         registerCommands();
         logger.info(Icon.Icon);
         server.getEventManager().register(this, new EventManager(server));
-        defaultManager.createNewDefaultServer();
+        defaultsManager.createDefault();
         server.getScheduler()
                 .buildTask(this, this::Update)
                 .repeat(1, TimeUnit.SECONDS)
                 .schedule();
-
     }
 
     private void Update() {
         util.updateState();
-        queueProcessor.process();
     }
 
     private void registerCommands() {
         CommandManager commandManager = server.getCommandManager();
         commandManager.register("admin", new AdminCommand(logger));
         commandManager.register("shutdown", new ShutdownCommand(server));
-        commandManager.register("queue", new QueueCommand(dataHolder));
         logger.info("Commands registered.");
     }
 

@@ -6,8 +6,6 @@ import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
-import com.velocitypowered.api.event.proxy.server.ServerRegisteredEvent;
-import com.velocitypowered.api.event.proxy.server.ServerUnregisteredEvent;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.nebula.Event.Events.*;
 import de.voasis.nebula.Nebula;
@@ -17,21 +15,14 @@ import org.slf4j.LoggerFactory;
 public class EventManager {
 
     private final Logger logger = LoggerFactory.getLogger("nebula");
-    ProxyServer server;
+    private final ProxyServer server;
+
     public EventManager(ProxyServer server) {
         this.server = server;
     }
     @Subscribe
-    public void onServerRegistered(ServerRegisteredEvent event) {
-        new ServerRegistered(event, logger, server);
-    }
-    @Subscribe
-    public void onServerUnregistered(ServerUnregisteredEvent event) {
-        new ServerUnregistered(event, logger);
-    }
-    @Subscribe
     public void onChooseServer(PlayerChooseInitialServerEvent event) {
-        new PlayerChooseInitialServer(event, logger);
+        new PlayerChooseInitialServer(event, server);
     }
     @Subscribe
     public void preConnect(ServerPreConnectEvent event) {
