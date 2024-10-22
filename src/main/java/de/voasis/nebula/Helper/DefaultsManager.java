@@ -41,7 +41,7 @@ public class DefaultsManager {
         for(BackendServer target : Nebula.dataHolder.backendInfoMap.stream().filter(backendServer -> backendServer.getTag().equals("default")).toList()) {
             int availables = Nebula.dataHolder.backendInfoMap.stream().filter(backendServer -> backendServer.getTag().equals("default") && backendServer.isOnline() && server.getServer(backendServer.getServerName()).get().getPlayersConnected().size() < max).toList().size();
             int count = server.getServer(target.getServerName()).get().getPlayersConnected().size();
-            if(count == 0 && availables > 2) {
+            if(count == 0 && availables > 2 || count == 0 && isOtherEmpty(target)) {
                 Nebula.serverManager.delete(target.getHoldServer(), target.getServerName(), server.getConsoleCommandSource());
             }
         }
@@ -85,6 +85,18 @@ public class DefaultsManager {
                     .getPlayersConnected()
                     .size();
             if (playerCount < min && !backendServer.equals(other)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private boolean isOtherEmpty(BackendServer other) {
+        for (BackendServer backendServer : getAvailableServers()) {
+            int playerCount = server.getServer(backendServer.getServerName())
+                    .get()
+                    .getPlayersConnected()
+                    .size();
+            if (playerCount == 0 && !backendServer.equals(other)) {
                 return true;
             }
         }
