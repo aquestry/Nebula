@@ -15,7 +15,7 @@
 - **Docker and Ruby on hold server**: Necessary for running the backend servers.
 - **User on hold server**: Necessary for interacting with Docker, make sure he has the right permissions.
 
-## Usage:
+## Setup:
 1. Clone the repository.
 2. Build.
 3. Put into your plugins folder (Velocity-Proxy).
