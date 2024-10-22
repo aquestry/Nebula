@@ -13,23 +13,21 @@ import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.Callable;
 
 public class Util {
-    static DataHolder dataHolder;
     static ProxyServer server;
-    static Logger logger;
+    private final Logger logger = LoggerFactory.getLogger("nebula");
     static Object plugin;
 
-    public Util(DataHolder dataHolder, ProxyServer server, Object plugin, Logger logger) {
-        Util.dataHolder = dataHolder;
+    public Util(ProxyServer server, Object plugin) {
         Util.server = server;
         Util.plugin = plugin;
-        Util.logger = logger;
     }
-
 
     public void updateFreePort(HoldServer externalServer) {
         int freePort = -1;
@@ -65,7 +63,7 @@ public class Util {
     }
 
     public void updateState() {
-        for (BackendServer backendServer : dataHolder.backendInfoMap) {
+        for (BackendServer backendServer : Nebula.dataHolder.backendInfoMap) {
             Optional<RegisteredServer> registeredServer = server.getServer(backendServer.getServerName());
             registeredServer.ifPresent(value -> pingServer(value, stateComplete(value), stateCompleteFailed(value), logger, plugin));
         }
@@ -73,7 +71,7 @@ public class Util {
 
     public Callable<Void> stateComplete(RegisteredServer registeredServer) {
         return () -> {
-            for (BackendServer backendServer : dataHolder.backendInfoMap) {
+            for (BackendServer backendServer : Nebula.dataHolder.backendInfoMap) {
                 if (registeredServer.getServerInfo().getName().equals(backendServer.getServerName())) {
                     if (!backendServer.isOnline()) {
                         backendServer.setOnline(true);
@@ -83,7 +81,6 @@ public class Util {
                             p.createConnectionRequest(target).fireAndForget();
                         }
                         creator.sendMessage(Component.text("Server: " + backendServer.getServerName() + " is now online.", NamedTextColor.GREEN));
-                        Nebula.defaultManager.refresh();
                     }
                 }
             }
@@ -93,7 +90,7 @@ public class Util {
 
     public Callable<Void> stateCompleteFailed(RegisteredServer registeredServer) {
         return () -> {
-            for (BackendServer backendServer : dataHolder.backendInfoMap) {
+            for (BackendServer backendServer : Nebula.dataHolder.backendInfoMap) {
                 if (registeredServer.getServerInfo().getName().equals(backendServer.getServerName())) {
                     if (backendServer.isOnline()) {
                         backendServer.setOnline(false);

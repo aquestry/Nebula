@@ -63,7 +63,7 @@ public class AdminCommand implements SimpleCommand {
 
         if (temp != null && Nebula.dataHolder.getBackendServer(instanceName) != null) {
             source.sendMessage(Component.text("Killing server instance...", NamedTextColor.AQUA));
-            Nebula.externalServerManager.kill(temp, instanceName, source);
+            Nebula.serverManager.kill(temp, instanceName, source);
         } else {
             source.sendMessage(Component.text("Server not found.", NamedTextColor.GOLD));
         }
@@ -76,7 +76,7 @@ public class AdminCommand implements SimpleCommand {
 
         if (temp != null && Nebula.dataHolder.getBackendServer(instanceName) != null) {
             source.sendMessage(Component.text("Deleting server instance...", NamedTextColor.AQUA));
-            Nebula.externalServerManager.delete(temp, instanceName, source);
+            Nebula.serverManager.delete(temp, instanceName, source);
         } else {
             source.sendMessage(Component.text("Server not found.", NamedTextColor.GOLD));
         }
@@ -90,7 +90,7 @@ public class AdminCommand implements SimpleCommand {
         if (temp != null) {
             if(Nebula.dataHolder.getBackendServer(newName) == null) {
                 source.sendMessage(Component.text("Creating server instance from template...", NamedTextColor.AQUA));
-                Nebula.externalServerManager.createFromTemplate(temp, templateName, newName, source, "custom");
+                Nebula.serverManager.createFromTemplate(temp, templateName, newName, source, "custom");
             } else {
                 source.sendMessage(Component.text("Server already exists.", NamedTextColor.GOLD));
             }

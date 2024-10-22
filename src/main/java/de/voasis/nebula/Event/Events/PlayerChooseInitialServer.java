@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 public class PlayerChooseInitialServer {
     public PlayerChooseInitialServer(PlayerChooseInitialServerEvent event, Logger logger) {
         Player player = event.getPlayer();
-        RegisteredServer defaultServer = Nebula.defaultManager.getDefaultServer();
+        RegisteredServer defaultServer = Nebula.defaultManager.getDefault();
         if (defaultServer != null) {
             event.setInitialServer(defaultServer);
             logger.info("Connecting player...");

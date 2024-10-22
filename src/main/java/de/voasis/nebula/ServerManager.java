@@ -7,8 +7,6 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
-import de.voasis.nebula.Helper.DataHolder;
-import de.voasis.nebula.Helper.Util;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Maps.QueueInfo;
@@ -16,20 +14,16 @@ import de.voasis.nebula.Maps.HoldServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 
-public class ExternalServerManager {
-    private final Logger logger;
+public class ServerManager {
+    private final Logger logger = LoggerFactory.getLogger("nebula");
     private final ProxyServer server;
-    private final DataHolder dataHolder;
-    private final Util util;
 
-    public ExternalServerManager(Logger logger, ProxyServer proxyServer, DataHolder dataHolder, Util util) {
-        this.logger = logger;
+    public ServerManager(ProxyServer proxyServer) {
         this.server = proxyServer;
-        this.dataHolder = dataHolder;
-        this.util = util;
     }
 
     private void executeSSHCommand(HoldServer externalServer, String command, CommandSource source, String successMessage, String errorMessage) {
@@ -65,7 +59,7 @@ public class ExternalServerManager {
 
 
     public void createFromTemplate(HoldServer externalServer, String templateName, String newName, CommandSource source, String tag) {
-        for (BackendServer backendServer : dataHolder.backendInfoMap) {
+        for (BackendServer backendServer : Nebula.dataHolder.backendInfoMap) {
             if(backendServer.getServerName().equals(newName)) {
                 source.sendMessage(Component.text("Server already exists.", NamedTextColor.GOLD));
                 return;
@@ -79,9 +73,9 @@ public class ExternalServerManager {
 
         ServerInfo newInfo = new ServerInfo(newName, new InetSocketAddress(externalServer.getIp(), tempPort));
         server.registerServer(newInfo);
-        dataHolder.backendInfoMap.add(new BackendServer(newName, externalServer, tempPort, false, source, templateName, tag));
-        util.updateFreePort(externalServer);
-        for(QueueInfo q : dataHolder.queues) {
+        Nebula.dataHolder.backendInfoMap.add(new BackendServer(newName, externalServer, tempPort, false, source, templateName, tag));
+        Nebula.util.updateFreePort(externalServer);
+        for(QueueInfo q : Nebula.dataHolder.queues) {
             if(q.getGamemode().getTemplateName().equals(templateName)) {
                 q.setUsed(false);
             }
@@ -90,7 +84,7 @@ public class ExternalServerManager {
 
     public void kill(HoldServer externalServer, String servername, CommandSource source) {
         for(Player p : server.getServer(servername).get().getPlayersConnected()) {
-            Nebula.defaultManager.connectPlayerToDefaultServer(p);
+            p.createConnectionRequest(Nebula.defaultManager.getDefault()).fireAndForget();
             p.sendMessage(Component.text("The server you were on was killed.", NamedTextColor.GOLD));
         }
         String command = "docker kill " + servername;
@@ -101,7 +95,7 @@ public class ExternalServerManager {
         kill(externalServer, servername, source);
         String command = "docker rm -f " + servername;
         executeSSHCommand(externalServer, command, source, "Docker container deleted: " + servername, "Failed to delete Docker container.");
-        server.unregisterServer(new ServerInfo(servername, new InetSocketAddress(externalServer.getIp(), dataHolder.getBackendServer(servername).getPort())));
-        dataHolder.backendInfoMap.remove(dataHolder.getBackendServer(servername));
+        server.unregisterServer(new ServerInfo(servername, new InetSocketAddress(externalServer.getIp(), Nebula.dataHolder.getBackendServer(servername).getPort())));
+        Nebula.dataHolder.backendInfoMap.remove(Nebula.dataHolder.getBackendServer(servername));
     }
 }

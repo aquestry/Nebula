@@ -26,7 +26,7 @@ public class QueueProcessor {
                 queue.setUsed(true);
                 logger.info("Enough players, creating server...");
                 String newName = queue.getGamemode().getName() + "-" + (dataHolder.backendInfoMap.size() + 1);
-                Nebula.externalServerManager.createFromTemplate(
+                Nebula.serverManager.createFromTemplate(
                         Util.getRandomElement(dataHolder.holdServerMap),
                         queue.getGamemode().getTemplateName(),
                         newName,

@@ -3,7 +3,6 @@ package de.voasis.nebula.Event;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
-import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
@@ -11,20 +10,15 @@ import com.velocitypowered.api.event.proxy.server.ServerRegisteredEvent;
 import com.velocitypowered.api.event.proxy.server.ServerUnregisteredEvent;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.nebula.Event.Events.*;
-import de.voasis.nebula.Helper.DataHolder;
-import de.voasis.nebula.Permission.PermissionManager;
+import de.voasis.nebula.Nebula;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EventManager {
 
-    Logger logger;
+    private final Logger logger = LoggerFactory.getLogger("nebula");
     ProxyServer server;
-    DataHolder dataHolder;
-    PermissionManager permissionManager;
-
-    public EventManager(ProxyServer server, DataHolder dataHolder, Logger logger) {
-        this.logger = logger;
-        this.dataHolder = dataHolder;
+    public EventManager(ProxyServer server) {
         this.server = server;
     }
     @Subscribe
@@ -49,14 +43,10 @@ public class EventManager {
     }
     @Subscribe
     public void Perm(PermissionsSetupEvent event) {
-        event.setProvider(permissionManager);
+        event.setProvider(Nebula.permissionManager);
     }
     @Subscribe
     public void onPlayerJoin(LoginEvent event) {
         new Login(event, logger);
-    }
-    @Subscribe
-    public void onServerLink(KickedFromServerEvent event) {
-        new KickedFromServer(event, server);
     }
 }

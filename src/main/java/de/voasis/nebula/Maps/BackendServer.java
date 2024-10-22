@@ -2,7 +2,6 @@ package de.voasis.nebula.Maps;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
-
 import java.util.ArrayList;
 import java.util.List;
 

@@ -37,7 +37,7 @@ public class Nebula {
 
     public static YamlDocument config;
     public static DataHolder dataHolder;
-    public static ExternalServerManager externalServerManager;
+    public static ServerManager serverManager;
     public static QueueProcessor queueProcessor;
     public static PermissionManager permissionManager;
     public static DefaultManager defaultManager;
@@ -46,20 +46,20 @@ public class Nebula {
     @Inject
     public Nebula(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         loadConfig(dataDirectory);
-        permissionManager  = new PermissionManager(logger);
+        permissionManager  = new PermissionManager();
         dataHolder = new DataHolder(config, server, logger);
-        util = new Util(dataHolder, server, this, logger);
+        util = new Util(server, this);
         dataHolder.Refresh();
-        externalServerManager = new ExternalServerManager(logger, server, dataHolder, util);
+        serverManager = new ServerManager(server);
         queueProcessor = new QueueProcessor(server, dataHolder, logger);
-        defaultManager = new DefaultManager(dataHolder, server, externalServerManager, logger);
+        defaultManager = new DefaultManager(server);
     }
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         registerCommands();
         logger.info(Icon.Icon);
-        server.getEventManager().register(this, new EventManager(server, dataHolder, logger));
+        server.getEventManager().register(this, new EventManager(server));
         defaultManager.createNewDefaultServer();
         server.getScheduler()
                 .buildTask(this, this::Update)
@@ -80,7 +80,6 @@ public class Nebula {
         commandManager.register("queue", new QueueCommand(dataHolder));
         logger.info("Commands registered.");
     }
-
 
     public void loadConfig(Path dataDirectory) {
         try {
