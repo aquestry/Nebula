@@ -51,7 +51,7 @@ public class Nebula {
         util = new Util(server, this);
         dataHolder.Refresh();
         serverManager = new ServerManager(server);
-        queueProcessor = new QueueProcessor(server, dataHolder, logger);
+        queueProcessor = new QueueProcessor(server);
         defaultManager = new DefaultManager(server);
     }
 
