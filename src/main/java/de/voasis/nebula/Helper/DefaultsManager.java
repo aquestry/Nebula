@@ -39,8 +39,9 @@ public class DefaultsManager {
 
     public void checkForDelete() {
         for(BackendServer target : Nebula.dataHolder.backendInfoMap.stream().filter(backendServer -> backendServer.getTag().equals("default")).toList()) {
+            int availables = Nebula.dataHolder.backendInfoMap.stream().filter(backendServer -> backendServer.getTag().equals("default") && backendServer.isOnline() && server.getServer(backendServer.getServerName()).get().getPlayersConnected().size() < max).toList().size();
             int count = server.getServer(target.getServerName()).get().getPlayersConnected().size();
-            if(count == 0 && isOtherUnderMin(target)) {
+            if(count == 0 && availables > 2) {
                 Nebula.serverManager.delete(target.getHoldServer(), target.getServerName(), server.getConsoleCommandSource());
             }
         }
