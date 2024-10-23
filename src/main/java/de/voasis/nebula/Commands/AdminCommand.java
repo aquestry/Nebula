@@ -8,7 +8,6 @@ import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -19,7 +18,7 @@ public class AdminCommand implements SimpleCommand {
     @Override
     public void execute(Invocation invocation) {
         CommandSource source = invocation.source();
-        String[] args = parseQuotedArguments(invocation.arguments());
+        String[] args = invocation.arguments();
 
         if (args.length < 1) {
             source.sendMessage(Component.text("Usage: /admin <stop|delete|template> <args...>", NamedTextColor.GOLD));
@@ -141,32 +140,5 @@ public class AdminCommand implements SimpleCommand {
     @Override
     public boolean hasPermission(Invocation invocation) {
         return invocation.source().hasPermission("velocity.admin");
-    }
-
-    private String[] parseQuotedArguments(String[] args) {
-        List<String> result = new ArrayList<>();
-        StringBuilder currentArg = new StringBuilder();
-        boolean inQuotes = false;
-
-        for (String arg : args) {
-            if (arg.startsWith("\"") && arg.endsWith("\"")) {
-                result.add(arg.substring(1, arg.length() - 1));
-            } else if (arg.startsWith("\"")) {
-                inQuotes = true;
-                currentArg = new StringBuilder(arg.substring(1));
-            } else if (arg.endsWith("\"") && inQuotes) {
-                currentArg.append(" ").append(arg, 0, arg.length() - 1);
-                result.add(currentArg.toString());
-                inQuotes = false;
-            } else if (inQuotes) {
-                currentArg.append(" ").append(arg);
-            } else {
-                result.add(arg);
-            }
-        }
-        if (inQuotes) {
-            result.add(currentArg.toString());
-        }
-        return result.toArray(new String[0]);
     }
 }

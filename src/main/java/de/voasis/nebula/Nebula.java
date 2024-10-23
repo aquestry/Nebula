@@ -12,7 +12,7 @@ import de.voasis.nebula.Commands.ShutdownCommand;
 import de.voasis.nebula.Data.Icon;
 import de.voasis.nebula.Event.EventManager;
 import de.voasis.nebula.Helper.*;
-import de.voasis.nebula.Permission.PermissionManager;
+import de.voasis.nebula.Helper.PermissionManager;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.dvs.versioning.BasicVersioning;
 import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
@@ -45,8 +45,8 @@ public class Nebula {
         permissionManager  = new PermissionManager();
         dataHolder = new DataHolder(config, server);
         util = new Util(server, this);
-        dataHolder.Refresh();
         serverManager = new ServerManager(server);
+        dataHolder.Load();
         defaultsManager = new DefaultsManager(server);
     }
 
@@ -69,7 +69,6 @@ public class Nebula {
         CommandManager commandManager = server.getCommandManager();
         commandManager.register("admin", new AdminCommand(logger));
         commandManager.register("shutdown", new ShutdownCommand(server));
-        logger.info("Commands registered.");
     }
 
     public void loadConfig(Path dataDirectory) {

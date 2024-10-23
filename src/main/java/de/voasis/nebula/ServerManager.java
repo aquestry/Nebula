@@ -67,7 +67,7 @@ public class ServerManager {
         String command = String.format("docker run -d -p %d:25565 --name %s %s SECRET=%s", tempPort, newName, templateName, Data.vsecret);
         executeSSHCommand(externalServer, command, source,
                 "Container created from template: " + templateName,
-                "Failed to create container.");
+                "Failed to create container: " + newName);
 
         ServerInfo newInfo = new ServerInfo(newName, new InetSocketAddress(externalServer.getIp(), tempPort));
         server.registerServer(newInfo);
@@ -81,6 +81,10 @@ public class ServerManager {
         }
         String command = "docker kill " + servername;
         executeSSHCommand(externalServer, command, source, "Docker container killed: " + servername, "Failed to kill Docker container.");
+    }
+    public void pull(HoldServer externalServer, String template, CommandSource source) {
+        String command = "docker pull " + template;
+        executeSSHCommand(externalServer, command, source, "Docker template pulled: " + template, "Failed to pull Docker template: " + template);
     }
 
     public void delete(HoldServer externalServer, String servername, CommandSource source) {
