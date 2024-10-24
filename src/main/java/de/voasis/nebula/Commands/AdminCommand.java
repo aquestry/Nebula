@@ -10,7 +10,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
@@ -78,13 +77,13 @@ public class AdminCommand implements SimpleCommand {
     }
 
     private void handleTemplateCommand(CommandSource source, String[] args) {
-        String templateName = args[2];
+        String templateName = args[1];
         String newName = args[2];
-        if(Nebula.dataHolder.getBackendServer(newName) == null) {
+        if (Nebula.dataHolder.getBackendServer(newName) == null) {
             source.sendMessage(Component.text("Creating server instance from template...", NamedTextColor.AQUA));
             Nebula.serverManager.createFromTemplate(templateName, newName, source, "custom");
         } else {
-            source.sendMessage(Component.text("Server already exists.", NamedTextColor.GOLD));
+            source.sendMessage(Component.text("Server with the specified name already exists.", NamedTextColor.GOLD));
         }
     }
 
@@ -111,33 +110,27 @@ public class AdminCommand implements SimpleCommand {
                     .toList());
         }
 
-        if (args.length == 2 && !Objects.equals(args[1], "template")) {
-            return CompletableFuture.completedFuture(Nebula.dataHolder.backendInfoMap.stream()
-                    .map(BackendServer::getServerName)
-                    .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
+        if (args.length == 2) {
+            if ("template".equalsIgnoreCase(args[0])) {
+                return CompletableFuture.completedFuture(Nebula.dataHolder.alltemplates.stream()
+                        .filter(template -> template.toLowerCase().startsWith(args[1].toLowerCase()))
+                        .toList());
+            } else {
+                return CompletableFuture.completedFuture(Nebula.dataHolder.backendInfoMap.stream()
+                        .map(BackendServer::getServerName)
+                        .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
+                        .toList());
+            }
+        }
+
+        if (args.length == 3 && "template".equalsIgnoreCase(args[0])) {
+            return CompletableFuture.completedFuture(Nebula.dataHolder.alltemplates.stream()
+                    .filter(template -> template.toLowerCase().startsWith(args[2].toLowerCase()))
                     .toList());
         }
 
-        if (args.length == 3) {
-            switch (args[0].toLowerCase()) {
-                case "kill" -> {
-                    return CompletableFuture.completedFuture(Nebula.dataHolder.backendInfoMap.stream()
-                            .filter(BackendServer::isOnline)
-                            .filter(server -> server.getHoldServer().getServerName().toLowerCase().startsWith(args[1].toLowerCase()))
-                            .map(BackendServer::getServerName)
-                            .toList());
-                }
-                case "delete" -> {
-                    return CompletableFuture.completedFuture(Nebula.dataHolder.backendInfoMap.stream()
-                            .filter(server -> server.getHoldServer().getServerName().toLowerCase().startsWith(args[1].toLowerCase()))
-                            .map(BackendServer::getServerName)
-                            .toList());
-                }
-            }
-        }
         return CompletableFuture.completedFuture(List.of());
     }
-
 
     @Override
     public boolean hasPermission(Invocation invocation) {

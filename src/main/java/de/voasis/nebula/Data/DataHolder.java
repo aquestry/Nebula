@@ -15,7 +15,7 @@ public class DataHolder {
     public List<HoldServer> holdServerMap = new ArrayList<>();
     public List<BackendServer> backendInfoMap = new ArrayList<>();
     public List<GamemodeQueue> gamemodeQueueMap = new ArrayList<>();
-
+    public List<String> alltemplates = new ArrayList<>();
     private final Logger logger = LoggerFactory.getLogger("nebula");
     private final YamlDocument config;
     private final ProxyServer server;
@@ -47,14 +47,14 @@ public class DataHolder {
             String name = (String) queue;
             String template = config.getString("gamemodes." + name + ".templateName");
             int needed = config.getInt("gamemodes." + name + ".neededPlayers");
+            alltemplates.add(template);
             gamemodeQueueMap.add(new GamemodeQueue(name, template, needed));
             logger.info("Added gamemode to pool: {}, {}, {}.", name, template, needed);
         }
-
+        alltemplates.add(Data.defaultServerTemplate);
         for(HoldServer holdServer : holdServerMap){
-            Nebula.serverManager.pull(holdServer, Data.defaultServerTemplate, server.getConsoleCommandSource());
-            for(GamemodeQueue gamemode : gamemodeQueueMap) {
-                Nebula.serverManager.pull(holdServer, gamemode.getTemplate(), server.getConsoleCommandSource());
+            for(String temp : alltemplates) {
+                Nebula.serverManager.pull(holdServer, temp, server.getConsoleCommandSource());
             }
         }
     }

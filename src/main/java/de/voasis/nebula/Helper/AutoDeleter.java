@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class AutoDeleter {
 
@@ -24,7 +23,7 @@ public class AutoDeleter {
         List<BackendServer> serversToDelete = new ArrayList<>();
 
         for (BackendServer backendServer : Nebula.dataHolder.backendInfoMap) {
-            boolean conditionsMet = !Objects.equals(backendServer.getTag(), "default") &&
+            boolean conditionsMet = backendServer.getTag().startsWith("gamemode:") &&
                     server.getServer(backendServer.getServerName()).get().getPlayersConnected().isEmpty() && backendServer.getPendingPlayerConnections().isEmpty();
 
             if (conditionsMet) {
