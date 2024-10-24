@@ -8,6 +8,7 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.nebula.Commands.AdminCommand;
+import de.voasis.nebula.Commands.QueueCommand;
 import de.voasis.nebula.Commands.ShutdownCommand;
 import de.voasis.nebula.Data.Icon;
 import de.voasis.nebula.Event.EventManager;
@@ -69,6 +70,7 @@ public class Nebula {
         CommandManager commandManager = server.getCommandManager();
         commandManager.register("admin", new AdminCommand(logger));
         commandManager.register("shutdown", new ShutdownCommand(server));
+        commandManager.register("queue", new QueueCommand());
     }
 
     public void loadConfig(Path dataDirectory) {

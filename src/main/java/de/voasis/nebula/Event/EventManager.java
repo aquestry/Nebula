@@ -38,6 +38,6 @@ public class EventManager {
     }
     @Subscribe
     public void onPlayerJoin(LoginEvent event) {
-        new Login(event, logger);
+        new Login(event, logger, server);
     }
 }
