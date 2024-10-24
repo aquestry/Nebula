@@ -1,6 +1,7 @@
 package de.voasis.nebula.Event;
 
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.event.command.PlayerAvailableCommandsEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
@@ -41,5 +42,9 @@ public class EventManager {
     @Subscribe
     public void onCommandLoad(PlayerAvailableCommandsEvent event) {
         new PlayerAvailableCommands(event);
+    }
+    @Subscribe
+    public void onCommand(CommandExecuteEvent event) {
+        new CommandExecute(event);
     }
 }
