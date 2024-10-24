@@ -9,7 +9,7 @@ public class GamemodeQueue {
     private final String name;
     private final String template;
     private final int neededPlayers;
-    private List<Player> inQueue = new ArrayList<>();
+    private List<String> inQueue = new ArrayList<>();
 
     public GamemodeQueue(String name, String template, int neededPlayers) {
         this.name = name;
@@ -20,7 +20,7 @@ public class GamemodeQueue {
     public String getName() { return name; }
     public String getTemplate() { return template; }
     public int getNeededPlayers() { return neededPlayers; }
-    public List<Player> getInQueue() { return inQueue; }
-    public void addInQueue(Player player) { if (!inQueue.contains(player)) {inQueue.add(player); }}
+    public List<String> getInQueue() { return inQueue; }
+    public void addInQueue(Player player) { inQueue.add(player.getUniqueId().toString()); }
     public void removeInQueue(Player player) { inQueue.remove(player); }
 }

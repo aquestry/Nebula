@@ -10,6 +10,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 public class AdminCommand implements SimpleCommand {
 
@@ -111,31 +112,44 @@ public class AdminCommand implements SimpleCommand {
     public CompletableFuture<List<String>> suggestAsync(Invocation invocation) {
         String[] args = invocation.arguments();
 
-        if (args.length == 1) {
+        if (args.length == 0) {
             return CompletableFuture.completedFuture(List.of("kill", "delete", "template"));
-        } else if (args.length == 2) {
+        }
+
+        if (args.length == 1) {
+            return CompletableFuture.completedFuture(Stream.of("kill", "delete", "template")
+                    .filter(command -> command.startsWith(args[0].toLowerCase()))
+                    .toList());
+        }
+
+        if (args.length == 2) {
             return CompletableFuture.completedFuture(Nebula.dataHolder.holdServerMap.stream()
                     .map(HoldServer::getServerName)
+                    .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
                     .toList());
-        } else if (args.length == 3) {
-            switch (args[0]) {
+        }
+
+        if (args.length == 3) {
+            switch (args[0].toLowerCase()) {
                 case "kill" -> {
                     return CompletableFuture.completedFuture(Nebula.dataHolder.backendInfoMap.stream()
                             .filter(BackendServer::isOnline)
-                            .filter(server -> server.getHoldServer().getServerName().startsWith(args[1]))
+                            .filter(server -> server.getHoldServer().getServerName().toLowerCase().startsWith(args[1].toLowerCase()))
                             .map(BackendServer::getServerName)
                             .toList());
                 }
                 case "delete" -> {
                     return CompletableFuture.completedFuture(Nebula.dataHolder.backendInfoMap.stream()
-                            .filter(server -> server.getHoldServer().getServerName().startsWith(args[1]))
+                            .filter(server -> server.getHoldServer().getServerName().toLowerCase().startsWith(args[1].toLowerCase()))
                             .map(BackendServer::getServerName)
                             .toList());
                 }
             }
         }
+
         return CompletableFuture.completedFuture(List.of());
     }
+
 
     @Override
     public boolean hasPermission(Invocation invocation) {

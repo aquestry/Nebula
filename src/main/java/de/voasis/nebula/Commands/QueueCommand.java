@@ -37,18 +37,27 @@ public class QueueCommand implements SimpleCommand {
     @Override
     public List<String> suggest(Invocation invocation) {
         String[] args = invocation.arguments();
+
+        if (args.length == 0) {
+            return List.of("join", "leave");
+        }
+
         if (args.length == 1) {
             return Stream.of("join", "leave")
                     .filter(command -> command.startsWith(args[0].toLowerCase()))
                     .collect(Collectors.toList());
-        } else if (args.length == 2 && "join".equalsIgnoreCase(args[0])) {
+        }
+
+        if (args.length == 2 && "join".equalsIgnoreCase(args[0])) {
             return Nebula.dataHolder.gamemodeQueueMap.stream()
                     .map(GamemodeQueue::getName)
                     .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
                     .collect(Collectors.toList());
         }
+
         return List.of();
     }
+
 
     private void sendUsage(Player player) {
         player.sendMessage(Component.text("Usage: /queue leave or /queue join <name>", NamedTextColor.GOLD));
@@ -56,7 +65,7 @@ public class QueueCommand implements SimpleCommand {
 
     private boolean isInAnyQueue(Player player) {
         return Nebula.dataHolder.gamemodeQueueMap.stream()
-                .anyMatch(queue -> queue.getInQueue().contains(player.getUniqueId()));
+                .anyMatch(queue -> queue.getInQueue().contains(player.getUniqueId().toString()));
     }
 
     private void joinQueue(Player player, String queueName) {
@@ -69,8 +78,12 @@ public class QueueCommand implements SimpleCommand {
                 .findFirst()
                 .ifPresentOrElse(
                         queue -> {
-                            queue.addInQueue(player);
-                            player.sendMessage(Component.text("You got added to queue: " + queueName, NamedTextColor.GREEN));
+                            if (!isInAnyQueue(player)) {
+                                queue.addInQueue(player);
+                                player.sendMessage(Component.text("You got added to queue: " + queueName, NamedTextColor.GREEN));
+                            } else {
+                                player.sendMessage(Component.text("You are already a queue.", NamedTextColor.GOLD));
+                            }
                         },
                         () -> player.sendMessage(Component.text("Queue not found", NamedTextColor.RED))
                 );
@@ -82,11 +95,12 @@ public class QueueCommand implements SimpleCommand {
             return;
         }
         Nebula.dataHolder.gamemodeQueueMap.stream()
-                .filter(queue -> queue.getInQueue().contains(player.getUniqueId()))
+                .filter(queue -> queue.getInQueue().contains(player))
                 .findFirst()
                 .ifPresent(queue -> {
                     queue.removeInQueue(player);
                     player.sendMessage(Component.text("You got removed from queue: " + queue.getName(), NamedTextColor.GREEN));
                 });
     }
+
 }
