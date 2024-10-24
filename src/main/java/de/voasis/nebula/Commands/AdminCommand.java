@@ -118,15 +118,13 @@ public class AdminCommand implements SimpleCommand {
             } else {
                 return CompletableFuture.completedFuture(Nebula.dataHolder.backendInfoMap.stream()
                         .map(BackendServer::getServerName)
-                        .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
+                        .filter(serverName -> serverName.startsWith(args[1]))
                         .toList());
             }
         }
 
         if (args.length == 3 && "template".equalsIgnoreCase(args[0])) {
-            return CompletableFuture.completedFuture(Nebula.dataHolder.alltemplates.stream()
-                    .filter(template -> template.toLowerCase().startsWith(args[2].toLowerCase()))
-                    .toList());
+            return CompletableFuture.completedFuture(List.of());
         }
 
         return CompletableFuture.completedFuture(List.of());
