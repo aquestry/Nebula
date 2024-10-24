@@ -6,6 +6,7 @@ import com.velocitypowered.api.event.command.PlayerAvailableCommandsEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
+import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -46,5 +47,9 @@ public class EventManager {
     @Subscribe
     public void onCommand(CommandExecuteEvent event) {
         new CommandExecute(event);
+    }
+    @Subscribe
+    public void connected(ServerConnectedEvent event) {
+        new ServerConnected(event);
     }
 }
