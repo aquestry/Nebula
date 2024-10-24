@@ -25,7 +25,7 @@ public class AutoDeleter {
 
         for (BackendServer backendServer : Nebula.dataHolder.backendInfoMap) {
             boolean conditionsMet = !Objects.equals(backendServer.getTag(), "default") &&
-                    server.getServer(backendServer.getServerName()).get().getPlayersConnected().isEmpty();
+                    server.getServer(backendServer.getServerName()).get().getPlayersConnected().isEmpty() && backendServer.getPendingPlayerConnections().isEmpty();
 
             if (conditionsMet) {
                 if (!deletionTimers.containsKey(backendServer)) {
