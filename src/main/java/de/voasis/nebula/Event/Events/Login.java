@@ -6,11 +6,11 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Nebula;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Login {
-    private final ProxyServer server;
-    public Login(LoginEvent event, Logger logger, ProxyServer server) {
-        this.server = server;
+    private final Logger logger = LoggerFactory.getLogger("nebula");
+    public Login(LoginEvent event, ProxyServer server) {
         Player player = event.getPlayer();
         if (Data.adminUUIDs.contains(player.getUniqueId().toString())) {
             Nebula.permissionManager.addPermission(player, "velocity.*");

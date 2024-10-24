@@ -7,6 +7,7 @@ import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -71,6 +72,10 @@ public class QueueCommand implements SimpleCommand {
     private void joinQueue(Player player, String queueName) {
         if (isInAnyQueue(player)) {
             player.sendMessage(Component.text("You are already in a queue.", NamedTextColor.GOLD));
+            return;
+        }
+        if(!Objects.equals(Nebula.dataHolder.getBackendServer(player.getCurrentServer().get().getServerInfo().getName()).getTag(), "default")) {
+            player.sendMessage(Component.text("You can only join a queue from the lobby.", NamedTextColor.GOLD));
             return;
         }
         Nebula.dataHolder.gamemodeQueueMap.stream()
