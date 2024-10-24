@@ -70,7 +70,7 @@ public class QueueCommand implements SimpleCommand {
 
     private void joinQueue(Player player, String queueName) {
         if (isInAnyQueue(player)) {
-            player.sendMessage(Component.text("You are already in a queue", NamedTextColor.GOLD));
+            player.sendMessage(Component.text("You are already in a queue.", NamedTextColor.GOLD));
             return;
         }
         Nebula.dataHolder.gamemodeQueueMap.stream()
@@ -78,20 +78,16 @@ public class QueueCommand implements SimpleCommand {
                 .findFirst()
                 .ifPresentOrElse(
                         queue -> {
-                            if (!isInAnyQueue(player)) {
-                                queue.addInQueue(player);
-                                player.sendMessage(Component.text("You got added to queue: " + queueName, NamedTextColor.GREEN));
-                            } else {
-                                player.sendMessage(Component.text("You are already a queue.", NamedTextColor.GOLD));
-                            }
+                            queue.addInQueue(player);
+                            player.sendMessage(Component.text("You got added to queue: " + queueName, NamedTextColor.GREEN));
                         },
-                        () -> player.sendMessage(Component.text("Queue not found", NamedTextColor.RED))
+                        () -> player.sendMessage(Component.text("Queue not found.", NamedTextColor.RED))
                 );
     }
 
     private void leaveQueue(Player player) {
         if (!isInAnyQueue(player)) {
-            player.sendMessage(Component.text("You are in no queue", NamedTextColor.GOLD));
+            player.sendMessage(Component.text("You are in no queue.", NamedTextColor.GOLD));
             return;
         }
         Nebula.dataHolder.gamemodeQueueMap.stream()
