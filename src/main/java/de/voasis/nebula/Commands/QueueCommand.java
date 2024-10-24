@@ -79,7 +79,7 @@ public class QueueCommand implements SimpleCommand {
                 .ifPresentOrElse(
                         queue -> {
                             queue.addInQueue(player);
-                            player.sendMessage(Component.text("You got added to queue: " + queueName, NamedTextColor.GREEN));
+                            player.sendMessage(Component.text("You got added to queue: " + queueName + ".", NamedTextColor.GREEN));
                         },
                         () -> player.sendMessage(Component.text("Queue not found.", NamedTextColor.RED))
                 );
@@ -90,13 +90,10 @@ public class QueueCommand implements SimpleCommand {
             player.sendMessage(Component.text("You are in no queue.", NamedTextColor.GOLD));
             return;
         }
-        Nebula.dataHolder.gamemodeQueueMap.stream()
-                .filter(queue -> queue.getInQueue().contains(player))
-                .findFirst()
-                .ifPresent(queue -> {
-                    queue.removeInQueue(player);
-                    player.sendMessage(Component.text("You got removed from queue: " + queue.getName(), NamedTextColor.GREEN));
-                });
+        for(GamemodeQueue queue : Nebula.dataHolder.gamemodeQueueMap) {
+            if (queue.getInQueue().contains(player.getUniqueId().toString())) {
+                queue.removeInQueue(player);
+            }
+        }
     }
-
 }
