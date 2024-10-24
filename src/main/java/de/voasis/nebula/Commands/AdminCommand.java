@@ -10,6 +10,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
@@ -110,9 +111,9 @@ public class AdminCommand implements SimpleCommand {
                     .toList());
         }
 
-        if (args.length == 2) {
-            return CompletableFuture.completedFuture(Nebula.dataHolder.holdServerMap.stream()
-                    .map(HoldServer::getServerName)
+        if (args.length == 2 && !Objects.equals(args[1], "template")) {
+            return CompletableFuture.completedFuture(Nebula.dataHolder.backendInfoMap.stream()
+                    .map(BackendServer::getServerName)
                     .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
                     .toList());
         }
@@ -134,7 +135,6 @@ public class AdminCommand implements SimpleCommand {
                 }
             }
         }
-
         return CompletableFuture.completedFuture(List.of());
     }
 
