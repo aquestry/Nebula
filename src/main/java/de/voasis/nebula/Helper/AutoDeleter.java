@@ -10,8 +10,9 @@ import java.util.List;
 import java.util.Objects;
 
 public class AutoDeleter {
+
     private final Map<BackendServer, Long> deletionTimers = new HashMap<>();
-    private static final long DELETION_DELAY = 3000;
+    private static final long DELETION_DELAY = 1000;
     private final ProxyServer server;
 
     public AutoDeleter(ProxyServer server) {
