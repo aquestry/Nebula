@@ -107,16 +107,14 @@ public class DefaultsManager {
     }
 
     private BackendServer createDefault() {
-        String name = "default-" + Nebula.dataHolder.backendInfoMap.stream()
+        String name = "Default-" + Nebula.dataHolder.backendInfoMap.stream()
                 .filter(backendServer -> backendServer.getTag().equals("default"))
                 .toList().size();
-        Nebula.serverManager.createFromTemplate(
-                Nebula.dataHolder.holdServerMap.getFirst(),
+        return Nebula.serverManager.createFromTemplate(
                 Data.defaultServerTemplate,
                 name,
                 server.getConsoleCommandSource(),
                 "default"
         );
-        return Nebula.dataHolder.getBackendServer(name);
     }
 }

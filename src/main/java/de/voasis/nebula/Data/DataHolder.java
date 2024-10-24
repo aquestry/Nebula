@@ -1,7 +1,6 @@
-package de.voasis.nebula.Helper;
+package de.voasis.nebula.Data;
 
 import com.velocitypowered.api.proxy.ProxyServer;
-import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.GamemodeQueue;
 import de.voasis.nebula.Maps.HoldServer;

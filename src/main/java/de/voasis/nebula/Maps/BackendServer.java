@@ -15,6 +15,7 @@ public class BackendServer {
     private boolean online;
     private final List<Player> pendingPlayerConnections = new ArrayList<>();
     private final String tag;
+    private boolean autoDelete = false;
 
     public BackendServer(String serverName, HoldServer holdServer, int port, boolean online, CommandSource creator, String template, String tag) {
         this.serverName = serverName;
@@ -25,6 +26,7 @@ public class BackendServer {
         this.template = template;
         this.tag = tag;
     }
+
     public String getServerName() { return serverName; }
     public String getTemplate() { return template; }
     public int getPort() { return port; }
@@ -36,4 +38,6 @@ public class BackendServer {
     public void removePendingPlayerConnection(Player player) { pendingPlayerConnections.remove(player); }
     public void setOnline(boolean online) { this.online = online; }
     public String getTag() { return this.tag; }
+    public void setAutoDelete(boolean autoDelete) { this.autoDelete = autoDelete; }
+    public boolean getAutoDelete() { return autoDelete; }
 }

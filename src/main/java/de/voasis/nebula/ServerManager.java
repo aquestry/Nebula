@@ -56,11 +56,15 @@ public class ServerManager {
     }
 
 
-    public void createFromTemplate(HoldServer externalServer, String templateName, String newName, CommandSource source, String tag) {
+    public BackendServer createFromTemplate(String templateName, String newName, CommandSource source, String tag) {
+        if(source == null) {
+            source = server.getConsoleCommandSource();
+        }
+        HoldServer externalServer = Nebula.dataHolder.holdServerMap.getFirst();
         for (BackendServer backendServer : Nebula.dataHolder.backendInfoMap) {
             if(backendServer.getServerName().equals(newName)) {
                 source.sendMessage(Component.text("Server already exists.", NamedTextColor.GOLD));
-                return;
+                return null;
             }
         }
         int tempPort = externalServer.getFreePort();
@@ -71,33 +75,43 @@ public class ServerManager {
 
         ServerInfo newInfo = new ServerInfo(newName, new InetSocketAddress(externalServer.getIp(), tempPort));
         server.registerServer(newInfo);
-        Nebula.dataHolder.backendInfoMap.add(new BackendServer(newName, externalServer, tempPort, false, source, templateName, tag));
+        BackendServer backendServer = new BackendServer(newName, externalServer, tempPort, false, source, templateName, tag);
+        Nebula.dataHolder.backendInfoMap.add(backendServer);
         Nebula.util.updateFreePort(externalServer);
+        return backendServer;
     }
 
-    public void kill(HoldServer externalServer, String servername, CommandSource source) {
-        for(Player p : server.getServer(servername).get().getPlayersConnected()) {
+    public void kill(BackendServer serverToDelete, CommandSource source) {
+        if(source == null) {
+            source = server.getConsoleCommandSource();
+        }
+        String name = serverToDelete.getServerName();
+        HoldServer externalServer = serverToDelete.getHoldServer();
+        for(Player p : server.getServer(name).get().getPlayersConnected()) {
             p.disconnect(Component.text("The server you were on was killed.", NamedTextColor.GOLD));
         }
-        String command = "docker kill " + servername;
-        executeSSHCommand(externalServer, command, source, "Docker container killed: " + servername, "Failed to kill Docker container.");
+        String command = "docker kill " + name;
+        executeSSHCommand(externalServer, command, source, "Docker container killed: " + name, "Failed to kill Docker container.");
     }
     public void pull(HoldServer externalServer, String template, CommandSource source) {
         String command = "docker pull " + template;
         executeSSHCommand(externalServer, command, source, "Docker template pulled: " + template, "Failed to pull Docker template: " + template);
     }
 
-    public void delete(HoldServer externalServer, String servername, CommandSource source) {
-        BackendServer backendServer = Nebula.dataHolder.getBackendServer(servername);
-        if (backendServer == null) {
-            source.sendMessage(Component.text("Server not found: " + servername, NamedTextColor.RED));
-            logger.error("Attempted to delete a server that does not exist: {}", servername);
+    public void delete(BackendServer serverToDelete, CommandSource source) {
+        String name = serverToDelete.getServerName();
+        HoldServer externalServer = serverToDelete.getHoldServer();
+        if (serverToDelete == null) {
+            source.sendMessage(Component.text("Server not found: " + name, NamedTextColor.RED));
             return;
         }
-        Nebula.dataHolder.backendInfoMap.removeIf(bs -> bs.getServerName().equals(servername));
-        kill(externalServer, servername, source);
-        String command = "docker rm -f " + servername;
-        executeSSHCommand(externalServer, command, source, "Docker container deleted: " + servername, "Failed to delete Docker container.");
-        server.unregisterServer(new ServerInfo(servername, new InetSocketAddress(externalServer.getIp(), backendServer.getPort())));
+        if(source == null) {
+            source = server.getConsoleCommandSource();
+        }
+        Nebula.dataHolder.backendInfoMap.removeIf(bs -> bs.getServerName().equals(name));
+        kill(serverToDelete, source);
+        String command = "docker rm -f " + name;
+        executeSSHCommand(serverToDelete.getHoldServer(), command, source, "Docker container deleted: " + name, "Failed to delete Docker container.");
+        server.unregisterServer(new ServerInfo(name, new InetSocketAddress(externalServer.getIp(), serverToDelete.getPort())));
     }
 }
