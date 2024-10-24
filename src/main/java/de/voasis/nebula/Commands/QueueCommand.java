@@ -92,6 +92,7 @@ public class QueueCommand implements SimpleCommand {
         }
         for(GamemodeQueue queue : Nebula.dataHolder.gamemodeQueueMap) {
             if (queue.getInQueue().contains(player.getUniqueId().toString())) {
+                player.sendMessage(Component.text("You got removed from queue: " + queue.getName() + ".", NamedTextColor.GOLD));
                 queue.removeInQueue(player);
             }
         }
