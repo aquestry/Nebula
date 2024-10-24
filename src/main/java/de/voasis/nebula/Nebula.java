@@ -54,7 +54,7 @@ public class Nebula {
         dataHolder.Load();
         defaultsManager = new DefaultsManager(server);
         queueProcessor = new QueueProcessor();
-        autoDeleter = new AutoDeleter();
+        autoDeleter = new AutoDeleter(server);
     }
 
     @Subscribe
