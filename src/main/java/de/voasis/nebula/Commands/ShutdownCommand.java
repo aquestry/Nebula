@@ -5,7 +5,6 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-
 public class ShutdownCommand implements SimpleCommand {
     private final ProxyServer server;
     public ShutdownCommand(ProxyServer server) {
@@ -14,7 +13,10 @@ public class ShutdownCommand implements SimpleCommand {
 
     @Override
     public void execute(Invocation invocation) {
-        String reason = invocation.arguments().length > 0 ? invocation.arguments()[0] : "No reason provided";
+        String reason =  "No reason provided";
+        if( invocation.arguments().length > 0) {
+            reason = String.join(" ", invocation.arguments());
+        }
         server.shutdown(Component.text("Shutdown! Reason: " + reason).color(NamedTextColor.WHITE));
     }
 

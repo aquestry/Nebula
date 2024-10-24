@@ -9,9 +9,9 @@ import org.slf4j.Logger;
 public class Login {
     public Login(LoginEvent event, Logger logger) {
         Player player = event.getPlayer();
-        if (Data.adminUUIDs.contains(player.getUniqueId())) {
-            Nebula.permissionManager.addPermission(player, "velocity.admin");
-            logger.info("User logged in: {}, is admin : {}.", player.getUsername(), player.hasPermission("velocity.admin"));
+        if (Data.adminUUIDs.contains(player.getUniqueId().toString())) {
+            Nebula.permissionManager.addPermission(player, "velocity.*");
         }
+        logger.info("User logged in: {}, UUID: {}, is admin : {}.", player.getUsername(),player.getUniqueId().toString(), player.hasPermission("velocity.admin"));
     }
 }
