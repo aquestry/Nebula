@@ -17,7 +17,6 @@ public class QueueProcessor {
                 BackendServer newServer = Nebula.serverManager.createFromTemplate(queue.getTemplate(), getName(queue), null, "gamemode:" + queue.getName());
                 newServer.addPendingPlayerConnection(player1);
                 newServer.addPendingPlayerConnection(player2);
-                newServer.setAutoDelete(true);
             }
         }
     }
