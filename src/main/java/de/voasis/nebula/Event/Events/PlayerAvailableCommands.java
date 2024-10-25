@@ -9,7 +9,7 @@ import java.util.Objects;
 public class PlayerAvailableCommands {
     public PlayerAvailableCommands(PlayerAvailableCommandsEvent event) {
         Player player = event.getPlayer();
-        if(!Objects.equals(Nebula.dataHolder.getBackendServer(player.getCurrentServer().get().getServerInfo().getName()).getTag(), "default")) {
+        if(!Objects.equals(Nebula.util.getBackendServer(player.getCurrentServer().get().getServerInfo().getName()).getTag(), "lobby")) {
             event.getRootNode().removeChildByName("queue");
         }
     }

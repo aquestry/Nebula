@@ -2,6 +2,7 @@ package de.voasis.nebula.Commands;
 
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
+import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Maps.GamemodeQueue;
 import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.Component;
@@ -50,7 +51,7 @@ public class QueueCommand implements SimpleCommand {
         }
 
         if (args.length == 2 && "join".equalsIgnoreCase(args[0])) {
-            return Nebula.dataHolder.gamemodeQueueMap.stream()
+            return Data.gamemodeQueueMap.stream()
                     .map(GamemodeQueue::getName)
                     .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
                     .collect(Collectors.toList());
@@ -65,7 +66,7 @@ public class QueueCommand implements SimpleCommand {
     }
 
     private boolean isInAnyQueue(Player player) {
-        return Nebula.dataHolder.gamemodeQueueMap.stream()
+        return Data.gamemodeQueueMap.stream()
                 .anyMatch(queue -> queue.getInQueue().contains(player));
     }
 
@@ -74,11 +75,11 @@ public class QueueCommand implements SimpleCommand {
             player.sendMessage(Component.text("You are already in a queue.", NamedTextColor.GOLD));
             return;
         }
-        if(!Objects.equals(Nebula.dataHolder.getBackendServer(player.getCurrentServer().get().getServerInfo().getName()).getTag(), "default")) {
+        if(!Objects.equals(Nebula.util.getBackendServer(player.getCurrentServer().get().getServerInfo().getName()).getTag(), "default")) {
             player.sendMessage(Component.text("You can only join a queue from the lobby.", NamedTextColor.GOLD));
             return;
         }
-        Nebula.dataHolder.gamemodeQueueMap.stream()
+        Data.gamemodeQueueMap.stream()
                 .filter(queue -> queue.getName().equalsIgnoreCase(queueName))
                 .findFirst()
                 .ifPresentOrElse(
@@ -95,7 +96,7 @@ public class QueueCommand implements SimpleCommand {
             player.sendMessage(Component.text("You are in no queue.", NamedTextColor.GOLD));
             return;
         }
-        for(GamemodeQueue queue : Nebula.dataHolder.gamemodeQueueMap) {
+        for(GamemodeQueue queue :Data.gamemodeQueueMap) {
             if (queue.getInQueue().contains(player)) {
                 player.sendMessage(Component.text("You got removed from queue: " + queue.getName() + ".", NamedTextColor.GOLD));
                 queue.getInQueue().remove(player);

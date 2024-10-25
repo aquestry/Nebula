@@ -2,6 +2,7 @@ package de.voasis.nebula.Commands;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
+import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.HoldServer;
 import de.voasis.nebula.Nebula;
@@ -57,7 +58,7 @@ public class AdminCommand implements SimpleCommand {
 
 
     private void handleKillCommand(CommandSource source, String[] args) {
-        BackendServer backendServer = Nebula.dataHolder.getBackendServer(args[1]);
+        BackendServer backendServer = Nebula.util.getBackendServer(args[1]);
         if (backendServer != null) {
             source.sendMessage(Component.text("Killing server instance...", NamedTextColor.AQUA));
             Nebula.serverManager.kill(backendServer, source);
@@ -67,7 +68,7 @@ public class AdminCommand implements SimpleCommand {
     }
 
     private void handleDeleteCommand(CommandSource source, String[] args) {
-        BackendServer backendServer = Nebula.dataHolder.getBackendServer(args[1]);
+        BackendServer backendServer = Nebula.util.getBackendServer(args[1]);
         if (backendServer != null) {
             source.sendMessage(Component.text("Deleting server instance...", NamedTextColor.AQUA));
             Nebula.serverManager.delete(backendServer, source);
@@ -79,7 +80,7 @@ public class AdminCommand implements SimpleCommand {
     private void handleTemplateCommand(CommandSource source, String[] args) {
         String templateName = args[1];
         String newName = args[2];
-        if (Nebula.dataHolder.getBackendServer(newName) == null) {
+        if (Nebula.util.getBackendServer(newName) == null) {
             source.sendMessage(Component.text("Creating server instance from template...", NamedTextColor.AQUA));
             Nebula.serverManager.createFromTemplate(templateName, newName, source, "custom");
         } else {
@@ -88,7 +89,7 @@ public class AdminCommand implements SimpleCommand {
     }
 
     private HoldServer findServerInfo(String serverName) {
-        for (HoldServer info : Nebula.dataHolder.holdServerMap) {
+        for (HoldServer info : Data.holdServerMap) {
             if (serverName.equals(info.getServerName())) {
                 return info;
             }
@@ -112,11 +113,11 @@ public class AdminCommand implements SimpleCommand {
 
         if (args.length == 2) {
             if ("template".equalsIgnoreCase(args[0])) {
-                return CompletableFuture.completedFuture(Nebula.dataHolder.alltemplates.stream()
+                return CompletableFuture.completedFuture(Data.alltemplates.stream()
                         .filter(template -> template.toLowerCase().startsWith(args[1].toLowerCase()))
                         .toList());
             } else {
-                return CompletableFuture.completedFuture(Nebula.dataHolder.backendInfoMap.stream()
+                return CompletableFuture.completedFuture(Data.backendInfoMap.stream()
                         .map(BackendServer::getServerName)
                         .filter(serverName -> serverName.startsWith(args[1]))
                         .toList());

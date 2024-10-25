@@ -39,8 +39,8 @@ public class DefaultsManager {
 
     private List<BackendServer> getAvailableServers() {
         List<BackendServer> servers = new ArrayList<>();
-        for (BackendServer server : Nebula.dataHolder.backendInfoMap) {
-            if (server.getTag().equals("default") && server.isOnline()) {
+        for (BackendServer server : Data.backendInfoMap) {
+            if (server.getTag().equals("lobby") && server.isOnline()) {
                 servers.add(server);
             }
         }
@@ -107,14 +107,14 @@ public class DefaultsManager {
     }
 
     private BackendServer createDefault() {
-        String name = "Default-" + Nebula.dataHolder.backendInfoMap.stream()
-                .filter(backendServer -> backendServer.getTag().equals("default"))
+        String name = "Lobby-" + Data.backendInfoMap.stream()
+                .filter(backendServer -> backendServer.getTag().equals("lobby"))
                 .toList().size();
         return Nebula.serverManager.createFromTemplate(
                 Data.defaultServerTemplate,
                 name,
                 server.getConsoleCommandSource(),
-                "default"
+                "lobby"
         );
     }
 }

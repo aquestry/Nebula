@@ -8,7 +8,7 @@ import java.util.Objects;
 public class CommandExecute {
     public CommandExecute(CommandExecuteEvent event) {
         if(event.getCommandSource() instanceof Player player) {
-            if(!Objects.equals(Nebula.dataHolder.getBackendServer(player.getCurrentServer().get().getServerInfo().getName()).getTag(), "default") && event.getCommand().startsWith("queue")) {
+            if(!Objects.equals(Nebula.util.getBackendServer(player.getCurrentServer().get().getServerInfo().getName()).getTag(), "lobby") && event.getCommand().startsWith("queue")) {
                 event.setResult(CommandExecuteEvent.CommandResult.denied());
             }
         }

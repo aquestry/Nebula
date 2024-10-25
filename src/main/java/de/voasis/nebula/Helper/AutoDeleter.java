@@ -1,8 +1,8 @@
 package de.voasis.nebula.Helper;
 
+import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Nebula;
-import com.velocitypowered.api.proxy.ProxyServer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
@@ -12,19 +12,14 @@ public class AutoDeleter {
 
     private final Map<BackendServer, Long> deletionTimers = new HashMap<>();
     private static final long DELETION_DELAY = 1000;
-    private final ProxyServer server;
-
-    public AutoDeleter(ProxyServer server) {
-        this.server = server;
-    }
 
     public void process() {
         long currentTime = System.currentTimeMillis();
         List<BackendServer> serversToDelete = new ArrayList<>();
 
-        for (BackendServer backendServer : Nebula.dataHolder.backendInfoMap) {
+        for (BackendServer backendServer : Data.backendInfoMap) {
             boolean conditionsMet = backendServer.getTag().startsWith("gamemode:") &&
-                    server.getServer(backendServer.getServerName()).get().getPlayersConnected().isEmpty() && backendServer.getPendingPlayerConnections().isEmpty();
+                    Nebula.util.getPlayerCount(backendServer) == 0 && backendServer.getPendingPlayerConnections().isEmpty();
 
             if (conditionsMet) {
                 if (!deletionTimers.containsKey(backendServer)) {

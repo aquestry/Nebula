@@ -5,6 +5,6 @@ import de.voasis.nebula.Nebula;
 
 public class ServerConnected {
     public ServerConnected(ServerConnectedEvent event) {
-        Nebula.dataHolder.getBackendServer(event.getServer().getServerInfo().getName()).removePendingPlayerConnection(event.getPlayer());
+        Nebula.util.getBackendServer(event.getServer().getServerInfo().getName()).removePendingPlayerConnection(event.getPlayer());
     }
 }

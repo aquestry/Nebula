@@ -9,7 +9,6 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.HoldServer;
-import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
@@ -62,7 +61,7 @@ public class Util {
     }
 
     public void updateState() {
-        for (BackendServer backendServer : Nebula.dataHolder.backendInfoMap) {
+        for (BackendServer backendServer : Data.backendInfoMap) {
             Optional<RegisteredServer> registeredServer = server.getServer(backendServer.getServerName());
             registeredServer.ifPresent(value -> pingServer(value, stateComplete(value), stateCompleteFailed(value), logger, plugin));
         }
@@ -70,7 +69,7 @@ public class Util {
 
     public Callable<Void> stateComplete(RegisteredServer registeredServer) {
         return () -> {
-            for (BackendServer backendServer : Nebula.dataHolder.backendInfoMap) {
+            for (BackendServer backendServer : Data.backendInfoMap) {
                 if (registeredServer.getServerInfo().getName().equals(backendServer.getServerName())) {
                     if (!backendServer.isOnline()) {
                         backendServer.setOnline(true);
@@ -89,7 +88,7 @@ public class Util {
 
     public Callable<Void> stateCompleteFailed(RegisteredServer registeredServer) {
         return () -> {
-            for (BackendServer backendServer : Nebula.dataHolder.backendInfoMap) {
+            for (BackendServer backendServer : Data.backendInfoMap) {
                 if (registeredServer.getServerInfo().getName().equals(backendServer.getServerName())) {
                     if (backendServer.isOnline()) {
                         backendServer.setOnline(false);
@@ -131,5 +130,24 @@ public class Util {
         Random r = new Random();
         int i = r.nextInt(list.size());
         return list.get(i);
+    }
+
+    public BackendServer getBackendServer(String name) {
+        for (BackendServer server : Data.backendInfoMap) {
+            if (server.getServerName().equals(name)) {
+                return server;
+            }
+        }
+        return null;
+    }
+
+    public int getPlayerCount(Object backendServer) {
+        if(backendServer instanceof RegisteredServer registeredServer) {
+            return registeredServer.getPlayersConnected().size();
+        }
+        if(backendServer instanceof BackendServer backend) {
+            return server.getServer(backend.getServerName()).get().getPlayersConnected().size();
+        }
+        return 0;
     }
 }
