@@ -65,8 +65,8 @@ public class ServerManager {
             }
         }
         int tempPort = externalServer.getFreePort();
-        String command = String.format("docker run -d -p %d:25565 --name %s %s SECRET=%s",
-                tempPort, newName, templateName, Data.vsecret);
+        String command = String.format("docker run -d -e PAPER_VELOCITY_SECRET=%s -p %d:25565 --name %s %s",
+                Data.vsecret, tempPort, newName, templateName);
         executeSSHCommand(externalServer, command, source,
                 "Container created from template: " + templateName,
                 "Failed to create container: " + newName);
