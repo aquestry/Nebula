@@ -44,7 +44,7 @@ public class Nebula {
         configManager.loadConfig(dataDirectory);
         configManager.Load();
         defaultsManager = new DefaultsManager(server);
-        queueProcessor = new QueueProcessor();
+        queueProcessor = new QueueProcessor(server);
         autoDeleter = new AutoDeleter();
     }
 
