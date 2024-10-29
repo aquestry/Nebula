@@ -75,7 +75,7 @@ public class QueueCommand implements SimpleCommand {
             player.sendMessage(Component.text("You are already in a queue.", NamedTextColor.GOLD));
             return;
         }
-        if(!Objects.equals(Nebula.util.getBackendServer(player.getCurrentServer().get().getServerInfo().getName()).getTag(), "default")) {
+        if(!Objects.equals(Nebula.util.getBackendServer(player.getCurrentServer().get().getServerInfo().getName()).getTag(), "lobby")) {
             player.sendMessage(Component.text("You can only join a queue from the lobby.", NamedTextColor.GOLD));
             return;
         }

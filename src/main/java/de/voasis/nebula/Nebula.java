@@ -37,7 +37,6 @@ public class Nebula {
 
     @Inject
     public Nebula(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
-
         permissionManager  = new PermissionManager();
         configManager = new ConfigManager(config, server);
         util = new Util(server, this);
