@@ -49,15 +49,27 @@ public class ServerManager {
                 Thread.sleep(500);
             }
             if (channelExec.getExitStatus() == 0) {
-                source.sendMessage(isConsoleSource ? Component.text(stripColorCodes(successMessage)) : Component.text(successMessage, NamedTextColor.GREEN));
+                if (source != null) {
+                    source.sendMessage(isConsoleSource ? Component.text(stripColorCodes(successMessage)) : Component.text(successMessage, NamedTextColor.GREEN));
+                } else {
+                    logger.info(stripColorCodes(successMessage));
+                }
             } else {
-                source.sendMessage(isConsoleSource ? Component.text(stripColorCodes(errorMessage)) : Component.text(errorMessage, NamedTextColor.GOLD));
+                if (source != null) {
+                    source.sendMessage(isConsoleSource ? Component.text(stripColorCodes(errorMessage)) : Component.text(errorMessage, NamedTextColor.GOLD));
+                } else {
+                    logger.info(stripColorCodes(errorMessage));
+                }
             }
             channelExec.disconnect();
             session.disconnect();
         } catch (Exception e) {
             logger.error("Failed to execute SSH command.", e);
-            source.sendMessage(isConsoleSource ? Component.text(stripColorCodes(errorMessage)) : Component.text(errorMessage, NamedTextColor.GOLD));
+            if (source != null) {
+                source.sendMessage(isConsoleSource ? Component.text(stripColorCodes(errorMessage)) : Component.text(errorMessage, NamedTextColor.GOLD));
+            } else {
+                logger.info(stripColorCodes(errorMessage));
+            }
         }
     }
 
