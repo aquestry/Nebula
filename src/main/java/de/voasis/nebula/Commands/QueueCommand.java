@@ -8,7 +8,7 @@ import de.voasis.nebula.Maps.GamemodeQueue;
 import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import java.util.List;
-import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,27 +38,31 @@ public class QueueCommand implements SimpleCommand {
     }
 
     @Override
-    public List<String> suggest(Invocation invocation) {
+    public CompletableFuture<List<String>> suggestAsync(Invocation invocation) {
         String[] args = invocation.arguments();
 
         if (args.length == 0) {
-            return List.of("join", "leave");
+            return CompletableFuture.completedFuture(List.of("join", "leave"));
         }
 
         if (args.length == 1) {
-            return Stream.of("join", "leave")
-                    .filter(command -> command.startsWith(args[0].toLowerCase()))
-                    .collect(Collectors.toList());
+            return CompletableFuture.completedFuture(
+                    Stream.of("join", "leave")
+                            .filter(command -> command.startsWith(args[0].toLowerCase()))
+                            .collect(Collectors.toList())
+            );
         }
 
         if (args.length == 2 && "join".equalsIgnoreCase(args[0])) {
-            return Data.gamemodeQueueMap.stream()
-                    .map(GamemodeQueue::getName)
-                    .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
-                    .collect(Collectors.toList());
+            return CompletableFuture.completedFuture(
+                    Data.gamemodeQueueMap.stream()
+                            .map(GamemodeQueue::getName)
+                            .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
+                            .collect(Collectors.toList())
+            );
         }
 
-        return List.of();
+        return CompletableFuture.completedFuture(List.of());
     }
 
     private void sendUsage(Player player) {
@@ -75,7 +79,7 @@ public class QueueCommand implements SimpleCommand {
             player.sendMessage(mm.deserialize(Messages.FEEDBACK_ALREADY_IN_QUEUE));
             return;
         }
-        if (!Objects.equals(Nebula.util.getBackendServer(player.getCurrentServer().get().getServerInfo().getName()).getTag(), "lobby")) {
+        if (!Nebula.util.getBackendServer(player.getCurrentServer().get().getServerInfo().getName()).getTag().equals("lobby")) {
             player.sendMessage(mm.deserialize(Messages.FEEDBACK_LOBBY_ONLY));
             return;
         }

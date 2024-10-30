@@ -2,7 +2,7 @@
 file-version: 1
 
 # General Prefix
-prefix: "[Server] "
+prefix: "<red>[Server]: <blue>"
 
 # Usage Messages
 usage:
@@ -12,7 +12,7 @@ usage:
   admin-template: "Usage: /admin template <templateName> <newName>"
   queue: "Usage: /queue leave or /queue join <name>"
   shutdown: "Usage: /shutdown <reason> (optional)"
-  unknown-command: "Unknown command. Usage: /admin <stop|delete|template> <args...>"
+  unknown-command: "Unknown command."
 
 # Feedback Messages
 feedback:
