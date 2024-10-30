@@ -30,11 +30,11 @@ Nebula also supports in-game commands for admins to manage server instances dire
 
 ### **Admin Commands:**
 
-- **/admin template [hold server] [template_name] [new_server_name]**  
+- **/admin template [template_name] [new_server_name]**  
   - **Description**: Creates a new server instance using the specified template.
   - **Example**:  
     ```
-    /admin template server-1 anton691/simple-lobby:latest test
+    /admin template anton691/simple-lobby:latest test
     ```
     This will create a new server called `test` based on the `anton691/simple-lobby:latest` template on Dockerhub
     on the Hold-Server "server-1".
