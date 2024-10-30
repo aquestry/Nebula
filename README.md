@@ -30,28 +30,26 @@ Nebula also supports in-game commands for admins to manage server instances dire
 
 ### **Admin Commands:**
 
-- **/admin template [hold server] [template_name] [new_server_name]**  
+- **/admin template [template_name] [new_server_name]**  
   - **Description**: Creates a new server instance using the specified template.
   - **Example**:  
     ```
-    /admin template server-1 anton691/simple-lobby:latest test
+    /admin template anton691/simple-lobby:latest test
     ```
-    This will create a new server called `test` based on the `anton691/simple-lobby:latest` template on Dockerhub
-    on the Hold-Server "server-1".
+    This will create a new server called `test` based on the `anton691/simple-lobby:latest` template on Dockerhub.
 
-
-- **/admin kill [hold server] [server_name]**  
-  - **Description**: Kills a running server instance on the Hold-Server "server-1"..
+- **/admin kill [server_name]**  
+  - **Description**: Kills a running server instance.
   - **Example**:  
     ```
-    /admin kill server-1 lobby3
+    /admin kill test
     ```
 
-- **/admin delete [hold server] [server_name]**  
-  - **Description**: Deletes a server instance on the Hold-Server "server-1". (Will Kill it before.)
+- **/admin delete [server_name]**  
+  - **Description**: Deletes a server instance. (Will Kill it before.)
   - **Example**:  
     ```
-    /admin delete server-1 lobby3
+    /admin delete test
     ```
     
 ## Future Enhancements:
