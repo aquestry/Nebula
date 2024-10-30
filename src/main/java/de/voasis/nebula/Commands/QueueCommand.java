@@ -3,23 +3,23 @@ package de.voasis.nebula.Commands;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Data.Data;
+import de.voasis.nebula.Data.Messages;
 import de.voasis.nebula.Maps.GamemodeQueue;
 import de.voasis.nebula.Nebula;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class QueueCommand implements SimpleCommand {
-
+    private MiniMessage mm = MiniMessage.miniMessage();
     @Override
     public void execute(Invocation invocation) {
         String[] args = invocation.arguments();
         if (invocation.source() instanceof Player player) {
             if (args.length == 0) {
-                sendUsage(player);
+                player.sendMessage(mm.deserialize(Messages.USAGE_QUEUE));
                 return;
             }
             switch (args[0]) {
@@ -28,10 +28,10 @@ public class QueueCommand implements SimpleCommand {
                     if (args.length == 2) {
                         joinQueue(player, args[1]);
                     } else {
-                        sendUsage(player);
+                        player.sendMessage(mm.deserialize(Messages.USAGE_QUEUE));
                     }
                 }
-                default -> sendUsage(player);
+                default -> player.sendMessage(mm.deserialize(Messages.USAGE_QUEUE));
             }
         }
     }
@@ -60,11 +60,6 @@ public class QueueCommand implements SimpleCommand {
         return List.of();
     }
 
-
-    private void sendUsage(Player player) {
-        player.sendMessage(Component.text("Usage: /queue leave or /queue join <name>", NamedTextColor.GOLD));
-    }
-
     private boolean isInAnyQueue(Player player) {
         return Data.gamemodeQueueMap.stream()
                 .anyMatch(queue -> queue.getInQueue().contains(player));
@@ -72,11 +67,11 @@ public class QueueCommand implements SimpleCommand {
 
     private void joinQueue(Player player, String queueName) {
         if (isInAnyQueue(player)) {
-            player.sendMessage(Component.text("You are already in a queue.", NamedTextColor.GOLD));
+            player.sendMessage(mm.deserialize(Messages.ALREADY_IN_QUEUE));
             return;
         }
         if(!Objects.equals(Nebula.util.getBackendServer(player.getCurrentServer().get().getServerInfo().getName()).getTag(), "lobby")) {
-            player.sendMessage(Component.text("You can only join a queue from the lobby.", NamedTextColor.GOLD));
+            player.sendMessage(mm.deserialize(Messages.LOBBY_ONLY));
             return;
         }
         Data.gamemodeQueueMap.stream()
@@ -85,20 +80,20 @@ public class QueueCommand implements SimpleCommand {
                 .ifPresentOrElse(
                         queue -> {
                             queue.getInQueue().add(player);
-                            player.sendMessage(Component.text("You got added to queue: " + queueName + ".", NamedTextColor.GREEN));
+                            player.sendMessage(mm.deserialize(Messages.ADDED_TO_QUEUE.replace("<queue>", queueName)));
                         },
-                        () -> player.sendMessage(Component.text("Queue not found.", NamedTextColor.RED))
+                        () -> player.sendMessage(mm.deserialize(Messages.QUEUE_NOT_FOUND))
                 );
     }
 
     private void leaveQueue(Player player) {
         if (!isInAnyQueue(player)) {
-            player.sendMessage(Component.text("You are in no queue.", NamedTextColor.GOLD));
+            player.sendMessage(mm.deserialize(Messages.NOT_IN_QUEUE));
             return;
         }
         for(GamemodeQueue queue :Data.gamemodeQueueMap) {
             if (queue.getInQueue().contains(player)) {
-                player.sendMessage(Component.text("You got removed from queue: " + queue.getName() + ".", NamedTextColor.GOLD));
+                player.sendMessage(mm.deserialize(Messages.REMOVED_FROM_QUEUE.replace("<queue>", queue.getName())));
                 queue.getInQueue().remove(player);
             }
         }

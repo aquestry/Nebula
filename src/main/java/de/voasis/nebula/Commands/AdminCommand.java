@@ -3,11 +3,11 @@ package de.voasis.nebula.Commands;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import de.voasis.nebula.Data.Data;
+import de.voasis.nebula.Data.Messages;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.HoldServer;
 import de.voasis.nebula.Nebula;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.List;
@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 
 public class AdminCommand implements SimpleCommand {
 
+    private MiniMessage mm = MiniMessage.miniMessage();
     private final Logger logger = LoggerFactory.getLogger("nebula");
     @Override
     public void execute(Invocation invocation) {
@@ -23,7 +24,7 @@ public class AdminCommand implements SimpleCommand {
         String[] args = invocation.arguments();
 
         if (args.length < 1) {
-            source.sendMessage(Component.text("Usage: /admin <stop|delete|template> <args...>", NamedTextColor.GOLD));
+            source.sendMessage(mm.deserialize(Messages.USAGE_ADMIN));
             return;
         }
 
@@ -32,27 +33,27 @@ public class AdminCommand implements SimpleCommand {
         switch (subcommand) {
             case "kill":
                 if (args.length < 2) {
-                    source.sendMessage(Component.text("Usage: /admin stop <InstanceName>", NamedTextColor.GOLD));
+                    source.sendMessage(mm.deserialize(Messages.USAGE_ADMIN));
                     return;
                 }
                 handleKillCommand(source, args);
                 break;
             case "delete":
                 if (args.length < 2) {
-                    source.sendMessage(Component.text("Usage: /admin delete <InstanceName>", NamedTextColor.GOLD));
+                    source.sendMessage(mm.deserialize(Messages.USAGE_ADMIN));
                     return;
                 }
                 handleDeleteCommand(source, args);
                 break;
             case "template":
                 if (args.length < 3) {
-                    source.sendMessage(Component.text("Usage: /admin template <templateName> <newName>", NamedTextColor.GOLD));
+                    source.sendMessage(mm.deserialize(Messages.USAGE_ADMIN));
                     return;
                 }
                 handleTemplateCommand(source, args);
                 break;
             default:
-                source.sendMessage(Component.text("Unknown command. Usage: /admin <stop|delete|template> <args...>", NamedTextColor.GOLD));
+                source.sendMessage(mm.deserialize(Messages.USAGE_ADMIN));
         }
     }
 
@@ -60,20 +61,20 @@ public class AdminCommand implements SimpleCommand {
     private void handleKillCommand(CommandSource source, String[] args) {
         BackendServer backendServer = Nebula.util.getBackendServer(args[1]);
         if (backendServer != null) {
-            source.sendMessage(Component.text("Killing server instance...", NamedTextColor.AQUA));
+            source.sendMessage(mm.deserialize(Messages.KILL_CONTAINER.replace("<name>", backendServer.getServerName())));
             Nebula.serverManager.kill(backendServer, source);
         } else {
-            source.sendMessage(Component.text("Server not found.", NamedTextColor.GOLD));
+            source.sendMessage(mm.deserialize(Messages.SERVER_NOT_FOUND.replace("<name>", backendServer.getServerName())));
         }
     }
 
     private void handleDeleteCommand(CommandSource source, String[] args) {
         BackendServer backendServer = Nebula.util.getBackendServer(args[1]);
         if (backendServer != null) {
-            source.sendMessage(Component.text("Deleting server instance...", NamedTextColor.AQUA));
+            source.sendMessage(mm.deserialize(Messages.DELETE_CONTAINER.replace("<name>", backendServer.getServerName())));
             Nebula.serverManager.delete(backendServer, source);
         } else {
-            source.sendMessage(Component.text("Server not found.", NamedTextColor.GOLD));
+            source.sendMessage(mm.deserialize(Messages.SERVER_NOT_FOUND.replace("<name>", backendServer.getServerName())));
         }
     }
 
@@ -81,10 +82,10 @@ public class AdminCommand implements SimpleCommand {
         String templateName = args[1];
         String newName = args[2];
         if (Nebula.util.getBackendServer(newName) == null) {
-            source.sendMessage(Component.text("Creating server instance from template...", NamedTextColor.AQUA));
+            source.sendMessage(mm.deserialize(Messages.CREATE_CONTAINER.replace("<name>", newName)));
             Nebula.serverManager.createFromTemplate(templateName, newName, source, "custom");
         } else {
-            source.sendMessage(Component.text("Server with the specified name already exists.", NamedTextColor.GOLD));
+            source.sendMessage(mm.deserialize(Messages.ALREADY_EXISTS.replace("<name>", newName)));
         }
     }
 

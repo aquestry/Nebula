@@ -2,6 +2,7 @@ package de.voasis.nebula.Helper;
 
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.nebula.Data.Data;
+import de.voasis.nebula.Data.Messages;
 import de.voasis.nebula.Maps.GamemodeQueue;
 import de.voasis.nebula.Maps.HoldServer;
 import de.voasis.nebula.Nebula;
@@ -13,7 +14,6 @@ import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -21,17 +21,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class ConfigManager {
+public class FilesManager {
 
     private final Logger logger = LoggerFactory.getLogger("nebula");
     private YamlDocument config;
+    private YamlDocument messages;
     private final ProxyServer server;
 
-    public ConfigManager(YamlDocument config, ProxyServer server) {
-        this.config = config;
+    public FilesManager(ProxyServer server) {
         this.server = server;
     }
+
     public void Load() {
+        loadMessageStrings();
         Data.defaultServerTemplate = config.getString("lobby-template");
         Data.defaultmax = config.getInt("lobby-max");
         Data.defaultmin = config.getInt("lobby-min");
@@ -65,7 +67,37 @@ public class ConfigManager {
             }
         }
     }
-    public void loadConfig(Path dataDirectory) {
+
+    private void loadMessageStrings() {
+        String prefix = messages.getString("prefix", "[Server] ");
+
+        Messages.PREFIX = prefix;
+        Messages.NO_PERMISSION = prefix + messages.getString("no-permission", "You don't have permission to execute this command.");
+
+        Messages.USAGE_ADMIN = prefix + messages.getString("admin.usage", "Usage: /admin <stop|delete|template> <args...>");
+        Messages.KILL_CONTAINER = prefix + messages.getString("admin.kill-start", "Killing server instance...");
+        Messages.DELETE_CONTAINER = prefix + messages.getString("admin.delete-start", "Deleting server instance...");
+        Messages.CREATE_CONTAINER = prefix + messages.getString("admin.server-create", "Creating server instance from template...");
+        Messages.PULL_TEMPLATE = prefix + messages.getString("admin.server-pull", "Pulling template.");
+        Messages.ALREADY_EXISTS = prefix + messages.getString("admin.server-exists", "Server with the specified name already exists.");
+        Messages.SERVER_NOT_FOUND = prefix + messages.getString("admin.server-not-found", "Server not found.");
+        Messages.ERROR_CREATE = prefix + messages.getString("admin.error-create", "Error creating server instance.");
+        Messages.ERROR_KILL = prefix + messages.getString("admin.error-kill", "Error killing server instance.");
+        Messages.ERROR_DELETE = prefix + messages.getString("admin.error-delete", "Error deleting server instance.");
+        Messages.ERROR_PULL = prefix + messages.getString("admin.error-pull", "Error pulling server instance.");
+
+        Messages.USAGE_QUEUE = prefix + messages.getString("queue.usage", "Usage: /queue leave or /queue join <name>");
+        Messages.ADDED_TO_QUEUE = prefix + messages.getString("queue.added-to-queue", "You got added to queue: <queue>.");
+        Messages.REMOVED_FROM_QUEUE = prefix + messages.getString("queue.removed-from-queue", "You got removed from queue: <queue>.");
+        Messages.ALREADY_IN_QUEUE = prefix + messages.getString("queue.already-in-queue", "You are already in a queue.");
+        Messages.NOT_IN_QUEUE = prefix + messages.getString("queue.not-in-queue", "You are in no queue.");
+        Messages.LOBBY_ONLY = prefix + messages.getString("queue.lobby-only", "You can only join a queue from the lobby.");
+        Messages.QUEUE_NOT_FOUND = prefix + messages.getString("queue.queue-not-found", "Queue not found.");
+
+        Messages.SHUTDOWN = prefix + messages.getString("shutdown.message", "Shutdown! Reason: <reason>");
+    }
+
+    public void loadFiles(Path dataDirectory) {
         try {
             config = YamlDocument.create(
                     new File(dataDirectory.toFile(), "config.yml"),
@@ -80,6 +112,19 @@ public class ConfigManager {
             );
             config.update();
             config.save();
+            messages = YamlDocument.create(
+                    new File(dataDirectory.toFile(), "messages.yml"),
+                    Objects.requireNonNull(Nebula.class.getResourceAsStream("/messages.yml")),
+                    GeneralSettings.DEFAULT,
+                    LoaderSettings.builder().setAutoUpdate(true).build(),
+                    DumperSettings.DEFAULT,
+                    UpdaterSettings.builder()
+                            .setVersioning(new BasicVersioning("file-version"))
+                            .setOptionSorting(UpdaterSettings.OptionSorting.SORT_BY_DEFAULTS)
+                            .build()
+            );
+            messages.update();
+            messages.save();
         } catch (IOException e) {
             try {
                 server.shutdown();
@@ -88,5 +133,4 @@ public class ConfigManager {
             }
         }
     }
-
 }

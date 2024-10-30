@@ -1,0 +1,34 @@
+# File Version
+file-version: 1
+
+prefix: "[Server] "
+
+no-permission: "You don't have permission to execute this command."
+
+admin:
+  usage: "Usage: /admin <stop|delete|template> <args...>"
+  kill-start: "Killing server instance <name>."
+  delete-start: "Deleting server instance <name>."
+  server-pull: "Pulling template <template> on server <name>."
+  server-create: "Creating server instance <name>."
+  server-error: "Failed to create container: <name>."
+  server-exists: "Server <name> already exists."
+  server-not-found: "Server <name> not found."
+  error-create: "Error creating server instance <name>."
+  error-kill: "Error killing server instance <name>."
+  error-delete: "Error deleting server instance <name>."
+  error-pull: "Error pulling template <template> on server <name>."
+
+
+
+queue:
+  usage: "Usage: /queue leave or /queue join <name>"
+  added-to-queue: "You got added to queue: <queue>."
+  removed-from-queue: "You got removed from queue: <queue>."
+  already-in-queue: "You are already in a queue."
+  not-in-queue: "You are in no queue."
+  lobby-only: "You can only join a queue from the lobby."
+  queue-not-found: "Queue not found."
+
+shutdown:
+  message: "Shutdown! Reason: <reason>"

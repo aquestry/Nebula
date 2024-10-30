@@ -15,7 +15,6 @@ import de.voasis.nebula.Data.Util;
 import de.voasis.nebula.Event.EventManager;
 import de.voasis.nebula.Helper.*;
 import de.voasis.nebula.Helper.PermissionManager;
-import dev.dejvokep.boostedyaml.YamlDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.nio.file.Path;
@@ -26,8 +25,7 @@ public class Nebula {
     @Inject
     private ProxyServer server;
     private final Logger logger = LoggerFactory.getLogger("nebula");
-    public static YamlDocument config;
-    public static ConfigManager configManager;
+    public static FilesManager filesManager;
     public static ServerManager serverManager;
     public static PermissionManager permissionManager;
     public static DefaultsManager defaultsManager;
@@ -38,11 +36,11 @@ public class Nebula {
     @Inject
     public Nebula(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         permissionManager  = new PermissionManager();
-        configManager = new ConfigManager(config, server);
+        filesManager = new FilesManager(server);
         util = new Util(server, this);
         serverManager = new ServerManager(server);
-        configManager.loadConfig(dataDirectory);
-        configManager.Load();
+        filesManager.loadFiles(dataDirectory);
+        filesManager.Load();
         defaultsManager = new DefaultsManager(server);
         queueProcessor = new QueueProcessor(server);
         autoDeleter = new AutoDeleter();
