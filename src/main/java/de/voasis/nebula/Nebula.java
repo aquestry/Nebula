@@ -38,8 +38,8 @@ public class Nebula {
         permissionManager  = new PermissionManager();
         fileManager = new FileManager(dataDirectory, server);
         util = new Util(server, this);
-        serverManager = new ServerManager(server);
         fileManager.load();
+        serverManager = new ServerManager(server);
         defaultsManager = new DefaultsManager(server);
         queueProcessor = new QueueProcessor(server);
         autoDeleter = new AutoDeleter();
