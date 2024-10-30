@@ -80,18 +80,6 @@ public class DefaultsManager {
         }
         return false;
     }
-    private boolean isOtherEmpty(BackendServer other) {
-        for (BackendServer backendServer : getAvailableServers()) {
-            int playerCount = server.getServer(backendServer.getServerName())
-                    .get()
-                    .getPlayersConnected()
-                    .size();
-            if (playerCount == 0 && !backendServer.equals(other)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     private BackendServer getServerBetweenMinAndMaxPlayers() {
         for (BackendServer backendServer : getAvailableServers()) {

@@ -1,7 +1,10 @@
 package de.voasis.nebula.Helper;
 
 import com.velocitypowered.api.proxy.ProxyServer;
+import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Data.Messages;
+import de.voasis.nebula.Maps.HoldServer;
+import de.voasis.nebula.Nebula;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.dvs.versioning.BasicVersioning;
 import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
@@ -13,20 +16,31 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class FileManager {
-
     private static final Logger logger = LoggerFactory.getLogger("nebula");
+    private final ProxyServer server;
     private final Path dataDirectory;
     private YamlDocument config;
     private YamlDocument messages;
 
     public FileManager(Path dataDirectory, ProxyServer server) {
         this.dataDirectory = dataDirectory;
+        this.server = server;
     }
 
     public void load() {
+        loadConfig();
+        loadMessages();
+        loadData();
+        loadHoldServers();
+        logger.info("FileManager: All configurations and data loaded successfully.");
+    }
+
+    private void loadConfig() {
         try {
             config = YamlDocument.create(
                     new File(dataDirectory.toFile(), "config.yml"),
@@ -41,7 +55,14 @@ public class FileManager {
             );
             config.update();
             config.save();
+            logger.info("FileManager: config.yml loaded successfully.");
+        } catch (IOException e) {
+            logger.error("FileManager: Failed to load config.yml", e);
+        }
+    }
 
+    private void loadMessages() {
+        try {
             messages = YamlDocument.create(
                     new File(dataDirectory.toFile(), "messages.yml"),
                     Objects.requireNonNull(getClass().getResourceAsStream("/messages.yml")),
@@ -55,15 +76,14 @@ public class FileManager {
             );
             messages.update();
             messages.save();
-
-            loadMessages();
-
+            loadMessageStrings();
+            logger.info("FileManager: messages.yml loaded successfully.");
         } catch (IOException e) {
-            logger.error("Failed to load configuration files", e);
+            logger.error("FileManager: Failed to load messages.yml", e);
         }
     }
 
-    private void loadMessages() {
+    private void loadMessageStrings() {
         Messages.USAGE_ADMIN = messages.getString("usage.admin", "Usage: /admin <stop|delete|template> <args...>");
         Messages.USAGE_ADMIN_KILL = messages.getString("usage.admin-kill", "Usage: /admin stop <InstanceName>");
         Messages.USAGE_ADMIN_DELETE = messages.getString("usage.admin-delete", "Usage: /admin delete <InstanceName>");
@@ -94,5 +114,44 @@ public class FileManager {
         Messages.ERROR_NO_PERMISSION_ADMIN = messages.getString("error.no-permission-admin", "You do not have permission to perform this admin action.");
         Messages.ERROR_NO_PERMISSION_QUEUE = messages.getString("error.no-permission-queue", "You do not have permission to join or leave queues.");
         Messages.ERROR_SERVER_KILLED = messages.getString("error.server-killed", "The server you were on was killed.");
+    }
+
+    private void loadData() {
+        Data.defaultServerTemplate = config.getString("lobby-template");
+        Data.defaultmax = config.getInt("lobby-max");
+        Data.defaultmin = config.getInt("lobby-min");
+        Data.vsecret = config.getString("vsecret");
+        Data.adminUUIDs = List.of(config.getString("admins").split(","));
+        logger.info("FileManager: Loaded general Data configuration.");
+    }
+
+    private void loadHoldServers() {
+        Set<Object> managerServerKeys = config.getSection("manager-servers").getKeys();
+        for (Object serverName : managerServerKeys) {
+            String name = (String) serverName;
+            String ip = config.getString("manager-servers." + name + ".ip");
+            String password = config.getString("manager-servers." + name + ".password");
+            String username = config.getString("manager-servers." + name + ".username");
+            HoldServer holdServer = new HoldServer(name, ip, password, 0, username);
+            Data.holdServerMap.add(holdServer);
+            logger.info("FileManager: Added hold server to pool: {}", name);
+        }
+
+        Set<Object> gamemodes = config.getSection("gamemodes").getKeys();
+        for (Object queue : gamemodes) {
+            String name = (String) queue;
+            String template = config.getString("gamemodes." + name + ".templateName");
+            int needed = config.getInt("gamemodes." + name + ".neededPlayers");
+            Data.alltemplates.add(template);
+            Data.gamemodeQueueMap.add(new de.voasis.nebula.Maps.GamemodeQueue(name, template, needed));
+            logger.info("FileManager: Added gamemode to pool: {}, {}, {}.", name, template, needed);
+        }
+
+        Data.alltemplates.add(Data.defaultServerTemplate);
+        for (HoldServer holdServer : Data.holdServerMap) {
+            for (String template : Data.alltemplates) {
+                Nebula.serverManager.pull(holdServer, template);
+            }
+        }
     }
 }
