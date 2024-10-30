@@ -79,10 +79,10 @@ public class ServerManager {
                 Messages.ERROR_CONTAINER_FAILED.replace("<container>", newName));
 
         ServerInfo newInfo = new ServerInfo(newName, new InetSocketAddress(externalServer.getIp(), tempPort));
+        server.registerServer(newInfo);
         BackendServer backendServer = new BackendServer(newName, externalServer, tempPort, false, source, templateName, tag);
         Data.backendInfoMap.add(backendServer);
         Nebula.util.updateFreePort(externalServer);
-        server.registerServer(newInfo);
         return backendServer;
     }
 
