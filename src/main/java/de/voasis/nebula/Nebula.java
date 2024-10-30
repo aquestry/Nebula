@@ -37,8 +37,8 @@ public class Nebula {
     public Nebula(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         permissionManager  = new PermissionManager();
         fileManager = new FileManager(dataDirectory, server);
-        util = new Util(server, this);
         fileManager.load();
+        util = new Util(server, this);
         serverManager = new ServerManager(server);
         defaultsManager = new DefaultsManager(server);
         queueProcessor = new QueueProcessor(server);
