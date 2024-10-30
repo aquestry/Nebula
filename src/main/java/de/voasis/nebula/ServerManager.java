@@ -82,6 +82,7 @@ public class ServerManager {
         BackendServer backendServer = new BackendServer(newName, externalServer, tempPort, false, source, templateName, tag);
         Data.backendInfoMap.add(backendServer);
         Nebula.util.updateFreePort(externalServer);
+        server.registerServer(newInfo);
         return backendServer;
     }
 

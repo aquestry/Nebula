@@ -49,11 +49,11 @@ public class Nebula {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         registerCommands();
         logger.info(Data.Icon);
-        server.getEventManager().register(this, new EventManager(server));
         server.getScheduler()
                 .buildTask(this, this::Update)
                 .repeat(1, TimeUnit.SECONDS)
                 .schedule();
+        server.getEventManager().register(this, new EventManager(server));
     }
 
     private void Update() {
