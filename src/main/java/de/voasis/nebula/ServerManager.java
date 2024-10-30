@@ -58,6 +58,11 @@ public class ServerManager {
     }
 
     public BackendServer createFromTemplate(String templateName, String newName, CommandSource source, String tag) {
+        if (Data.holdServerMap.isEmpty()) {
+            source.sendMessage(mm.deserialize(Messages.ERROR_SERVER_NOT_FOUND));
+            return null;
+        }
+
         HoldServer externalServer = Data.holdServerMap.getFirst();
         for (BackendServer backendServer : Data.backendInfoMap) {
             if (backendServer.getServerName().equals(newName)) {
@@ -65,14 +70,15 @@ public class ServerManager {
                 return null;
             }
         }
+
         int tempPort = externalServer.getFreePort();
         String command = String.format("docker run -d -e PAPER_VELOCITY_SECRET=%s -p %d:25565 --name %s %s",
                 Data.vsecret, tempPort, newName, templateName);
         executeSSHCommand(externalServer, command, source,
                 Messages.FEEDBACK_TEMPLATE_CREATE.replace("<template>", templateName),
                 Messages.ERROR_CONTAINER_FAILED.replace("<container>", newName));
+
         ServerInfo newInfo = new ServerInfo(newName, new InetSocketAddress(externalServer.getIp(), tempPort));
-        server.registerServer(newInfo);
         BackendServer backendServer = new BackendServer(newName, externalServer, tempPort, false, source, templateName, tag);
         Data.backendInfoMap.add(backendServer);
         Nebula.util.updateFreePort(externalServer);
