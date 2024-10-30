@@ -17,9 +17,7 @@
     </properties>
 
     <build>
-
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -30,7 +28,6 @@
                 </configuration>
             </plugin>
             <plugin>
-
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.4.1</version>
@@ -49,6 +46,10 @@
                         </filter>
                     </filters>
                     <relocations>
+                        <relocation>
+                            <pattern>org.intellij.lang.annotations</pattern>
+                            <shadedPattern>de.voasis.nebula.libs.org.intellij.lang.annotations</shadedPattern>
+                        </relocation>
                         <relocation>
                             <pattern>dev.dejvokep.boostedyaml</pattern>
                             <shadedPattern>de.voasis.nebula.libs.boostedyaml</shadedPattern>
@@ -103,5 +104,4 @@
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
     </repositories>
-
 </project>
