@@ -1,10 +1,8 @@
 # File Version
 file-version: 1
-
+# Prefix before each message.
 prefix: "[Server] "
-
 no-permission: "You don't have permission to execute this command."
-
 admin:
   usage: "Usage: /admin <stop|delete|template> <args...>"
   kill-start: "Killing server instance <name>."
@@ -18,9 +16,6 @@ admin:
   error-kill: "Error killing server instance <name>."
   error-delete: "Error deleting server instance <name>."
   error-pull: "Error pulling template <template> on server <name>."
-
-
-
 queue:
   usage: "Usage: /queue leave or /queue join <name>"
   added-to-queue: "You got added to queue: <queue>."
@@ -29,6 +24,5 @@ queue:
   not-in-queue: "You are in no queue."
   lobby-only: "You can only join a queue from the lobby."
   queue-not-found: "Queue not found."
-
 shutdown:
   message: "Shutdown! Reason: <reason>"

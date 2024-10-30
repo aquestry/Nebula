@@ -11,7 +11,7 @@ import java.util.List;
 public class AutoDeleter {
 
     private final Map<BackendServer, Long> deletionTimers = new HashMap<>();
-    private static final long DELETION_DELAY = 1000;
+    private static final long DELETION_DELAY = 2000;
 
     public void process() {
         long currentTime = System.currentTimeMillis();

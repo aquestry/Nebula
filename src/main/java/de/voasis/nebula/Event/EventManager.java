@@ -14,9 +14,7 @@ import de.voasis.nebula.Event.Events.*;
 import de.voasis.nebula.Nebula;
 
 public class EventManager {
-
     private final ProxyServer server;
-
     public EventManager(ProxyServer server) {
         this.server = server;
     }
