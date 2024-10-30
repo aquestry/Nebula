@@ -144,6 +144,7 @@ public class ServerManager {
                 Messages.ERROR_DELETE.replace("<name>", name)
                 );
         server.unregisterServer(new ServerInfo(name,
-                new InetSocketAddress(externalServer.getIp(), serverToDelete.getPort())));
+                new InetSocketAddress(externalServer.getIp(),
+                        serverToDelete.getPort())));
     }
 }
