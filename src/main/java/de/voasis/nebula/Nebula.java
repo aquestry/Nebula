@@ -27,7 +27,8 @@ public class Nebula {
     private ProxyServer server;
     private final Logger logger = LoggerFactory.getLogger("nebula");
     public static YamlDocument config;
-    public static ConfigManager configManager;
+    public static YamlDocument messages;
+    public static FileManager fileManager;
     public static ServerManager serverManager;
     public static PermissionManager permissionManager;
     public static DefaultsManager defaultsManager;
@@ -38,11 +39,11 @@ public class Nebula {
     @Inject
     public Nebula(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
         permissionManager  = new PermissionManager();
-        configManager = new ConfigManager(config, server);
+        fileManager = new FileManager(config, messages, server);
         util = new Util(server, this);
         serverManager = new ServerManager(server);
-        configManager.loadConfig(dataDirectory);
-        configManager.Load();
+        fileManager.loadFiles(dataDirectory);
+        fileManager.Load();
         defaultsManager = new DefaultsManager(server);
         queueProcessor = new QueueProcessor(server);
         autoDeleter = new AutoDeleter();

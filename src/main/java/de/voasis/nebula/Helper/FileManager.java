@@ -2,6 +2,7 @@ package de.voasis.nebula.Helper;
 
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.nebula.Data.Data;
+import de.voasis.nebula.Data.Messages;
 import de.voasis.nebula.Maps.GamemodeQueue;
 import de.voasis.nebula.Maps.HoldServer;
 import de.voasis.nebula.Nebula;
@@ -11,6 +12,7 @@ import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
 import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,15 +23,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class ConfigManager {
+public class FileManager {
 
     private final Logger logger = LoggerFactory.getLogger("nebula");
     private YamlDocument config;
+    private YamlDocument messages;
     private final ProxyServer server;
+    private MiniMessage mm = MiniMessage.miniMessage();
 
-    public ConfigManager(YamlDocument config, ProxyServer server) {
+    public FileManager(YamlDocument config, YamlDocument messages, ProxyServer server) {
         this.config = config;
         this.server = server;
+        this.messages = messages;
     }
     public void Load() {
         Data.defaultServerTemplate = config.getString("lobby-template");
@@ -65,7 +70,7 @@ public class ConfigManager {
             }
         }
     }
-    public void loadConfig(Path dataDirectory) {
+    public void loadFiles(Path dataDirectory) {
         try {
             config = YamlDocument.create(
                     new File(dataDirectory.toFile(), "config.yml"),
@@ -80,6 +85,7 @@ public class ConfigManager {
             );
             config.update();
             config.save();
+            Messages.load(messages);
         } catch (IOException e) {
             try {
                 server.shutdown();
