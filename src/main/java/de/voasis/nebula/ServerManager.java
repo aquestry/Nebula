@@ -25,12 +25,13 @@ public class ServerManager {
     private final Logger logger = LoggerFactory.getLogger("nebula");
     private final ProxyServer server;
     private MiniMessage mm = MiniMessage.miniMessage();
+
     public ServerManager(ProxyServer proxyServer) {
         this.server = proxyServer;
     }
 
     private void executeSSHCommand(HoldServer externalServer, String command, CommandSource source, String successMessage, String errorMessage) {
-        source = source != null ? source : server.getConsoleCommandSource();
+        boolean isConsoleSource = source == server.getConsoleCommandSource();
         try {
             Session session = new JSch().getSession(externalServer.getUsername(), externalServer.getIp(), 22);
             session.setPassword(externalServer.getPassword());
@@ -48,16 +49,20 @@ public class ServerManager {
                 Thread.sleep(500);
             }
             if (channelExec.getExitStatus() == 0) {
-                source.sendMessage(Component.text(successMessage, NamedTextColor.GREEN));
+                source.sendMessage(isConsoleSource ? Component.text(stripColorCodes(successMessage)) : Component.text(successMessage, NamedTextColor.GREEN));
             } else {
-                source.sendMessage(Component.text(errorMessage, NamedTextColor.GOLD));
+                source.sendMessage(isConsoleSource ? Component.text(stripColorCodes(errorMessage)) : Component.text(errorMessage, NamedTextColor.GOLD));
             }
             channelExec.disconnect();
             session.disconnect();
         } catch (Exception e) {
             logger.error("Failed to execute SSH command.", e);
-            source.sendMessage(Component.text(errorMessage, NamedTextColor.GOLD));
+            source.sendMessage(isConsoleSource ? Component.text(stripColorCodes(errorMessage)) : Component.text(errorMessage, NamedTextColor.GOLD));
         }
+    }
+
+    private String stripColorCodes(String message) {
+        return message.replaceAll("<.*?>", "");
     }
 
     public BackendServer createFromTemplate(String templateName, String newName, CommandSource source, String tag) {
