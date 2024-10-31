@@ -72,12 +72,7 @@ public class AdminCommand implements SimpleCommand {
     private void handleTemplateCommand(CommandSource source, String[] args) {
         String templateName = args[1];
         String newName = args[2];
-        if (Nebula.util.getBackendServer(newName) == null) {
-            source.sendMessage(mm.deserialize(Messages.CREATE_CONTAINER.replace("<name>", newName)));
-            Nebula.serverManager.createFromTemplate(templateName, newName, source, "custom");
-        } else {
-            source.sendMessage(mm.deserialize(Messages.ALREADY_EXISTS.replace("<name>", newName)));
-        }
+        Nebula.serverManager.createFromTemplate(templateName, newName, source, "custom");
     }
 
     @Override
