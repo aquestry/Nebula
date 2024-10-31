@@ -6,8 +6,11 @@ import de.voasis.nebula.Data.Messages;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 public class ShutdownCommand implements SimpleCommand {
+
     private final ProxyServer server;
     private MiniMessage mm = MiniMessage.miniMessage();
+
+
     public ShutdownCommand(ProxyServer server) {
         this.server = server;
     }

@@ -22,6 +22,7 @@ import java.net.InetSocketAddress;
 import java.util.Optional;
 
 public class ServerManager {
+
     private final Logger logger = LoggerFactory.getLogger("nebula");
     private final ProxyServer server;
     private MiniMessage mm = MiniMessage.miniMessage();
@@ -143,8 +144,6 @@ public class ServerManager {
                 Messages.DELETE_CONTAINER.replace("<name>", name),
                 Messages.ERROR_DELETE.replace("<name>", name)
                 );
-        server.unregisterServer(new ServerInfo(name,
-                new InetSocketAddress(externalServer.getIp(),
-                        serverToDelete.getPort())));
+        server.unregisterServer(new ServerInfo(name, new InetSocketAddress(externalServer.getIp(), serverToDelete.getPort())));
     }
 }

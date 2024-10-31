@@ -5,7 +5,6 @@ import com.velocitypowered.api.command.SimpleCommand;
 import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Data.Messages;
 import de.voasis.nebula.Maps.BackendServer;
-import de.voasis.nebula.Maps.HoldServer;
 import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.slf4j.Logger;
@@ -18,19 +17,12 @@ public class AdminCommand implements SimpleCommand {
 
     private MiniMessage mm = MiniMessage.miniMessage();
     private final Logger logger = LoggerFactory.getLogger("nebula");
+
     @Override
     public void execute(Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
-
-        if (args.length < 1) {
-            source.sendMessage(mm.deserialize(Messages.USAGE_ADMIN));
-            return;
-        }
-
-        String subcommand = args[0].toLowerCase();
-
-        switch (subcommand) {
+        switch (args[0].toLowerCase()) {
             case "kill":
                 if (args.length < 2) {
                     source.sendMessage(mm.deserialize(Messages.USAGE_ADMIN));
@@ -56,7 +48,6 @@ public class AdminCommand implements SimpleCommand {
                 source.sendMessage(mm.deserialize(Messages.USAGE_ADMIN));
         }
     }
-
 
     private void handleKillCommand(CommandSource source, String[] args) {
         BackendServer backendServer = Nebula.util.getBackendServer(args[1]);
@@ -89,29 +80,17 @@ public class AdminCommand implements SimpleCommand {
         }
     }
 
-    private HoldServer findServerInfo(String serverName) {
-        for (HoldServer info : Data.holdServerMap) {
-            if (serverName.equals(info.getServerName())) {
-                return info;
-            }
-        }
-        return null;
-    }
-
     @Override
     public CompletableFuture<List<String>> suggestAsync(Invocation invocation) {
         String[] args = invocation.arguments();
-
         if (args.length == 0) {
             return CompletableFuture.completedFuture(List.of("kill", "delete", "template"));
         }
-
         if (args.length == 1) {
             return CompletableFuture.completedFuture(Stream.of("kill", "delete", "template")
                     .filter(command -> command.startsWith(args[0].toLowerCase()))
                     .toList());
         }
-
         if (args.length == 2) {
             if ("template".equalsIgnoreCase(args[0])) {
                 return CompletableFuture.completedFuture(Data.alltemplates.stream()
@@ -124,11 +103,6 @@ public class AdminCommand implements SimpleCommand {
                         .toList());
             }
         }
-
-        if (args.length == 3 && "template".equalsIgnoreCase(args[0])) {
-            return CompletableFuture.completedFuture(List.of());
-        }
-
         return CompletableFuture.completedFuture(List.of());
     }
 

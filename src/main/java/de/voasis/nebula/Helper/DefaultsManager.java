@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultsManager {
+
     private final ProxyServer server;
     private final Logger logger = LoggerFactory.getLogger("nebula");
     private final int max;
@@ -68,6 +69,7 @@ public class DefaultsManager {
         }
         return serverWithLowestCount;
     }
+
     private boolean isOtherUnderMin(BackendServer other) {
         for (BackendServer backendServer : getAvailableServers()) {
             int playerCount = server.getServer(backendServer.getServerName())

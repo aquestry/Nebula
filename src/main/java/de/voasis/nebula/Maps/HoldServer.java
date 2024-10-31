@@ -15,23 +15,11 @@ public class HoldServer {
         this.username = username;
         this.ip = ip;
     }
-    public String getIp() {
-        return ip;
-    }
-    public String getServerName() {
-        return serverName;
-    }
-    public String getPassword() {
-        return password;
-    }
-    public int getFreePort() {
-        return freePort;
-    }
-    public String getUsername() {
-        return username;
-    }
-    public void setFreePort(int freePort) {
-        this.freePort = freePort;
-    }
 
+    public String getIp() { return ip; }
+    public String getServerName() { return serverName; }
+    public String getPassword() { return password; }
+    public int getFreePort() { return freePort; }
+    public String getUsername() { return username; }
+    public void setFreePort(int freePort) { this.freePort = freePort; }
 }

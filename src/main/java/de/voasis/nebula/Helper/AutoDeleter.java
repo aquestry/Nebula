@@ -16,11 +16,9 @@ public class AutoDeleter {
     public void process() {
         long currentTime = System.currentTimeMillis();
         List<BackendServer> serversToDelete = new ArrayList<>();
-
         for (BackendServer backendServer : Data.backendInfoMap) {
             boolean conditionsMet = backendServer.getTag().startsWith("gamemode:") &&
                     Nebula.util.getPlayerCount(backendServer) == 0 && backendServer.getPendingPlayerConnections().isEmpty();
-
             if (conditionsMet) {
                 if (!deletionTimers.containsKey(backendServer)) {
                     deletionTimers.put(backendServer, currentTime);
@@ -35,7 +33,6 @@ public class AutoDeleter {
                 deletionTimers.remove(backendServer);
             }
         }
-
         for (BackendServer serverToDelete : serversToDelete) {
             Nebula.serverManager.delete(serverToDelete, null);
         }

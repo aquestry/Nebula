@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 @Plugin(id = "nebula", name = "Nebula", description = "Nebula can create servers on demand using Docker on multiple machines.", version = "1.0", authors = "Aquestry")
 public class Nebula {
+
     @Inject
     private ProxyServer server;
     private final Logger logger = LoggerFactory.getLogger("nebula");

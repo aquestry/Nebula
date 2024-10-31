@@ -13,7 +13,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class QueueCommand implements SimpleCommand {
+
     private MiniMessage mm = MiniMessage.miniMessage();
+
     @Override
     public void execute(Invocation invocation) {
         String[] args = invocation.arguments();
@@ -39,24 +41,20 @@ public class QueueCommand implements SimpleCommand {
     @Override
     public List<String> suggest(Invocation invocation) {
         String[] args = invocation.arguments();
-
         if (args.length == 0) {
             return List.of("join", "leave");
         }
-
         if (args.length == 1) {
             return Stream.of("join", "leave")
                     .filter(command -> command.startsWith(args[0].toLowerCase()))
                     .collect(Collectors.toList());
         }
-
         if (args.length == 2 && "join".equalsIgnoreCase(args[0])) {
             return Data.gamemodeQueueMap.stream()
                     .map(GamemodeQueue::getName)
                     .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
                     .collect(Collectors.toList());
         }
-
         return List.of();
     }
 

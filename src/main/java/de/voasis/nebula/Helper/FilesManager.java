@@ -70,10 +70,8 @@ public class FilesManager {
 
     private void loadMessageStrings() {
         String prefix = messages.getString("prefix", "[Server] ");
-
         Messages.PREFIX = prefix;
         Messages.NO_PERMISSION = prefix + messages.getString("no-permission", "You don't have permission to execute this command.");
-
         Messages.USAGE_ADMIN = prefix + messages.getString("admin.usage", "Usage: /admin <stop|delete|template> <args...>");
         Messages.KILL_CONTAINER = prefix + messages.getString("admin.kill-start", "Killing server instance...");
         Messages.DELETE_CONTAINER = prefix + messages.getString("admin.delete-start", "Deleting server instance...");
@@ -85,7 +83,6 @@ public class FilesManager {
         Messages.ERROR_KILL = prefix + messages.getString("admin.error-kill", "Error killing server instance.");
         Messages.ERROR_DELETE = prefix + messages.getString("admin.error-delete", "Error deleting server instance.");
         Messages.ERROR_PULL = prefix + messages.getString("admin.error-pull", "Error pulling server instance.");
-
         Messages.USAGE_QUEUE = prefix + messages.getString("queue.usage", "Usage: /queue leave or /queue join <name>");
         Messages.ADDED_TO_QUEUE = prefix + messages.getString("queue.added-to-queue", "You got added to queue: <queue>.");
         Messages.REMOVED_FROM_QUEUE = prefix + messages.getString("queue.removed-from-queue", "You got removed from queue: <queue>.");
@@ -93,7 +90,6 @@ public class FilesManager {
         Messages.NOT_IN_QUEUE = prefix + messages.getString("queue.not-in-queue", "You are in no queue.");
         Messages.LOBBY_ONLY = prefix + messages.getString("queue.lobby-only", "You can only join a queue from the lobby.");
         Messages.QUEUE_NOT_FOUND = prefix + messages.getString("queue.queue-not-found", "Queue not found.");
-
         Messages.SHUTDOWN = prefix + messages.getString("shutdown.message", "Shutdown! Reason: <reason>");
     }
 

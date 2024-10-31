@@ -18,6 +18,7 @@ import java.util.*;
 import java.util.concurrent.Callable;
 
 public class Util {
+
     static ProxyServer server;
     private final Logger logger = LoggerFactory.getLogger("nebula");
     static Object plugin;
@@ -50,10 +51,7 @@ public class Util {
             channelExec.disconnect();
             session.disconnect();
             if (freePort > 0) {
-                logger.info("Free port received via SSH: {}", freePort);
                 externalServer.setFreePort(freePort);
-            } else {
-                logger.error("No free port found via SSH.");
             }
         } catch (Exception e) {
             logger.error("Failed to fetch free port via SSH.", e);
@@ -121,15 +119,6 @@ public class Util {
                 }
             }
         });
-    }
-
-    public static <T> T getRandomElement(List<T> list) {
-        if (list == null || list.isEmpty()) {
-            return null;
-        }
-        Random r = new Random();
-        int i = r.nextInt(list.size());
-        return list.get(i);
     }
 
     public BackendServer getBackendServer(String name) {
