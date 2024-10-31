@@ -63,7 +63,7 @@ public class FilesManager {
         Data.alltemplates.add(Data.defaultServerTemplate);
         for(HoldServer holdServer : Data.holdServerMap){
             for(String temp : Data.alltemplates) {
-                Nebula.serverManager.pull(holdServer, temp);
+                Nebula.serverManager.pull(holdServer, temp, server.getConsoleCommandSource());
             }
         }
     }

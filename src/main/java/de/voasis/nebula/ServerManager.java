@@ -130,14 +130,14 @@ public class ServerManager {
         );
     }
 
-    public void pull(HoldServer externalServer, String template) {
+    public void pull(HoldServer externalServer, String template, CommandSource source) {
         String externName = externalServer.getServerName();
         executeSSHCommand(externalServer, "docker pull " + template,
                 () -> {
-                    logger.info(Messages.PULL_TEMPLATE.replace("<name>", externName).replace("<template>", template));
-                    logger.info(Messages.DONE);
+                    Nebula.util.sendMessage(source, Messages.PULL_TEMPLATE.replace("<name>", externName).replace("<template>", template));
+                    Nebula.util.sendMessage(source, Messages.DONE);
                 },
-                () -> logger.info(Messages.ERROR_PULL.replace("<name>", externName).replace("<template>", template))
+                () -> Nebula.util.sendMessage(source, Messages.ERROR_PULL.replace("<name>", externName).replace("<template>", template))
         );
     }
 
