@@ -31,4 +31,4 @@ util:
   server-online: "<pre>Server <name> is now online."
   server-offline: "<pre>Server <name> is now offline."
 shutdown:
-  message: "<pre>Shutdown! Reason: <reason>"
+  message: "Shutdown! Reason: <reason>"
