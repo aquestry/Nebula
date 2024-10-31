@@ -17,7 +17,7 @@ public class ShutdownCommand implements SimpleCommand {
 
     @Override
     public void execute(Invocation invocation) {
-        String reason =  "";
+        String reason =  "None";
         if( invocation.arguments().length > 0) {
             reason = String.join(" ", invocation.arguments());
         }
