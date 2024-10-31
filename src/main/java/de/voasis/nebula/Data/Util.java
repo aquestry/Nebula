@@ -9,7 +9,6 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.HoldServer;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,7 +145,7 @@ public class Util {
     }
 
     public void sendMessage(CommandSource source, String message) {
-        source.sendMessage(Component.text(stripColorCodes(message)));
+        logger.info(stripColorCodes(message));
         if (source != server.getConsoleCommandSource()) {
             source.sendMessage(mm.deserialize(message));
         }
