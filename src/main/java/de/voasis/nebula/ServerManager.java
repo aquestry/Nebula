@@ -31,14 +31,16 @@ public class ServerManager {
         this.server = proxyServer;
     }
 
-    private void executeSSHCommand(HoldServer externalServer, String command, CommandSource source, String successMessage, String errorMessage) {
-        boolean isConsoleSource = source == server.getConsoleCommandSource();
+    private boolean executeSSHCommand(HoldServer externalServer, String command, Runnable onSuccess, Runnable onError) {
+        Session session = null;
+        ChannelExec channelExec = null;
+
         try {
-            Session session = new JSch().getSession(externalServer.getUsername(), externalServer.getIp(), 22);
+            session = new JSch().getSession(externalServer.getUsername(), externalServer.getIp(), 22);
             session.setPassword(externalServer.getPassword());
             session.setConfig("StrictHostKeyChecking", "no");
             session.connect();
-            ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
+            channelExec = (ChannelExec) session.openChannel("exec");
             channelExec.setCommand(command);
             InputStream in = channelExec.getInputStream();
             channelExec.connect();
@@ -49,28 +51,21 @@ public class ServerManager {
                 }
                 Thread.sleep(500);
             }
-            if (channelExec.getExitStatus() == 0) {
-                if (source != null) {
-                    source.sendMessage(isConsoleSource ? Component.text(stripColorCodes(successMessage)) : Component.text(successMessage, NamedTextColor.GREEN));
-                } else {
-                    logger.info(stripColorCodes(successMessage));
-                }
+
+            boolean success = channelExec.getExitStatus() == 0;
+            if (success) {
+                onSuccess.run();
             } else {
-                if (source != null) {
-                    source.sendMessage(isConsoleSource ? Component.text(stripColorCodes(errorMessage)) : Component.text(errorMessage, NamedTextColor.GOLD));
-                } else {
-                    logger.info(stripColorCodes(errorMessage));
-                }
+                onError.run();
             }
-            channelExec.disconnect();
-            session.disconnect();
+            return success;
         } catch (Exception e) {
             logger.error("Failed to execute SSH command.", e);
-            if (source != null) {
-                source.sendMessage(isConsoleSource ? Component.text(stripColorCodes(errorMessage)) : Component.text(errorMessage, NamedTextColor.GOLD));
-            } else {
-                logger.info(stripColorCodes(errorMessage));
-            }
+            onError.run();
+            return false;
+        } finally {
+            if (channelExec != null) channelExec.disconnect();
+            if (session != null) session.disconnect();
         }
     }
 
@@ -89,20 +84,28 @@ public class ServerManager {
         int tempPort = externalServer.getFreePort();
         String command = String.format("docker run -d -e PAPER_VELOCITY_SECRET=%s -p %d:25565 --name %s %s",
                 Data.vsecret, tempPort, newName, templateName);
-        executeSSHCommand(externalServer, command, source,
-                Messages.CREATE_CONTAINER.replace("<name>", newName),
-                Messages.ERROR_CREATE.replace("<name>", newName)
-                );
-        ServerInfo newInfo = new ServerInfo(newName, new InetSocketAddress(externalServer.getIp(), tempPort));
-        server.registerServer(newInfo);
-        BackendServer backendServer = new BackendServer(newName, externalServer, tempPort, false, source, templateName, tag);
-        Data.backendInfoMap.add(backendServer);
-        Nebula.util.updateFreePort(externalServer);
-        return backendServer;
+        executeSSHCommand(externalServer, command,
+                () -> {
+                    ServerInfo newInfo = new ServerInfo(newName, new InetSocketAddress(externalServer.getIp(), tempPort));
+                    server.registerServer(newInfo);
+                    BackendServer backendServer = new BackendServer(newName, externalServer, tempPort, false, source, templateName, tag);
+                    Data.backendInfoMap.add(backendServer);
+                    Nebula.util.updateFreePort(externalServer);
+                        source.sendMessage(mm.deserialize(Messages.CREATE_CONTAINER.replace("<name>", newName)));
+                },
+                () -> source.sendMessage(mm.deserialize(Messages.ERROR_CREATE.replace("<name>", newName)))
+        );
+
+        return null;
     }
 
     public void kill(BackendServer serverToDelete, CommandSource source) {
+        if (serverToDelete == null) return;
+
         String name = serverToDelete.getServerName();
+        final String successMessage = Messages.KILL_CONTAINER.replace("<name>", name);
+        final String errorMessage = Messages.ERROR_KILL.replace("<name>", name);
+
         server.getServer(name).ifPresent(serverInfo -> {
             for (Player p : serverInfo.getPlayersConnected()) {
                 Optional<RegisteredServer> target = server.getServer(Nebula.defaultsManager.getTarget().getServerName());
@@ -113,20 +116,31 @@ public class ServerManager {
                 }
             }
         });
+
         executeSSHCommand(serverToDelete.getHoldServer(), "docker kill " + name,
-                source,
-                Messages.KILL_CONTAINER.replace("<name>", name),
-                Messages.ERROR_KILL.replace("<name>", name)
+                () -> {
+                    if (source != null) {
+                        source.sendMessage(Component.text(successMessage, NamedTextColor.GREEN));
+                    }
+                    logger.info(successMessage);
+                },
+                () -> {
+                    if (source != null) {
+                        source.sendMessage(Component.text(errorMessage, NamedTextColor.GOLD));
+                    }
+                    logger.info(errorMessage);
+                }
         );
     }
 
     public void pull(HoldServer externalServer, String template) {
         String externName = externalServer.getServerName();
+        final String successMessage = Messages.PULL_TEMPLATE.replace("<name>", externName).replace("<template>", template);
+        final String errorMessage = Messages.ERROR_PULL.replace("<name>", externName).replace("<template>", template);
         executeSSHCommand(externalServer, "docker pull " + template,
-                null ,
-                Messages.PULL_TEMPLATE.replace("<name>", externName).replace("<template>", template),
-                Messages.ERROR_PULL.replace("<name>", externName).replace("<template>", template)
-                );
+                () -> logger.info(successMessage),
+                () -> logger.info(errorMessage)
+        );
     }
 
     public void delete(BackendServer serverToDelete, CommandSource source) {
@@ -137,13 +151,15 @@ public class ServerManager {
         }
         String name = serverToDelete.getServerName();
         HoldServer externalServer = serverToDelete.getHoldServer();
-        Data.backendInfoMap.removeIf(bs -> bs.getServerName().equals(name));
         kill(serverToDelete, source);
+        CommandSource finalSource = source;
         executeSSHCommand(externalServer, "docker rm -f " + name,
-                source,
-                Messages.DELETE_CONTAINER.replace("<name>", name),
-                Messages.ERROR_DELETE.replace("<name>", name)
-                );
-        server.unregisterServer(new ServerInfo(name, new InetSocketAddress(externalServer.getIp(), serverToDelete.getPort())));
+                () -> {
+                    server.unregisterServer(new ServerInfo(name, new InetSocketAddress(externalServer.getIp(), serverToDelete.getPort())));
+                    Data.backendInfoMap.remove(serverToDelete);
+                    finalSource.sendMessage(mm.deserialize(Messages.DELETE_CONTAINER.replace("<name>", name)));
+                },
+                () -> finalSource.sendMessage(mm.deserialize(Messages.ERROR_DELETE.replace("<name>", name)))
+        );
     }
 }
