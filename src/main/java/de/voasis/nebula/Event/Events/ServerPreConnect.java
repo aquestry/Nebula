@@ -10,8 +10,13 @@ public class ServerPreConnect {
     public ServerPreConnect(ServerPreConnectEvent event) {
         Player player = event.getPlayer();
         RegisteredServer target = event.getOriginalServer();
-        if (Nebula.util.getPlayerCount(target) >= Data.defaultmax || player.getCurrentServer().get().getServer().equals(target) || !Nebula.util.getBackendServer(target.getServerInfo().getName()).isOnline()) {
+        if (Nebula.util.getPlayerCount(target) >= Data.defaultmax || !Nebula.util.getBackendServer(target.getServerInfo().getName()).isOnline()) {
             event.setResult(ServerPreConnectEvent.ServerResult.denied());
+        }
+        if(player.getCurrentServer().isPresent()) {
+            if(player.getCurrentServer().get().getServer().equals(target)) {
+                event.setResult(ServerPreConnectEvent.ServerResult.denied());
+            }
         }
     }
 }
