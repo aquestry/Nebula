@@ -51,22 +51,12 @@ public class AdminCommand implements SimpleCommand {
 
     private void handleKillCommand(CommandSource source, String[] args) {
         BackendServer backendServer = Nebula.util.getBackendServer(args[1]);
-        if (backendServer != null) {
-            source.sendMessage(mm.deserialize(Messages.KILL_CONTAINER.replace("<name>", backendServer.getServerName())));
-            Nebula.serverManager.kill(backendServer, source);
-        } else {
-            source.sendMessage(mm.deserialize(Messages.SERVER_NOT_FOUND.replace("<name>", backendServer.getServerName())));
-        }
+        Nebula.serverManager.kill(backendServer, source);
     }
 
     private void handleDeleteCommand(CommandSource source, String[] args) {
         BackendServer backendServer = Nebula.util.getBackendServer(args[1]);
-        if (backendServer != null) {
-            source.sendMessage(mm.deserialize(Messages.DELETE_CONTAINER.replace("<name>", backendServer.getServerName())));
-            Nebula.serverManager.delete(backendServer, source);
-        } else {
-            source.sendMessage(mm.deserialize(Messages.SERVER_NOT_FOUND.replace("<name>", backendServer.getServerName())));
-        }
+        Nebula.serverManager.delete(backendServer, source);
     }
 
     private void handleTemplateCommand(CommandSource source, String[] args) {

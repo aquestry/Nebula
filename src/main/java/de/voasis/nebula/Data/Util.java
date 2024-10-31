@@ -146,9 +146,8 @@ public class Util {
     }
 
     public void sendMessage(CommandSource source, String message) {
-        if (source == server.getConsoleCommandSource()) {
-            source.sendMessage(Component.text(stripColorCodes(message)));
-        } else {
+        source.sendMessage(Component.text(stripColorCodes(message)));
+        if (source != server.getConsoleCommandSource()) {
             source.sendMessage(mm.deserialize(message));
         }
     }

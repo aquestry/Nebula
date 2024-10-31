@@ -144,7 +144,7 @@ public class ServerManager {
     public void delete(BackendServer serverToDelete, CommandSource source) {
         source = source != null ? source : server.getConsoleCommandSource();
         if (serverToDelete == null) {
-            Nebula.util.sendMessage(source, Messages.SERVER_NOT_FOUND);
+            Nebula.util.sendMessage(source, Messages.SERVER_NOT_FOUND.replace("<name>", serverToDelete.getServerName()));
             return;
         }
 
