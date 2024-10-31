@@ -1,4 +1,4 @@
-# File Version
+## File Version
 file-version: 1
 # Prefix before each message.
 prefix: "[Server] "
@@ -16,6 +16,7 @@ admin:
   error-kill: "Error killing server instance <name>."
   error-delete: "Error deleting server instance <name>."
   error-pull: "Error pulling template <template> on server <name>."
+  done: "Done."
 queue:
   usage: "Usage: /queue leave or /queue join <name>"
   added-to-queue: "You got added to queue: <queue>."
@@ -24,5 +25,8 @@ queue:
   not-in-queue: "You are in no queue."
   lobby-only: "You can only join a queue from the lobby."
   queue-not-found: "Queue not found."
+util:
+  server-online: "Server <name> is now online."
+  server-offline: "Server <name> is now offline."
 shutdown:
   message: "Shutdown! Reason: <reason>"

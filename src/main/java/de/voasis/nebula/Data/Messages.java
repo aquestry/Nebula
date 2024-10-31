@@ -14,6 +14,9 @@ public class Messages {
     public static String ERROR_KILL;
     public static String ERROR_DELETE;
     public static String ERROR_PULL;
+    public static String DONE;
+    public static String ONLINE;
+    public static String OFFLINE;
     public static String USAGE_QUEUE;
     public static String ADDED_TO_QUEUE;
     public static String REMOVED_FROM_QUEUE;

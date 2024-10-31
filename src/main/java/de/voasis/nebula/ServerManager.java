@@ -68,29 +68,21 @@ public class ServerManager {
         }
     }
 
-    private String stripColorCodes(String message) {
-        return message.replaceAll("<.*?>", "");
-    }
-
-    private void sendMessage(CommandSource source, String message) {
-        if (source == server.getConsoleCommandSource()) {
-            source.sendMessage(Component.text(stripColorCodes(message)));
-        } else {
-            source.sendMessage(mm.deserialize(message));
-        }
-    }
-
     public BackendServer createFromTemplate(String templateName, String newName, CommandSource source, String tag) {
         HoldServer externalServer = Data.holdServerMap.getFirst();
         for (BackendServer backendServer : Data.backendInfoMap) {
             if (backendServer.getServerName().equals(newName)) {
-                sendMessage(source, Messages.ALREADY_EXISTS);
+                Nebula.util.sendMessage(source, Messages.ALREADY_EXISTS.replace("<name>", newName));
                 return null;
             }
         }
+
         int tempPort = externalServer.getFreePort();
         String command = String.format("docker run -d -e PAPER_VELOCITY_SECRET=%s -p %d:25565 --name %s %s",
                 Data.vsecret, tempPort, newName, templateName);
+
+        Nebula.util.sendMessage(source, Messages.CREATE_CONTAINER.replace("<name>", newName));
+
         executeSSHCommand(externalServer, command,
                 () -> {
                     ServerInfo newInfo = new ServerInfo(newName, new InetSocketAddress(externalServer.getIp(), tempPort));
@@ -98,9 +90,9 @@ public class ServerManager {
                     BackendServer backendServer = new BackendServer(newName, externalServer, tempPort, false, source, templateName, tag);
                     Data.backendInfoMap.add(backendServer);
                     Nebula.util.updateFreePort(externalServer);
-                    sendMessage(source, Messages.CREATE_CONTAINER.replace("<name>", newName));
+                    Nebula.util.sendMessage(source, Messages.DONE);
                 },
-                () -> sendMessage(source, Messages.ERROR_CREATE.replace("<name>", newName))
+                () -> Nebula.util.sendMessage(source, Messages.ERROR_CREATE.replace("<name>", newName))
         );
 
         return null;
@@ -110,13 +102,10 @@ public class ServerManager {
         if (serverToDelete == null) return;
 
         String name = serverToDelete.getServerName();
-        final String successMessage = Messages.KILL_CONTAINER.replace("<name>", name);
-        final String errorMessage = Messages.ERROR_KILL.replace("<name>", name);
-
         server.getServer(name).ifPresent(serverInfo -> {
             for (Player p : serverInfo.getPlayersConnected()) {
                 Optional<RegisteredServer> target = server.getServer(Nebula.defaultsManager.getTarget().getServerName());
-                if(target.isPresent()) {
+                if (target.isPresent()) {
                     p.createConnectionRequest(target.get()).fireAndForget();
                 } else {
                     p.disconnect(Component.empty());
@@ -127,46 +116,51 @@ public class ServerManager {
         executeSSHCommand(serverToDelete.getHoldServer(), "docker kill " + name,
                 () -> {
                     if (source != null) {
-                        sendMessage(source, successMessage);
+                        Nebula.util.sendMessage(source, Messages.KILL_CONTAINER.replace("<name>", name));
+                        Nebula.util.sendMessage(source, Messages.DONE);
                     }
-                    logger.info(successMessage);
+                    logger.info(Messages.KILL_CONTAINER.replace("<name>", name));
                 },
                 () -> {
                     if (source != null) {
-                        sendMessage(source, errorMessage);
+                        Nebula.util.sendMessage(source, Messages.ERROR_KILL.replace("<name>", name));
                     }
-                    logger.info(errorMessage);
+                    logger.info(Messages.ERROR_KILL.replace("<name>", name));
                 }
         );
     }
 
     public void pull(HoldServer externalServer, String template) {
         String externName = externalServer.getServerName();
-        final String successMessage = Messages.PULL_TEMPLATE.replace("<name>", externName).replace("<template>", template);
-        final String errorMessage = Messages.ERROR_PULL.replace("<name>", externName).replace("<template>", template);
         executeSSHCommand(externalServer, "docker pull " + template,
-                () -> logger.info(successMessage),
-                () -> logger.info(errorMessage)
+                () -> {
+                    logger.info(Messages.PULL_TEMPLATE.replace("<name>", externName).replace("<template>", template));
+                    logger.info(Messages.DONE);
+                },
+                () -> logger.info(Messages.ERROR_PULL.replace("<name>", externName).replace("<template>", template))
         );
     }
 
     public void delete(BackendServer serverToDelete, CommandSource source) {
         source = source != null ? source : server.getConsoleCommandSource();
         if (serverToDelete == null) {
-            sendMessage(source, Messages.SERVER_NOT_FOUND);
+            Nebula.util.sendMessage(source, Messages.SERVER_NOT_FOUND);
             return;
         }
+
         String name = serverToDelete.getServerName();
         HoldServer externalServer = serverToDelete.getHoldServer();
-        kill(serverToDelete, source);
+
+        Nebula.util.sendMessage(source, Messages.DELETE_CONTAINER.replace("<name>", name));
+
         CommandSource finalSource = source;
         executeSSHCommand(externalServer, "docker rm -f " + name,
                 () -> {
                     server.unregisterServer(new ServerInfo(name, new InetSocketAddress(externalServer.getIp(), serverToDelete.getPort())));
                     Data.backendInfoMap.remove(serverToDelete);
-                    sendMessage(finalSource, Messages.DELETE_CONTAINER.replace("<name>", name));
+                    Nebula.util.sendMessage(finalSource, Messages.DONE);
                 },
-                () -> sendMessage(finalSource, Messages.ERROR_DELETE.replace("<name>", name))
+                () -> Nebula.util.sendMessage(finalSource, Messages.ERROR_DELETE.replace("<name>", name))
         );
     }
 }

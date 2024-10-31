@@ -10,7 +10,7 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.HoldServer;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.InputStream;
@@ -21,6 +21,7 @@ public class Util {
 
     static ProxyServer server;
     private final Logger logger = LoggerFactory.getLogger("nebula");
+    private MiniMessage mm = MiniMessage.miniMessage();
     static Object plugin;
 
     public Util(ProxyServer server, Object plugin) {
@@ -76,7 +77,7 @@ public class Util {
                             RegisteredServer target = server.getServer(backendServer.getServerName()).get();
                             p.createConnectionRequest(target).fireAndForget();
                         }
-                        creator.sendMessage(Component.text("Server: " + backendServer.getServerName() + " is now online.", NamedTextColor.GREEN));
+                        sendMessage(creator, Messages.ONLINE.replace("<name>", backendServer.getServerName()));
                     }
                 }
             }
@@ -91,7 +92,7 @@ public class Util {
                     if (backendServer.isOnline()) {
                         backendServer.setOnline(false);
                         CommandSource creator = backendServer.getCreator();
-                        creator.sendMessage(Component.text("Server: " + backendServer.getServerName() + " is now offline.", NamedTextColor.GOLD));
+                        sendMessage(creator, Messages.OFFLINE.replace("<name>", backendServer.getServerName()));
                     }
                 }
             }
@@ -138,5 +139,17 @@ public class Util {
             return server.getServer(backend.getServerName()).get().getPlayersConnected().size();
         }
         return 0;
+    }
+
+    private String stripColorCodes(String message) {
+        return message.replaceAll("<.*?>", "");
+    }
+
+    public void sendMessage(CommandSource source, String message) {
+        if (source == server.getConsoleCommandSource()) {
+            source.sendMessage(Component.text(stripColorCodes(message)));
+        } else {
+            source.sendMessage(mm.deserialize(message));
+        }
     }
 }
