@@ -13,7 +13,6 @@ import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Maps.HoldServer;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,11 +72,19 @@ public class ServerManager {
         return message.replaceAll("<.*?>", "");
     }
 
+    private void sendMessage(CommandSource source, String message) {
+        if (source == server.getConsoleCommandSource()) {
+            source.sendMessage(Component.text(stripColorCodes(message)));
+        } else {
+            source.sendMessage(mm.deserialize(message));
+        }
+    }
+
     public BackendServer createFromTemplate(String templateName, String newName, CommandSource source, String tag) {
         HoldServer externalServer = Data.holdServerMap.getFirst();
         for (BackendServer backendServer : Data.backendInfoMap) {
             if (backendServer.getServerName().equals(newName)) {
-                source.sendMessage(mm.deserialize(Messages.ALREADY_EXISTS));
+                sendMessage(source, Messages.ALREADY_EXISTS);
                 return null;
             }
         }
@@ -91,9 +98,9 @@ public class ServerManager {
                     BackendServer backendServer = new BackendServer(newName, externalServer, tempPort, false, source, templateName, tag);
                     Data.backendInfoMap.add(backendServer);
                     Nebula.util.updateFreePort(externalServer);
-                        source.sendMessage(mm.deserialize(Messages.CREATE_CONTAINER.replace("<name>", newName)));
+                    sendMessage(source, Messages.CREATE_CONTAINER.replace("<name>", newName));
                 },
-                () -> source.sendMessage(mm.deserialize(Messages.ERROR_CREATE.replace("<name>", newName)))
+                () -> sendMessage(source, Messages.ERROR_CREATE.replace("<name>", newName))
         );
 
         return null;
@@ -120,13 +127,13 @@ public class ServerManager {
         executeSSHCommand(serverToDelete.getHoldServer(), "docker kill " + name,
                 () -> {
                     if (source != null) {
-                        source.sendMessage(Component.text(successMessage, NamedTextColor.GREEN));
+                        sendMessage(source, successMessage);
                     }
                     logger.info(successMessage);
                 },
                 () -> {
                     if (source != null) {
-                        source.sendMessage(Component.text(errorMessage, NamedTextColor.GOLD));
+                        sendMessage(source, errorMessage);
                     }
                     logger.info(errorMessage);
                 }
@@ -146,7 +153,7 @@ public class ServerManager {
     public void delete(BackendServer serverToDelete, CommandSource source) {
         source = source != null ? source : server.getConsoleCommandSource();
         if (serverToDelete == null) {
-            source.sendMessage(mm.deserialize(Messages.SERVER_NOT_FOUND));
+            sendMessage(source, Messages.SERVER_NOT_FOUND);
             return;
         }
         String name = serverToDelete.getServerName();
@@ -157,9 +164,9 @@ public class ServerManager {
                 () -> {
                     server.unregisterServer(new ServerInfo(name, new InetSocketAddress(externalServer.getIp(), serverToDelete.getPort())));
                     Data.backendInfoMap.remove(serverToDelete);
-                    finalSource.sendMessage(mm.deserialize(Messages.DELETE_CONTAINER.replace("<name>", name)));
+                    sendMessage(finalSource, Messages.DELETE_CONTAINER.replace("<name>", name));
                 },
-                () -> finalSource.sendMessage(mm.deserialize(Messages.ERROR_DELETE.replace("<name>", name)))
+                () -> sendMessage(finalSource, Messages.ERROR_DELETE.replace("<name>", name))
         );
     }
 }
