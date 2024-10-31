@@ -82,7 +82,6 @@ public class ServerManager {
                 Data.vsecret, tempPort, newName, templateName);
 
         Nebula.util.sendMessage(source, Messages.CREATE_CONTAINER.replace("<name>", newName));
-
         executeSSHCommand(externalServer, command,
                 () -> {
                     ServerInfo newInfo = new ServerInfo(newName, new InetSocketAddress(externalServer.getIp(), tempPort));
@@ -99,8 +98,8 @@ public class ServerManager {
     }
 
     public void kill(BackendServer serverToDelete, CommandSource source) {
+        source = source != null ? source : server.getConsoleCommandSource();
         if (serverToDelete == null) return;
-
         String name = serverToDelete.getServerName();
         server.getServer(name).ifPresent(serverInfo -> {
             for (Player p : serverInfo.getPlayersConnected()) {
@@ -112,21 +111,11 @@ public class ServerManager {
                 }
             }
         });
-
+        Nebula.util.sendMessage(source, Messages.KILL_CONTAINER.replace("<name>", name));
+        CommandSource finalSource = source;
         executeSSHCommand(serverToDelete.getHoldServer(), "docker kill " + name,
-                () -> {
-                    if (source != null) {
-                        Nebula.util.sendMessage(source, Messages.KILL_CONTAINER.replace("<name>", name));
-                        Nebula.util.sendMessage(source, Messages.DONE);
-                    }
-                    logger.info(Messages.KILL_CONTAINER.replace("<name>", name));
-                },
-                () -> {
-                    if (source != null) {
-                        Nebula.util.sendMessage(source, Messages.ERROR_KILL.replace("<name>", name));
-                    }
-                    logger.info(Messages.ERROR_KILL.replace("<name>", name));
-                }
+                () -> Nebula.util.sendMessage(finalSource, Messages.DONE),
+                () -> Nebula.util.sendMessage(finalSource, Messages.ERROR_KILL.replace("<name>", name))
         );
     }
 
