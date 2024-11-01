@@ -6,6 +6,7 @@ import com.jcraft.jsch.Session;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import de.voasis.nebula.Data.Messages;
 import de.voasis.nebula.Maps.BackendServer;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.util.Optional;
 
 public class ServerManager {
 
@@ -96,7 +98,12 @@ public class ServerManager {
         String name = serverToDelete.getServerName();
         server.getServer(name).ifPresent(serverInfo -> {
             for (Player p : serverInfo.getPlayersConnected()) {
-                p.disconnect(Component.empty());
+                Optional<RegisteredServer> target = server.getServer(Nebula.defaultsManager.getTarget().getServerName());
+                if (target.isPresent()) {
+                    p.createConnectionRequest(target.get()).fireAndForget();
+                } else {
+                    p.disconnect(Component.empty());
+                }
             }
         });
         Nebula.util.sendMessage(source, Messages.KILL_CONTAINER.replace("<name>", name));
@@ -124,6 +131,7 @@ public class ServerManager {
             Nebula.util.sendMessage(source, Messages.SERVER_NOT_FOUND.replace("<name>", serverToDelete.getServerName()));
             return;
         }
+        kill(serverToDelete, source);
         String name = serverToDelete.getServerName();
         HoldServer externalServer = serverToDelete.getHoldServer();
         Nebula.util.sendMessage(source, Messages.DELETE_CONTAINER.replace("<name>", name));
