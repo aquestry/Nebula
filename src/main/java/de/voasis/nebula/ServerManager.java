@@ -96,22 +96,25 @@ public class ServerManager {
         source = source != null ? source : server.getConsoleCommandSource();
         if (serverToDelete == null) return;
         String name = serverToDelete.getServerName();
-        server.getServer(name).ifPresent(serverInfo -> {
-            for (Player p : serverInfo.getPlayersConnected()) {
-                Optional<RegisteredServer> target = server.getServer(Nebula.defaultsManager.getTarget().getServerName());
-                if (target.isPresent()) {
-                    p.createConnectionRequest(target.get()).fireAndForget();
-                } else {
-                    p.disconnect(Component.empty());
+        try {
+            server.getServer(name).ifPresent(serverInfo -> {
+                for (Player p : serverInfo.getPlayersConnected()) {
+                    Optional<RegisteredServer> target = server.getServer(Nebula.defaultsManager.getTarget().getServerName());
+                    if (target.isPresent()) {
+                        p.createConnectionRequest(target.get()).fireAndForget();
+                    } else {
+                        p.disconnect(Component.empty());
+                    }
                 }
-            }
-        });
-        Nebula.util.sendMessage(source, Messages.KILL_CONTAINER.replace("<name>", name));
-        CommandSource finalSource = source;
-        executeSSHCommand(serverToDelete.getHoldServer(), "docker kill " + name,
-                () -> Nebula.util.sendMessage(finalSource, Messages.DONE),
-                () -> Nebula.util.sendMessage(finalSource, Messages.ERROR_KILL.replace("<name>", name))
-        );
+            });
+        } finally {
+            Nebula.util.sendMessage(source, Messages.KILL_CONTAINER.replace("<name>", name));
+            CommandSource finalSource = source;
+            executeSSHCommand(serverToDelete.getHoldServer(), "docker kill " + name,
+                    () -> Nebula.util.sendMessage(finalSource, Messages.DONE),
+                    () -> Nebula.util.sendMessage(finalSource, Messages.ERROR_KILL.replace("<name>", name))
+            );
+        }
     }
 
     public void pull(HoldServer externalServer, String template, CommandSource source) {
