@@ -6,7 +6,6 @@ import com.jcraft.jsch.Session;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import de.voasis.nebula.Data.Messages;
 import de.voasis.nebula.Maps.BackendServer;
@@ -18,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
-import java.util.Optional;
 
 public class ServerManager {
 
@@ -96,25 +94,17 @@ public class ServerManager {
         source = source != null ? source : server.getConsoleCommandSource();
         if (serverToDelete == null) return;
         String name = serverToDelete.getServerName();
-        try {
-            server.getServer(name).ifPresent(serverInfo -> {
-                for (Player p : serverInfo.getPlayersConnected()) {
-                    Optional<RegisteredServer> target = server.getServer(Nebula.defaultsManager.getTarget().getServerName());
-                    if (target.isPresent()) {
-                        p.createConnectionRequest(target.get()).fireAndForget();
-                    } else {
-                        p.disconnect(Component.empty());
-                    }
-                }
-            });
-        } finally {
-            Nebula.util.sendMessage(source, Messages.KILL_CONTAINER.replace("<name>", name));
-            CommandSource finalSource = source;
-            executeSSHCommand(serverToDelete.getHoldServer(), "docker kill " + name,
-                    () -> Nebula.util.sendMessage(finalSource, Messages.DONE),
-                    () -> Nebula.util.sendMessage(finalSource, Messages.ERROR_KILL.replace("<name>", name))
-            );
-        }
+        server.getServer(name).ifPresent(serverInfo -> {
+            for (Player p : serverInfo.getPlayersConnected()) {
+                p.disconnect(Component.empty());
+            }
+        });
+        Nebula.util.sendMessage(source, Messages.KILL_CONTAINER.replace("<name>", name));
+        CommandSource finalSource = source;
+        executeSSHCommand(serverToDelete.getHoldServer(), "docker kill " + name,
+                () -> Nebula.util.sendMessage(finalSource, Messages.DONE),
+                () -> Nebula.util.sendMessage(finalSource, Messages.ERROR_KILL.replace("<name>", name))
+        );
     }
 
     public void pull(HoldServer externalServer, String template, CommandSource source) {
