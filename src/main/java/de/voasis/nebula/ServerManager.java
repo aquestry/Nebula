@@ -33,7 +33,6 @@ public class ServerManager {
     private boolean executeSSHCommand(HoldServer externalServer, String command, Runnable onSuccess, Runnable onError) {
         Session session = null;
         ChannelExec channelExec = null;
-
         try {
             session = new JSch().getSession(externalServer.getUsername(), externalServer.getIp(), 22);
             session.setPassword(externalServer.getPassword());
@@ -46,11 +45,10 @@ public class ServerManager {
             byte[] buffer = new byte[1024];
             while (!channelExec.isClosed()) {
                 while (in.available() > 0) {
-                    System.out.print(new String(buffer, 0, in.read(buffer)));
+                    logger.info(new String(buffer, 0, in.read(buffer)));
                 }
-                Thread.sleep(500);
+                Thread.sleep(100);
             }
-
             boolean success = channelExec.getExitStatus() == 0;
             if (success) {
                 onSuccess.run();
@@ -59,7 +57,6 @@ public class ServerManager {
             }
             return success;
         } catch (Exception e) {
-            logger.error("Failed to execute SSH command.", e);
             onError.run();
             return false;
         } finally {
@@ -76,11 +73,9 @@ public class ServerManager {
                 return null;
             }
         }
-
         int tempPort = externalServer.getFreePort();
         String command = String.format("docker run -d -e PAPER_VELOCITY_SECRET=%s -p %d:25565 --name %s %s",
                 Data.vsecret, tempPort, newName, templateName);
-
         Nebula.util.sendMessage(source, Messages.CREATE_CONTAINER.replace("<name>", newName));
         executeSSHCommand(externalServer, command,
                 () -> {
@@ -136,12 +131,9 @@ public class ServerManager {
             Nebula.util.sendMessage(source, Messages.SERVER_NOT_FOUND.replace("<name>", serverToDelete.getServerName()));
             return;
         }
-
         String name = serverToDelete.getServerName();
         HoldServer externalServer = serverToDelete.getHoldServer();
-
         Nebula.util.sendMessage(source, Messages.DELETE_CONTAINER.replace("<name>", name));
-
         CommandSource finalSource = source;
         executeSSHCommand(externalServer, "docker rm -f " + name,
                 () -> {

@@ -22,35 +22,35 @@ public class EventManager {
     }
 
     @Subscribe
-    public void onChooseServer(PlayerChooseInitialServerEvent event) {
+    public void PlayerChooseInitialServer(PlayerChooseInitialServerEvent event) {
         new PlayerChooseInitialServer(event, server);
     }
     @Subscribe
-    public void preConnect(ServerPreConnectEvent event) {
+    public void ServerPreConnect(ServerPreConnectEvent event) {
         new ServerPreConnect(event);
     }
     @Subscribe
-    public void onProxyShutdown(ProxyShutdownEvent event) {
+    public void ProxyShutdown(ProxyShutdownEvent event) {
         new ProxyShutdown(event, server);
     }
     @Subscribe
-    public void Perm(PermissionsSetupEvent event) {
-        event.setProvider(Nebula.permissionManager);
-    }
-    @Subscribe
-    public void onPlayerJoin(LoginEvent event) {
+    public void LoginEvent(LoginEvent event) {
         new Login(event, server);
     }
     @Subscribe
-    public void onCommandLoad(PlayerAvailableCommandsEvent event) {
+    public void PlayerAvailableCommands(PlayerAvailableCommandsEvent event) {
         new PlayerAvailableCommands(event);
     }
     @Subscribe
-    public void onCommand(CommandExecuteEvent event) {
+    public void CommandExecute(CommandExecuteEvent event) {
         new CommandExecute(event);
     }
     @Subscribe
-    public void connected(ServerConnectedEvent event) {
+    public void ServerConnected(ServerConnectedEvent event) {
         new ServerConnected(event);
+    }
+    @Subscribe
+    public void PermissionsSetup(PermissionsSetupEvent event) {
+        event.setProvider(Nebula.permissionManager);
     }
 }
