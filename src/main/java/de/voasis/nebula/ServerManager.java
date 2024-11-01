@@ -88,7 +88,6 @@ public class ServerManager {
                 },
                 () -> Nebula.util.sendMessage(source, Messages.ERROR_CREATE.replace("<name>", newName))
         );
-
         return null;
     }
 
