@@ -44,15 +44,6 @@ public class ServerManager {
             channelExec.connect();
             byte[] buffer = new byte[1024];
             while (!channelExec.isClosed()) {
-                while (in.available() > 0) {
-                    int bytesRead = in.read(buffer);
-                    if (bytesRead > 0) {
-                        String output = new String(buffer, 0, bytesRead).trim();
-                        if(!output.isEmpty()) {
-                            logger.info(output);
-                        }
-                    }
-                }
                 Thread.sleep(100);
             }
             boolean success = channelExec.getExitStatus() == 0;
