@@ -145,6 +145,7 @@ public class Util {
     }
 
     public void sendMessage(CommandSource source, String message) {
+        source = source != null ? source : server.getConsoleCommandSource();
         logger.info(stripColorCodes(message));
         if (source != server.getConsoleCommandSource()) {
             source.sendMessage(mm.deserialize(message));

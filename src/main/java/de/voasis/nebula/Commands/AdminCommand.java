@@ -22,19 +22,18 @@ public class AdminCommand implements SimpleCommand {
     public void execute(Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
+        if (args.length == 0 || args.length < 2) {
+            source.sendMessage(mm.deserialize(Messages.USAGE_ADMIN));
+            return;
+        }
         switch (args[0].toLowerCase()) {
             case "kill":
-                if (args.length < 2) {
-                    source.sendMessage(mm.deserialize(Messages.USAGE_ADMIN));
-                    return;
-                }
                 handleKillCommand(source, args);
                 break;
+            case "start":
+                handleStartCommand(source, args);
+                break;
             case "delete":
-                if (args.length < 2) {
-                    source.sendMessage(mm.deserialize(Messages.USAGE_ADMIN));
-                    return;
-                }
                 handleDeleteCommand(source, args);
                 break;
             case "template":
@@ -46,6 +45,7 @@ public class AdminCommand implements SimpleCommand {
                 break;
             default:
                 source.sendMessage(mm.deserialize(Messages.USAGE_ADMIN));
+                break;
         }
     }
 
@@ -55,6 +55,15 @@ public class AdminCommand implements SimpleCommand {
             source.sendMessage(mm.deserialize(Messages.SERVER_NOT_FOUND.replace("<name>", args[1])));
         } else {
             Nebula.serverManager.kill(backendServer, source);
+        }
+    }
+
+    private void handleStartCommand(CommandSource source, String[] args) {
+        BackendServer backendServer = Nebula.util.getBackendServer(args[1]);
+        if(backendServer == null) {
+            source.sendMessage(mm.deserialize(Messages.SERVER_NOT_FOUND.replace("<name>", args[1])));
+        } else {
+            Nebula.serverManager.start(backendServer, source);
         }
     }
 
@@ -75,10 +84,10 @@ public class AdminCommand implements SimpleCommand {
     public CompletableFuture<List<String>> suggestAsync(Invocation invocation) {
         String[] args = invocation.arguments();
         if (args.length == 0) {
-            return CompletableFuture.completedFuture(List.of("kill", "delete", "template"));
+            return CompletableFuture.completedFuture(List.of("template", "delete", "kill", "start"));
         }
         if (args.length == 1) {
-            return CompletableFuture.completedFuture(Stream.of("kill", "delete", "template")
+            return CompletableFuture.completedFuture(Stream.of("template", "delete", "kill", "start")
                     .filter(command -> command.startsWith(args[0].toLowerCase()))
                     .toList());
         }

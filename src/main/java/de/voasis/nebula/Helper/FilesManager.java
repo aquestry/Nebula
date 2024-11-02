@@ -71,19 +71,21 @@ public class FilesManager {
     private void loadMessageStrings() {
         String prefix = messages.getString("prefix", "[Server] ");
         Messages.PREFIX = prefix;
-
         Messages.NO_PERMISSION = messages.getString("no-permission", "<pre>You don't have permission to execute this command.").replace("<pre>", prefix);
         Messages.USAGE_ADMIN = messages.getString("admin.usage", "<pre>Usage: /admin <stop|delete|template> <args...>").replace("<pre>", prefix);
         Messages.KILL_CONTAINER = messages.getString("admin.kill-start", "<pre>Killing server instance <name>.").replace("<pre>", prefix);
         Messages.DELETE_CONTAINER = messages.getString("admin.delete-start", "<pre>Deleting server instance <name>.").replace("<pre>", prefix);
         Messages.CREATE_CONTAINER = messages.getString("admin.server-create", "<pre>Creating server instance from template...").replace("<pre>", prefix);
+        Messages.START_CONTAINER = messages.getString("admin.server-start", "<pre>Starting server instance <name>.").replace("<pre>", prefix);
         Messages.PULL_TEMPLATE = messages.getString("admin.server-pull", "<pre>Pulling template <template> on server <name>.").replace("<pre>", prefix);
         Messages.ALREADY_EXISTS = messages.getString("admin.server-exists", "<pre>Server <name> already exists.").replace("<pre>", prefix);
+        Messages.SERVER_RUNNING = messages.getString("admin.server-running", "<pre>Server <name> is already running.").replace("<pre>", prefix);
         Messages.SERVER_NOT_FOUND = messages.getString("admin.server-not-found", "<pre>Server <name> not found.").replace("<pre>", prefix);
         Messages.ERROR_CREATE = messages.getString("admin.error-create", "<pre>Error creating server instance <name>.").replace("<pre>", prefix);
         Messages.ERROR_KILL = messages.getString("admin.error-kill", "<pre>Error killing server instance <name>.").replace("<pre>", prefix);
         Messages.ERROR_DELETE = messages.getString("admin.error-delete", "<pre>Error deleting server instance <name>.").replace("<pre>", prefix);
         Messages.ERROR_PULL = messages.getString("admin.error-pull", "<pre>Error pulling template <template> on server <name>.").replace("<pre>", prefix);
+        Messages.ERROR_START = messages.getString("admin.error-start", "<pre>Error starting server <name>.").replace("<pre>", prefix);
         Messages.DONE = messages.getString("admin.done", "<pre>Done.").replace("<pre>", prefix);
         Messages.ONLINE = messages.getString("util.server-online", "<pre>Server <name> is now online.").replace("<pre>", prefix);
         Messages.OFFLINE = messages.getString("util.server-offline", "<pre>Server <name> is now offline.").replace("<pre>", prefix);
