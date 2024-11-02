@@ -47,13 +47,14 @@ public class ServerManager {
                 while (in.available() > 0) {
                     int bytesRead = in.read(buffer);
                     if (bytesRead > 0) {
-                        String output = new String(buffer, 0, bytesRead);
-                        logger.info(output);
+                        String output = new String(buffer, 0, bytesRead).trim();
+                        if(!output.isEmpty()) {
+                            logger.info(output);
+                        }
                     }
                 }
                 Thread.sleep(100);
             }
-
             boolean success = channelExec.getExitStatus() == 0;
             if (success) {
                 onSuccess.run();
