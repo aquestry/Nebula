@@ -45,7 +45,9 @@ public class ServerManager {
             byte[] buffer = new byte[1024];
             while (!channelExec.isClosed()) {
                 while (in.available() > 0) {
-                    System.out.println(new String(buffer, 0, in.read(buffer)));
+                    if(buffer.length != 0) {
+                        System.out.println(new String(buffer, 0, in.read(buffer)));
+                    }
                 }
                 Thread.sleep(100);
             }
