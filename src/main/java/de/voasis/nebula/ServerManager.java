@@ -90,6 +90,10 @@ public class ServerManager {
 
     public void kill(BackendServer serverToDelete, CommandSource source) {
         String name = serverToDelete.getServerName();
+        if(!serverToDelete.isOnline()) {
+            Nebula.util.sendMessage(source, Messages.SERVER_STOPPED.replace("<name>", name));
+            return;
+        }
         server.getServer(name).ifPresent(serverInfo -> {
             for (Player p : serverInfo.getPlayersConnected()) {
                 Optional<RegisteredServer> target = server.getServer(Nebula.defaultsManager.getTarget().getServerName());
@@ -134,9 +138,6 @@ public class ServerManager {
     }
 
     public void delete(BackendServer serverToDelete, CommandSource source) {
-        if(serverToDelete.isOnline()) {
-            kill(serverToDelete, source);
-        }
         String name = serverToDelete.getServerName();
         HoldServer externalServer = serverToDelete.getHoldServer();
         Nebula.util.sendMessage(source, Messages.DELETE_CONTAINER.replace("<name>", name));

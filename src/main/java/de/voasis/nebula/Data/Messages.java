@@ -9,6 +9,7 @@ public class Messages {
     public static String CREATE_CONTAINER;
     public static String START_CONTAINER;
     public static String SERVER_RUNNING;
+    public static String SERVER_STOPPED;
     public static String TEMPLATE_EXISTS;
     public static String SERVER_NOT_FOUND;
     public static String ALREADY_EXISTS;

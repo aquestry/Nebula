@@ -131,10 +131,10 @@ public class Util {
     }
 
     public int getPlayerCount(Object backendServer) {
-        if(backendServer instanceof RegisteredServer registeredServer) {
+        if(backendServer instanceof RegisteredServer registeredServer && backendServer != null) {
             return registeredServer.getPlayersConnected().size();
         }
-        if(backendServer instanceof BackendServer backend) {
+        if(backendServer instanceof BackendServer backend && backendServer != null) {
             return server.getServer(backend.getServerName()).get().getPlayersConnected().size();
         }
         return 0;

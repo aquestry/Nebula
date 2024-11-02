@@ -14,6 +14,7 @@ admin:
   server-start: "<pre>Starting server instance <name>."
   server-error: "<pre>Failed to create container: <name>."
   server-running: "<pre>Server <name> is already running."
+  server-stopped: "<pre>Server <name> is already stopped."
   server-exists: "<pre>Server <name> already exists."
   server-not-found: "<pre>Server <name> not found."
   error-create: "<pre>Error creating server instance <name>."

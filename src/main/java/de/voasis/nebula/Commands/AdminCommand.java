@@ -7,8 +7,6 @@ import de.voasis.nebula.Data.Messages;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
@@ -16,7 +14,6 @@ import java.util.stream.Stream;
 public class AdminCommand implements SimpleCommand {
 
     private MiniMessage mm = MiniMessage.miniMessage();
-    private final Logger logger = LoggerFactory.getLogger("nebula");
 
     @Override
     public void execute(Invocation invocation) {
