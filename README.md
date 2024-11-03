@@ -51,6 +51,30 @@ Nebula also supports in-game commands for admins to manage server instances dire
     ```
     /admin delete test
     ```
+- **/admin start [server_name]**  
+  - **Description**: Starts a server instance.
+  - **Example**:  
+    ```
+    /admin start test
+    ```
+
+### **Queue Commands:**
+
+- **/queue join [queue name]**  
+  - **Description**: Join a queue.
+  - **Example**:  
+    ```
+    /queue join Duels
+    ```
+
+- **/queue leave**  
+  - **Description**: Leaves current queue.
+  - **Example**:  
+    ```
+    /queue leave
+    ```
     
 ## Future Enhancements:
 - UI for easier server management.
+- Better perms system
+- Auto deletion for default servers
