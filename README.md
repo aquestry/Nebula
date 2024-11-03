@@ -78,3 +78,4 @@ Nebula also supports in-game commands for admins to manage server instances dire
 - UI for easier server management.
 - Better perms system
 - Auto deletion for default servers
+- An API that can be used by other plugins
