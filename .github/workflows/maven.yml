@@ -8,10 +8,12 @@ on:
 
 permissions:
   contents: write
+  dependency-graph: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 21
@@ -20,10 +22,21 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+
       - name: Build with Maven
         run: mvn -B package --file pom.xml
+
       - name: Upload built JAR
         uses: actions/upload-artifact@v3
         with:
           name: nebula-jar
-          path: build/nebula.jar
+          path: target/nebula.jar
+
+      - name: Commit JAR file
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          cp target/nebula.jar .   # Copy the JAR to the root or desired location in the repo
+          git add nebula.jar
+          git commit -m "Add built JAR file"
+          git push
