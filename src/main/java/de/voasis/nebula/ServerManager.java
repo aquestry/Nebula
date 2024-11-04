@@ -74,18 +74,18 @@ public class ServerManager {
         String command = String.format("docker run -d -e PAPER_VELOCITY_SECRET=%s -p %d:25565 --name %s %s",
                 Data.vsecret, tempPort, newName, templateName);
         Nebula.util.sendMessage(source, Messages.CREATE_CONTAINER.replace("<name>", newName));
+        BackendServer backendServer = new BackendServer(newName, externalServer, tempPort, false, source, templateName, tag);
         executeSSHCommand(externalServer, command,
                 () -> {
                     ServerInfo newInfo = new ServerInfo(newName, new InetSocketAddress(externalServer.getIp(), tempPort));
                     server.registerServer(newInfo);
-                    BackendServer backendServer = new BackendServer(newName, externalServer, tempPort, false, source, templateName, tag);
                     Data.backendInfoMap.add(backendServer);
                     Nebula.util.updateFreePort(externalServer);
                     Nebula.util.sendMessage(source, Messages.DONE);
                 },
                 () -> Nebula.util.sendMessage(source, Messages.ERROR_CREATE.replace("<name>", newName))
         );
-        return null;
+        return backendServer;
     }
 
     public void kill(BackendServer serverToDelete, CommandSource source) {
