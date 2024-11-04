@@ -26,4 +26,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: nebula-jar
-          path: target/nebula.jar
+          path: build/nebula.jar
