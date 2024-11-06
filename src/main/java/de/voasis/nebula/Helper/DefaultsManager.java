@@ -97,9 +97,7 @@ public class DefaultsManager {
     }
 
     private BackendServer createDefault() {
-        String name = "Lobby-" + Data.backendInfoMap.stream()
-                .filter(backendServer -> backendServer.getTag().equals("lobby"))
-                .toList().size();
+        String name = "Lobby-" + Nebula.util.generateUniqueString();
         return Nebula.serverManager.createFromTemplate(
                 Data.defaultServerTemplate,
                 name,

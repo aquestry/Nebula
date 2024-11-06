@@ -22,9 +22,7 @@ public class QueueProcessor {
                 Player player2 = queue.getInQueue().get(1);
                 queue.getInQueue().remove(player1);
                 queue.getInQueue().remove(player2);
-                String name = queue.getName() + "-" + Data.backendInfoMap.stream()
-                        .filter(backendServer -> backendServer.getTag().equals("lobby"))
-                        .toList().size();
+                String name = queue.getName() + "-" + Nebula.util.generateUniqueString();
                 BackendServer newServer = Nebula.serverManager.createFromTemplate(queue.getTemplate(), name, server.getConsoleCommandSource(), "gamemode:" + queue.getName());
                 newServer.addPendingPlayerConnection(player1);
                 newServer.addPendingPlayerConnection(player2);

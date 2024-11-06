@@ -22,10 +22,29 @@ public class Util {
     private final Logger logger = LoggerFactory.getLogger("nebula");
     private MiniMessage mm = MiniMessage.miniMessage();
     static Object plugin;
+    private static final int LENGTH = 5;
+    private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyz0123456789";
+    private static final Set<String> generatedStrings = new HashSet<>();
+    private static final Random random = new Random();
 
     public Util(ProxyServer server, Object plugin) {
         Util.server = server;
         Util.plugin = plugin;
+    }
+
+    public static String generateUniqueString() {
+        StringBuilder sb;
+        String result;
+        do {
+            sb = new StringBuilder(LENGTH);
+            for (int i = 0; i < LENGTH; i++) {
+                int index = random.nextInt(CHARACTERS.length());
+                sb.append(CHARACTERS.charAt(index));
+            }
+            result = sb.toString();
+        } while (generatedStrings.contains(result));
+        generatedStrings.add(result);
+        return result;
     }
 
     public void updateFreePort(HoldServer externalServer) {
