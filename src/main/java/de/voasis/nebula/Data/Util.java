@@ -74,7 +74,7 @@ public class Util {
                 externalServer.setFreePort(freePort);
             }
         } catch (Exception e) {
-            logger.error("Failed to fetch free port via SSH.", e);
+            logger.error("Failed to fetch free port via SSH on server: " + externalServer.getServerName());
         }
     }
 

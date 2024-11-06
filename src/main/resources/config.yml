@@ -14,7 +14,7 @@ lobby-max: 5
 lobby-min: 3
 # Hold-Servers, at least one.
 manager-servers:
-  server-1:
+  example:
     ip: localhost
     username: notrootpls
     password: 1234
