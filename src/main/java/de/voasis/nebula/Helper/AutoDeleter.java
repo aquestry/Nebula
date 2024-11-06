@@ -21,10 +21,12 @@ public class AutoDeleter {
             if (backendServer.getTag().equals("custom")) {
                 continue;
             }
+
             boolean conditionsMet = Nebula.util.getPlayerCount(backendServer) == 0 &&
                     backendServer.getPendingPlayerConnections().isEmpty();
+
             if (backendServer.getTag().equals("lobby")) {
-                conditionsMet = conditionsMet && hasOtherDefaultServerUnderMin(backendServer);
+                conditionsMet = conditionsMet && hasSufficientLobbyServers(backendServer);
             }
 
             if (conditionsMet) {
@@ -47,15 +49,19 @@ public class AutoDeleter {
         }
     }
 
-    private boolean hasOtherDefaultServerUnderMin(BackendServer serverToExclude) {
+    private boolean hasSufficientLobbyServers(BackendServer serverToExclude) {
+        int totalLobbies = 0;
+        int lobbiesUnderMin = 0;
+
         for (BackendServer otherServer : Data.backendInfoMap) {
-            if (!otherServer.equals(serverToExclude) && otherServer.getTag().equals("default") && otherServer.isOnline()) {
-                int playerCount = Nebula.util.getPlayerCount(otherServer);
-                if (playerCount < Data.defaultmin) {
-                    return true;
+            if (otherServer.getTag().equals("lobby") && otherServer.isOnline()) {
+                totalLobbies++;
+                if (!otherServer.equals(serverToExclude) && Nebula.util.getPlayerCount(otherServer) < Data.defaultmin) {
+                    lobbiesUnderMin++;
                 }
             }
         }
-        return false;
+
+        return totalLobbies > 1 && lobbiesUnderMin >= 1;
     }
 }
