@@ -12,6 +12,7 @@ public class Messages {
     public static String SERVER_STOPPED;
     public static String TEMPLATE_EXISTS;
     public static String SERVER_NOT_FOUND;
+    public static String SERVER_CONNECT;
     public static String ALREADY_EXISTS;
     public static String ERROR_CREATE;
     public static String ERROR_KILL;

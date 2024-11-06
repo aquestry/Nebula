@@ -34,5 +34,6 @@ queue:
 util:
   server-online: "<pre>Server <name> is now online."
   server-offline: "<pre>Server <name> is now offline."
+  server-connect: "<green>Connecting to server <name>..."
 shutdown:
   message: "Shutdown! Reason: <reason>"

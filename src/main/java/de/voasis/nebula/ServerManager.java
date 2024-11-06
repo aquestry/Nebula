@@ -6,19 +6,16 @@ import com.jcraft.jsch.Session;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import de.voasis.nebula.Data.Messages;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Maps.HoldServer;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
-import java.util.Optional;
 
 public class ServerManager {
 
@@ -95,12 +92,7 @@ public class ServerManager {
         }
         server.getServer(name).ifPresent(serverInfo -> {
             for (Player p : serverInfo.getPlayersConnected()) {
-                Optional<RegisteredServer> target = server.getServer(Nebula.defaultsManager.getTarget().getServerName());
-                if (target.isPresent()) {
-                    p.createConnectionRequest(target.get()).fireAndForget();
-                } else {
-                    p.disconnect(Component.empty());
-                }
+                Nebula.util.connectPlayer(p, Nebula.defaultsManager.getTarget(), true);
             }
         });
         Nebula.util.sendMessage(source, Messages.KILL_CONTAINER.replace("<name>", name));

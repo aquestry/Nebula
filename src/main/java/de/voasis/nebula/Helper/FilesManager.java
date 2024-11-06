@@ -79,6 +79,7 @@ public class FilesManager {
         Messages.START_CONTAINER = messages.getString("admin.server-start", "<pre>Starting server instance <name>.").replace("<pre>", prefix);
         Messages.PULL_TEMPLATE = messages.getString("admin.server-pull", "<pre>Pulling template <template> on server <name>.").replace("<pre>", prefix);
         Messages.ALREADY_EXISTS = messages.getString("admin.server-exists", "<pre>Server <name> already exists.").replace("<pre>", prefix);
+        Messages.SERVER_CONNECT = messages.getString("util.server-connect", "<green>Connecting to server <name>...").replace("<pre>", prefix);
         Messages.SERVER_RUNNING = messages.getString("admin.server-running", "<pre>Server <name> is already running.").replace("<pre>", prefix);
         Messages.SERVER_STOPPED = messages.getString("admin.server-stopped", "<pre>Server <name> is already stopped.").replace("<pre>", prefix);
         Messages.SERVER_NOT_FOUND = messages.getString("admin.server-not-found", "<pre>Server <name> not found.").replace("<pre>", prefix);

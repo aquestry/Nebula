@@ -9,6 +9,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.HoldServer;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,8 +93,7 @@ public class Util {
                         backendServer.setOnline(true);
                         CommandSource creator = backendServer.getCreator();
                         for(Player p : backendServer.getPendingPlayerConnections()) {
-                            RegisteredServer target = server.getServer(backendServer.getServerName()).get();
-                            p.createConnectionRequest(target).fireAndForget();
+                            connectPlayer(p, backendServer, false);
                         }
                         sendMessage(creator, Messages.ONLINE.replace("<name>", backendServer.getServerName()));
                     }
@@ -116,6 +116,19 @@ public class Util {
             }
             return null;
         };
+    }
+
+    public void connectPlayer(Player player, BackendServer backendServer, boolean quit) {
+        String name = backendServer.getServerName();
+        Optional<RegisteredServer> target = server.getServer(name);
+        player.sendMessage(mm.deserialize(Messages.SERVER_CONNECT.replace("<name>", name)));
+        if(target.isPresent()) {
+            player.createConnectionRequest(target.get()).fireAndForget();
+            return;
+        }
+        if(quit) {
+            player.disconnect(Component.empty());
+        }
     }
 
     public void pingServer(RegisteredServer regServer, Callable<Void> response, Callable<Void> noResponse, Logger logger, Object plugin) {
