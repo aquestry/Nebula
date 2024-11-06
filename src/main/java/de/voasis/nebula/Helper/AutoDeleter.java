@@ -16,15 +16,17 @@ public class AutoDeleter {
     public void process() {
         long currentTime = System.currentTimeMillis();
         List<BackendServer> serversToDelete = new ArrayList<>();
+
         for (BackendServer backendServer : Data.backendInfoMap) {
             if (backendServer.getTag().equals("custom")) {
                 continue;
             }
             boolean conditionsMet = Nebula.util.getPlayerCount(backendServer) == 0 &&
                     backendServer.getPendingPlayerConnections().isEmpty();
-            if (backendServer.getTag().equals("default")) {
-                conditionsMet = conditionsMet && hasOtherDefaultServersMeetingConditions(backendServer);
+            if (backendServer.getTag().equals("lobby")) {
+                conditionsMet = conditionsMet && hasOtherDefaultServerUnderMin(backendServer);
             }
+
             if (conditionsMet) {
                 if (!deletionTimers.containsKey(backendServer)) {
                     deletionTimers.put(backendServer, currentTime);
@@ -39,12 +41,13 @@ public class AutoDeleter {
                 deletionTimers.remove(backendServer);
             }
         }
+
         for (BackendServer serverToDelete : serversToDelete) {
             Nebula.serverManager.delete(serverToDelete, null);
         }
     }
 
-    private boolean hasOtherDefaultServersMeetingConditions(BackendServer serverToExclude) {
+    private boolean hasOtherDefaultServerUnderMin(BackendServer serverToExclude) {
         for (BackendServer otherServer : Data.backendInfoMap) {
             if (!otherServer.equals(serverToExclude) && otherServer.getTag().equals("default") && otherServer.isOnline()) {
                 int playerCount = Nebula.util.getPlayerCount(otherServer);
