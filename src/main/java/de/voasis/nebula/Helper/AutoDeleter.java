@@ -22,14 +22,11 @@ public class AutoDeleter {
             if (backendServer.getTag().equals("custom")) {
                 continue;
             }
-
             boolean conditionsMet = Nebula.util.getPlayerCount(backendServer) == 0 &&
                     backendServer.getPendingPlayerConnections().isEmpty();
-
             if (backendServer.getTag().equals("lobby")) {
                 conditionsMet = conditionsMet && !lobbyServerDeleted && canDeleteLobbyServer(backendServer);
             }
-
             if (conditionsMet) {
                 if (!deletionTimers.containsKey(backendServer)) {
                     deletionTimers.put(backendServer, currentTime);
@@ -47,33 +44,15 @@ public class AutoDeleter {
                 deletionTimers.remove(backendServer);
             }
         }
-
         for (BackendServer serverToDelete : serversToDelete) {
             Nebula.serverManager.delete(serverToDelete, null);
         }
     }
 
-    private int getActiveLobbyServerCount() {
-        int count = 0;
-        for (BackendServer server : Data.backendInfoMap) {
-            if (server.getTag().equals("lobby") && server.isOnline()) {
-                count++;
-            }
-        }
-        return count;
-    }
-
     private boolean canDeleteLobbyServer(BackendServer serverToExclude) {
-        int activeLobbies = getActiveLobbyServerCount();
-        if (activeLobbies <= 1) {
-            return false;
-        }
         for (BackendServer otherServer : Data.backendInfoMap) {
-            if (!otherServer.equals(serverToExclude) && otherServer.getTag().equals("lobby") && otherServer.isOnline()) {
-                int playerCount = Nebula.util.getPlayerCount(otherServer);
-                if (playerCount < Data.defaultmin) {
-                    return true;
-                }
+            if (!otherServer.equals(serverToExclude) && otherServer.getTag().equals("lobby") && otherServer.isOnline() && Nebula.util.getPlayerCount(otherServer) < Data.defaultmin) {
+                return true;
             }
         }
         return false;
