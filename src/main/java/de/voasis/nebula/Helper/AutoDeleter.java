@@ -16,6 +16,7 @@ public class AutoDeleter {
     public void process() {
         long currentTime = System.currentTimeMillis();
         List<BackendServer> serversToDelete = new ArrayList<>();
+        boolean lobbyServerDeleted = false;
 
         for (BackendServer backendServer : Data.backendInfoMap) {
             if (backendServer.getTag().equals("custom")) {
@@ -26,7 +27,7 @@ public class AutoDeleter {
                     backendServer.getPendingPlayerConnections().isEmpty();
 
             if (backendServer.getTag().equals("lobby")) {
-                conditionsMet = conditionsMet && hasSufficientLobbyServers(backendServer);
+                conditionsMet = conditionsMet && !lobbyServerDeleted && canDeleteLobbyServer(backendServer);
             }
 
             if (conditionsMet) {
@@ -37,6 +38,9 @@ public class AutoDeleter {
                     if (currentTime - timerStarted >= DELETION_DELAY) {
                         serversToDelete.add(backendServer);
                         deletionTimers.remove(backendServer);
+                        if (backendServer.getTag().equals("lobby")) {
+                            lobbyServerDeleted = true;
+                        }
                     }
                 }
             } else {
@@ -49,19 +53,29 @@ public class AutoDeleter {
         }
     }
 
-    private boolean hasSufficientLobbyServers(BackendServer serverToExclude) {
-        int totalLobbies = 0;
-        int lobbiesUnderMin = 0;
+    private int getActiveLobbyServerCount() {
+        int count = 0;
+        for (BackendServer server : Data.backendInfoMap) {
+            if (server.getTag().equals("lobby") && server.isOnline()) {
+                count++;
+            }
+        }
+        return count;
+    }
 
+    private boolean canDeleteLobbyServer(BackendServer serverToExclude) {
+        int activeLobbies = getActiveLobbyServerCount();
+        if (activeLobbies <= 1) {
+            return false;
+        }
         for (BackendServer otherServer : Data.backendInfoMap) {
-            if (otherServer.getTag().equals("lobby") && otherServer.isOnline()) {
-                totalLobbies++;
-                if (!otherServer.equals(serverToExclude) && Nebula.util.getPlayerCount(otherServer) < Data.defaultmin) {
-                    lobbiesUnderMin++;
+            if (!otherServer.equals(serverToExclude) && otherServer.getTag().equals("lobby") && otherServer.isOnline()) {
+                int playerCount = Nebula.util.getPlayerCount(otherServer);
+                if (playerCount < Data.defaultmin) {
+                    return true;
                 }
             }
         }
-
-        return totalLobbies > 1 && lobbiesUnderMin >= 1;
+        return false;
     }
 }
