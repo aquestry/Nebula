@@ -51,25 +51,26 @@ public class ServerManager {
 
     public BackendServer createFromTemplate(String templateName, String newName, CommandSource source, String tag) {
         HoldServer externalServer = Data.holdServerMap.getFirst();
+        String FinalNewName = newName + "-" + externalServer.getServerName();
         for (BackendServer backendServer : Data.backendInfoMap) {
-            if (backendServer.getServerName().equals(newName)) {
-                Nebula.util.sendMessage(source, Messages.ALREADY_EXISTS.replace("<name>", newName));
+            if (backendServer.getServerName().equals(FinalNewName)) {
+                Nebula.util.sendMessage(source, Messages.ALREADY_EXISTS.replace("<name>", FinalNewName));
                 return null;
             }
         }
         int tempPort = externalServer.getFreePort();
-        String command = String.format("docker run -d -e PAPER_VELOCITY_SECRET=%s -p %d:25565 --name %s %s", Data.vsecret, tempPort, newName, templateName);
-        Nebula.util.sendMessage(source, Messages.CREATE_CONTAINER.replace("<name>", newName));
-        BackendServer backendServer = new BackendServer(newName, externalServer, tempPort, false, source, templateName, tag);
+        String command = String.format("docker run -d -e PAPER_VELOCITY_SECRET=%s -p %d:25565 --name %s %s", Data.vsecret, tempPort, FinalNewName, templateName);
+        Nebula.util.sendMessage(source, Messages.CREATE_CONTAINER.replace("<name>", FinalNewName));
+        BackendServer backendServer = new BackendServer(FinalNewName, externalServer, tempPort, false, source, templateName, tag);
         executeSSHCommand(externalServer, command,
                 () -> {
-                    ServerInfo newInfo = new ServerInfo(newName, new InetSocketAddress(externalServer.getIp(), tempPort));
+                    ServerInfo newInfo = new ServerInfo(FinalNewName, new InetSocketAddress(externalServer.getIp(), tempPort));
                     server.registerServer(newInfo);
                     Data.backendInfoMap.add(backendServer);
                     Nebula.util.updateFreePort(externalServer);
                     Nebula.util.sendMessage(source, Messages.DONE);
                 },
-                () -> Nebula.util.sendMessage(source, Messages.ERROR_CREATE.replace("<name>", newName))
+                () -> Nebula.util.sendMessage(source, Messages.ERROR_CREATE.replace("<name>", FinalNewName))
         );
         return backendServer;
     }
