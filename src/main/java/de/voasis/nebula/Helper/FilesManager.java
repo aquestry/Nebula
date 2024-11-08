@@ -9,7 +9,6 @@ import de.voasis.nebula.Nebula;
 import org.simpleyaml.configuration.file.YamlConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -38,7 +37,7 @@ public class FilesManager {
             Data.defaultmin = config.getInt("lobby-min");
             Data.vsecret = config.getString("vsecret");
             Data.adminUUIDs = List.of(config.getString("admins").split(","));
-            logger.info("Admin UUIDS: " + Data.adminUUIDs);
+            logger.info("Admin UUIDS: {}", Data.adminUUIDs);
             Data.holdServerMap.clear();
 
             Map<String, Object> managerServers = config.getConfigurationSection("manager-servers").getValues(false);
@@ -153,7 +152,6 @@ public class FilesManager {
 
     private void copyResource(String resourceName, File destination) throws IOException {
         destination.getParentFile().mkdirs();
-
         try (InputStream resourceStream = getClass().getResourceAsStream("/" + resourceName);
              FileOutputStream outputStream = new FileOutputStream(destination)) {
             if (resourceStream == null) {

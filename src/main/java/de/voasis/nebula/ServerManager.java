@@ -11,23 +11,17 @@ import de.voasis.nebula.Data.Messages;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Maps.HoldServer;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import java.io.InputStream;
 import java.net.InetSocketAddress;
 
 public class ServerManager {
 
-    private final Logger logger = LoggerFactory.getLogger("nebula");
     private final ProxyServer server;
-    private MiniMessage mm = MiniMessage.miniMessage();
 
     public ServerManager(ProxyServer proxyServer) {
         this.server = proxyServer;
     }
 
-    private boolean executeSSHCommand(HoldServer externalServer, String command, Runnable onSuccess, Runnable onError) {
+    private void executeSSHCommand(HoldServer externalServer, String command, Runnable onSuccess, Runnable onError) {
         Session session = null;
         ChannelExec channelExec = null;
         try {
@@ -37,9 +31,7 @@ public class ServerManager {
             session.connect();
             channelExec = (ChannelExec) session.openChannel("exec");
             channelExec.setCommand(command);
-            InputStream in = channelExec.getInputStream();
             channelExec.connect();
-            byte[] buffer = new byte[1024];
             while (!channelExec.isClosed()) {
                 Thread.sleep(100);
             }
@@ -49,10 +41,8 @@ public class ServerManager {
             } else {
                 onError.run();
             }
-            return success;
         } catch (Exception e) {
             onError.run();
-            return false;
         } finally {
             if (channelExec != null) channelExec.disconnect();
             if (session != null) session.disconnect();
@@ -96,10 +86,9 @@ public class ServerManager {
             }
         });
         Nebula.util.sendMessage(source, Messages.KILL_CONTAINER.replace("<name>", name));
-        CommandSource finalSource = source;
         executeSSHCommand(serverToDelete.getHoldServer(), "docker kill " + name,
-                () -> Nebula.util.sendMessage(finalSource, Messages.DONE),
-                () -> Nebula.util.sendMessage(finalSource, Messages.ERROR_KILL.replace("<name>", name))
+                () -> Nebula.util.sendMessage(source, Messages.DONE),
+                () -> Nebula.util.sendMessage(source, Messages.ERROR_KILL.replace("<name>", name))
         );
     }
 
@@ -110,10 +99,9 @@ public class ServerManager {
             return;
         }
         Nebula.util.sendMessage(source, Messages.START_CONTAINER.replace("<name>", name));
-        CommandSource finalSource = source;
         executeSSHCommand(serverToStart.getHoldServer(), "docker start " + name,
-                () -> Nebula.util.sendMessage(finalSource, Messages.DONE),
-                () -> Nebula.util.sendMessage(finalSource, Messages.ERROR_START.replace("<name>", name))
+                () -> Nebula.util.sendMessage(source, Messages.DONE),
+                () -> Nebula.util.sendMessage(source, Messages.ERROR_START.replace("<name>", name))
         );
     }
 
@@ -132,14 +120,13 @@ public class ServerManager {
         String name = serverToDelete.getServerName();
         HoldServer externalServer = serverToDelete.getHoldServer();
         Nebula.util.sendMessage(source, Messages.DELETE_CONTAINER.replace("<name>", name));
-        CommandSource finalSource = source;
         executeSSHCommand(externalServer, "docker rm -f " + name,
                 () -> {
                     server.unregisterServer(new ServerInfo(name, new InetSocketAddress(externalServer.getIp(), serverToDelete.getPort())));
                     Data.backendInfoMap.remove(serverToDelete);
-                    Nebula.util.sendMessage(finalSource, Messages.DONE);
+                    Nebula.util.sendMessage(source, Messages.DONE);
                 },
-                () -> Nebula.util.sendMessage(finalSource, Messages.ERROR_DELETE.replace("<name>", name))
+                () -> Nebula.util.sendMessage(source, Messages.ERROR_DELETE.replace("<name>", name))
         );
     }
 }
