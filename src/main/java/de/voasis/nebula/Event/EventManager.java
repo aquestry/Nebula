@@ -4,6 +4,7 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.event.command.PlayerAvailableCommandsEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
+import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
@@ -48,6 +49,10 @@ public class EventManager {
     @Subscribe
     public void ServerConnected(ServerConnectedEvent event) {
         new ServerConnected(event);
+    }
+    @Subscribe
+    public void PluginMessage(PluginMessageEvent event) {
+        new PluginMessage(event, server);
     }
     @Subscribe
     public void PermissionsSetup(PermissionsSetupEvent event) {

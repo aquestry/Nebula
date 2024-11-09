@@ -5,13 +5,10 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Nebula;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ProxyShutdown {
-    private final Logger logger = LoggerFactory.getLogger("nebula");
     public ProxyShutdown(ProxyShutdownEvent event, ProxyServer server) {
         List<BackendServer> serversToDelete = new ArrayList<>(Data.backendInfoMap);
         for(BackendServer backendServer : serversToDelete) {

@@ -7,6 +7,8 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
+import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import de.voasis.nebula.Commands.AdminCommand;
 import de.voasis.nebula.Commands.QueueCommand;
 import de.voasis.nebula.Commands.ServerCommand;
@@ -26,6 +28,7 @@ public class Nebula {
     @Inject
     private ProxyServer server;
     private final Logger logger = LoggerFactory.getLogger("nebula");
+    public static ChannelIdentifier channel = MinecraftChannelIdentifier.create("nebula", "main");
     public static FilesManager filesManager;
     public static ServerManager serverManager;
     public static PermissionManager permissionManager;
@@ -51,6 +54,7 @@ public class Nebula {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         registerCommands();
         logger.info(Data.Icon);
+        server.getChannelRegistrar().register(channel);
         server.getEventManager().register(this, new EventManager(server));
         server.getScheduler()
                 .buildTask(this, this::Update)
