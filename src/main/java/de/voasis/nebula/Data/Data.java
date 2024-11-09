@@ -1,6 +1,5 @@
 package de.voasis.nebula.Data;
 
-
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.GamemodeQueue;
 import de.voasis.nebula.Maps.HoldServer;

@@ -199,13 +199,9 @@ public class Util {
         return 0;
     }
 
-    private String stripColorCodes(String message) {
-        return message.replaceAll("<.*?>", "");
-    }
-
     public void sendMessage(CommandSource source, String message) {
         source = source != null ? source : server.getConsoleCommandSource();
-        logger.info(stripColorCodes(message));
+        logger.info(message.replaceAll("<.*?>", ""));
         if (source != server.getConsoleCommandSource()) {
             source.sendMessage(mm.deserialize(message));
         }
