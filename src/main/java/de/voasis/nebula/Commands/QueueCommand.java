@@ -4,6 +4,7 @@ import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Data.Messages;
+import de.voasis.nebula.Data.Util;
 import de.voasis.nebula.Maps.GamemodeQueue;
 import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -28,7 +29,7 @@ public class QueueCommand implements SimpleCommand {
                 case "leave" -> leaveQueue(player);
                 case "join" -> {
                     if (args.length == 2) {
-                        joinQueue(player, args[1]);
+                        Nebula.util.joinQueue(player, args[1]);
                     } else {
                         player.sendMessage(mm.deserialize(Messages.USAGE_QUEUE));
                     }
@@ -58,34 +59,8 @@ public class QueueCommand implements SimpleCommand {
         return List.of();
     }
 
-    private boolean isInAnyQueue(Player player) {
-        return Data.gamemodeQueueMap.stream()
-                .anyMatch(queue -> queue.getInQueue().contains(player));
-    }
-
-    private void joinQueue(Player player, String queueName) {
-        if (isInAnyQueue(player)) {
-            player.sendMessage(mm.deserialize(Messages.ALREADY_IN_QUEUE));
-            return;
-        }
-        if(!Objects.equals(Nebula.util.getBackendServer(player.getCurrentServer().get().getServerInfo().getName()).getTag(), "lobby")) {
-            player.sendMessage(mm.deserialize(Messages.LOBBY_ONLY));
-            return;
-        }
-        Data.gamemodeQueueMap.stream()
-                .filter(queue -> queue.getName().equalsIgnoreCase(queueName))
-                .findFirst()
-                .ifPresentOrElse(
-                        queue -> {
-                            queue.getInQueue().add(player);
-                            player.sendMessage(mm.deserialize(Messages.ADDED_TO_QUEUE.replace("<queue>", queueName)));
-                        },
-                        () -> player.sendMessage(mm.deserialize(Messages.QUEUE_NOT_FOUND))
-                );
-    }
-
     private void leaveQueue(Player player) {
-        if (!isInAnyQueue(player)) {
+        if (!Nebula.util.isInAnyQueue(player)) {
             player.sendMessage(mm.deserialize(Messages.NOT_IN_QUEUE));
             return;
         }
