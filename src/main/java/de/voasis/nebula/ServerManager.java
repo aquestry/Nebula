@@ -16,7 +16,6 @@ import java.net.InetSocketAddress;
 public class ServerManager {
 
     private final ProxyServer server;
-
     public ServerManager(ProxyServer proxyServer) {
         this.server = proxyServer;
     }
