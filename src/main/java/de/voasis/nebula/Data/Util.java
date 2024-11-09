@@ -9,6 +9,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.HoldServer;
+import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.slf4j.Logger;
@@ -129,6 +130,32 @@ public class Util {
         if(quit) {
             player.disconnect(Component.empty());
         }
+    }
+
+    public boolean isInAnyQueue(Player player) {
+        return Data.gamemodeQueueMap.stream()
+                .anyMatch(queue -> queue.getInQueue().contains(player));
+    }
+
+    public void joinQueue(Player player, String queueName) {
+        if (isInAnyQueue(player)) {
+            player.sendMessage(mm.deserialize(Messages.ALREADY_IN_QUEUE));
+            return;
+        }
+        if(!Objects.equals(Nebula.util.getBackendServer(player.getCurrentServer().get().getServerInfo().getName()).getTag(), "lobby")) {
+            player.sendMessage(mm.deserialize(Messages.LOBBY_ONLY));
+            return;
+        }
+        Data.gamemodeQueueMap.stream()
+                .filter(queue -> queue.getName().equalsIgnoreCase(queueName))
+                .findFirst()
+                .ifPresentOrElse(
+                        queue -> {
+                            queue.getInQueue().add(player);
+                            player.sendMessage(mm.deserialize(Messages.ADDED_TO_QUEUE.replace("<queue>", queueName)));
+                        },
+                        () -> player.sendMessage(mm.deserialize(Messages.QUEUE_NOT_FOUND))
+                );
     }
 
     public void pingServer(RegisteredServer regServer, Callable<Void> response, Callable<Void> noResponse, Logger logger, Object plugin) {
