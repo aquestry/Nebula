@@ -1,5 +1,9 @@
 package de.voasis.nebula.Maps;
 
+import de.voasis.nebula.Data.Data;
+import java.util.ArrayList;
+import java.util.List;
+
 public class HoldServer {
 
     private final String serverName;
@@ -22,4 +26,14 @@ public class HoldServer {
     public int getFreePort() { return freePort; }
     public String getUsername() { return username; }
     public void setFreePort(int freePort) { this.freePort = freePort; }
+
+    public List<BackendServer> getBackendServers() {
+        List<BackendServer> list = new ArrayList<>();
+        for(BackendServer backendServer : Data.backendInfoMap) {
+            if(backendServer.getHoldServer().equals(this)) {
+                list.add(backendServer);
+            }
+        }
+        return list;
+    }
 }

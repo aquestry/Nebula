@@ -51,6 +51,11 @@ public class ServerManager {
 
     public BackendServer createFromTemplate(String templateName, String newName, CommandSource source, String tag) {
         HoldServer externalServer = Data.holdServerMap.getFirst();
+        for(HoldServer holdServer : Data.holdServerMap) {
+            if(holdServer.getBackendServers().size() < externalServer.getBackendServers().size()) {
+                externalServer = holdServer;
+            }
+        }
         String FinalNewName = newName + "-" + externalServer.getServerName();
         for (BackendServer backendServer : Data.backendInfoMap) {
             if (backendServer.getServerName().equals(FinalNewName)) {
@@ -62,12 +67,13 @@ public class ServerManager {
         String command = String.format("docker run -d -e PAPER_VELOCITY_SECRET=%s -p %d:25565 --name %s %s", Data.vsecret, tempPort, FinalNewName, templateName);
         Nebula.util.sendMessage(source, Messages.CREATE_CONTAINER.replace("<name>", FinalNewName));
         BackendServer backendServer = new BackendServer(FinalNewName, externalServer, tempPort, false, source, templateName, tag);
+        HoldServer finalExternalServer = externalServer;
         executeSSHCommand(externalServer, command,
                 () -> {
-                    ServerInfo newInfo = new ServerInfo(FinalNewName, new InetSocketAddress(externalServer.getIp(), tempPort));
+                    ServerInfo newInfo = new ServerInfo(FinalNewName, new InetSocketAddress(finalExternalServer.getIp(), tempPort));
                     server.registerServer(newInfo);
                     Data.backendInfoMap.add(backendServer);
-                    Nebula.util.updateFreePort(externalServer);
+                    Nebula.util.updateFreePort(finalExternalServer);
                     Nebula.util.sendMessage(source, Messages.DONE);
                 },
                 () -> Nebula.util.sendMessage(source, Messages.ERROR_CREATE.replace("<name>", FinalNewName))
