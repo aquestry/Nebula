@@ -13,14 +13,11 @@ public class PluginMessage {
     private final Logger logger = LoggerFactory.getLogger("nebula");
     public PluginMessage(PluginMessageEvent event, ProxyServer server) {
         String messageContent = new String(event.getData(), StandardCharsets.UTF_8);
-        logger.info("Message received: {}", messageContent);
         if (event.getIdentifier().equals(Nebula.channel)) {
-            logger.info("Right Channel");
             if (messageContent.startsWith("lobby:")) {
                 logger.info("Sending to Lobby");
                 Nebula.util.connectPlayer(server.getPlayer(messageContent.replace("lobby:", "")).get(), Nebula.defaultsManager.getTarget(), true);
             } else if (messageContent.startsWith("queue:")) {
-                // Usage: queue:player_name:game_name
                 if (messageContent.split(":").length != 3) logger.warn("Incorrect queue plugin message format: {}", messageContent);
                 Optional<Player> player = server.getPlayer(messageContent.split(":")[1]);
                 if (player.isEmpty()) {
