@@ -44,7 +44,7 @@ public class Nebula {
         util = new Util(server, this);
         serverManager = new ServerManager(server);
         filesManager.loadFiles(dataDirectory);
-        filesManager.Load();
+        filesManager.load();
         defaultsManager = new DefaultsManager(server);
         queueProcessor = new QueueProcessor(server);
         autoDeleter = new AutoDeleter();
