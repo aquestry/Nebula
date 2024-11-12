@@ -3,6 +3,7 @@ package de.voasis.nebula.Event;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.event.command.PlayerAvailableCommandsEvent;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
@@ -49,6 +50,10 @@ public class EventManager {
     @Subscribe
     public void ServerConnected(ServerConnectedEvent event) {
         new ServerConnected(event);
+    }
+    @Subscribe
+    public void Disconnect(DisconnectEvent event) {
+        new Disconnect(event);
     }
     @Subscribe
     public void PluginMessage(PluginMessageEvent event) {

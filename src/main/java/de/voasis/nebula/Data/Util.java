@@ -8,6 +8,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.Maps.BackendServer;
+import de.voasis.nebula.Maps.GamemodeQueue;
 import de.voasis.nebula.Maps.HoldServer;
 import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.Component;
@@ -156,6 +157,19 @@ public class Util {
                         },
                         () -> player.sendMessage(mm.deserialize(Messages.QUEUE_NOT_FOUND))
                 );
+    }
+
+    public void leaveQueue(Player player) {
+        if (!Nebula.util.isInAnyQueue(player)) {
+            player.sendMessage(mm.deserialize(Messages.NOT_IN_QUEUE));
+            return;
+        }
+        for(GamemodeQueue queue :Data.gamemodeQueueMap) {
+            if (queue.getInQueue().contains(player)) {
+                player.sendMessage(mm.deserialize(Messages.REMOVED_FROM_QUEUE.replace("<queue>", queue.getName())));
+                queue.getInQueue().remove(player);
+            }
+        }
     }
 
     public void pingServer(RegisteredServer regServer, Callable<Void> response, Callable<Void> noResponse, Logger logger, Object plugin) {

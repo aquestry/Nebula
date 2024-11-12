@@ -58,15 +58,6 @@ public class QueueCommand implements SimpleCommand {
     }
 
     private void leaveQueue(Player player) {
-        if (!Nebula.util.isInAnyQueue(player)) {
-            player.sendMessage(mm.deserialize(Messages.NOT_IN_QUEUE));
-            return;
-        }
-        for(GamemodeQueue queue :Data.gamemodeQueueMap) {
-            if (queue.getInQueue().contains(player)) {
-                player.sendMessage(mm.deserialize(Messages.REMOVED_FROM_QUEUE.replace("<queue>", queue.getName())));
-                queue.getInQueue().remove(player);
-            }
-        }
+        Nebula.util.leaveQueue(player);
     }
 }
