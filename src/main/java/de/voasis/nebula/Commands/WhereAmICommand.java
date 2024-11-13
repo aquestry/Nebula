@@ -21,7 +21,8 @@ public class WhereAmICommand implements SimpleCommand {
     public void execute(Invocation invocation) {
         CommandSource source = invocation.source();
         if(source instanceof Player player) {
-            for(RegisteredServer registeredServer : server.getAllServers()) {
+            RegisteredServer registeredServer = player.getCurrentServer().get().getServer();
+            if(registeredServer != null) {
                 for(BackendServer backendServer : Data.backendInfoMap) {
                     String name = backendServer.getServerName();
                     if(registeredServer.getServerInfo().getName().equals(name)) {
