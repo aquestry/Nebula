@@ -25,7 +25,7 @@ public class WhereAmICommand implements SimpleCommand {
                 for(BackendServer backendServer : Data.backendInfoMap) {
                     String name = backendServer.getServerName();
                     if(registeredServer.getServerInfo().getName().equals(name)) {
-                        Nebula.util.sendMessage(source ,"You on the backend server " + name + " on hold server " + backendServer.getHoldServer().getServerName() + ".");
+                        Nebula.util.sendMessage(source ,"You (" + player.getUsername() + ") are on the backend server " + name + " on hold server " + backendServer.getHoldServer().getServerName() + ".");
                     }
                 }
             }
