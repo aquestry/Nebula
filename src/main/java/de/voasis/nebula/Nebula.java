@@ -11,7 +11,7 @@ import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import de.voasis.nebula.Commands.AdminCommand;
 import de.voasis.nebula.Commands.QueueCommand;
-import de.voasis.nebula.Commands.ServerCommand;
+import de.voasis.nebula.Commands.WhereAmICommand;
 import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Data.Util;
 import de.voasis.nebula.Event.EventManager;
@@ -71,7 +71,7 @@ public class Nebula {
     private void registerCommands() {
         CommandManager commandManager = server.getCommandManager();
         commandManager.register("admin", new AdminCommand());
-        commandManager.register("server", new ServerCommand(server));
+        commandManager.register("whereami", new WhereAmICommand(server));
         commandManager.register("queue", new QueueCommand());
     }
 }
