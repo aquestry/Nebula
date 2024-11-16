@@ -6,6 +6,8 @@ import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.GamemodeQueue;
 import de.voasis.nebula.Nebula;
+import java.util.ArrayList;
+import java.util.List;
 
 public class QueueProcessor {
 
@@ -16,16 +18,24 @@ public class QueueProcessor {
     }
 
     public void process() {
-        for(GamemodeQueue queue : Data.gamemodeQueueMap) {
-            if(queue.getInQueue().size() >= queue.getNeededPlayers()) {
-                Player player1 = queue.getInQueue().get(0);
-                Player player2 = queue.getInQueue().get(1);
-                queue.getInQueue().remove(player1);
-                queue.getInQueue().remove(player2);
+        for (GamemodeQueue queue : Data.gamemodeQueueMap) {
+            int neededPlayers = queue.getNeededPlayers();
+            if (queue.getInQueue().size() >= neededPlayers) {
+                List<Player> playersToMove = new ArrayList<>();
+                for (int i = 0; i < neededPlayers; i++) {
+                    playersToMove.add(queue.getInQueue().getFirst());
+                    queue.getInQueue().removeFirst();
+                }
                 String name = queue.getName() + "-" + Nebula.util.generateUniqueString();
-                BackendServer newServer = Nebula.serverManager.createFromTemplate(queue.getTemplate(), name, server.getConsoleCommandSource(), "gamemode:" + queue.getName());
-                newServer.addPendingPlayerConnection(player1);
-                newServer.addPendingPlayerConnection(player2);
+                BackendServer newServer = Nebula.serverManager.createFromTemplate(
+                        queue.getTemplate(),
+                        name,
+                        server.getConsoleCommandSource(),
+                        "gamemode:" + queue.getName()
+                );
+                for (Player player : playersToMove) {
+                    newServer.addPendingPlayerConnection(player);
+                }
             }
         }
     }
