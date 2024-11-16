@@ -97,7 +97,7 @@ public class DefaultsManager {
         return null;
     }
 
-    private BackendServer createDefault() {
+    public BackendServer createDefault() {
         String name = "Lobby-" + Nebula.util.generateUniqueString();
         return Nebula.serverManager.createFromTemplate(
                 Data.defaultServerTemplate,
