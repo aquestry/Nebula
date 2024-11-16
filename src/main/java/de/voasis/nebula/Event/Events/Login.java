@@ -11,7 +11,6 @@ import java.util.UUID;
 
 public class Login {
     private final Logger logger = LoggerFactory.getLogger("nebula");
-
     public Login(LoginEvent event, ProxyServer server) {
         Player player = event.getPlayer();
         UUID playerUUID = player.getUniqueId();
@@ -22,5 +21,4 @@ public class Login {
                 player.getUsername(), playerUUID,
                 player.hasPermission("velocity.admin"));
     }
-
 }

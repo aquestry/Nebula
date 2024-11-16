@@ -123,6 +123,7 @@ public class ServerManager {
     }
 
     public void delete(BackendServer serverToDelete, CommandSource source) {
+        kill(serverToDelete, source);
         String name = serverToDelete.getServerName();
         HoldServer externalServer = serverToDelete.getHoldServer();
         Nebula.util.sendMessage(source, Messages.DELETE_CONTAINER.replace("<name>", name));
