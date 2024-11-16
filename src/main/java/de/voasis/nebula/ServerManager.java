@@ -11,6 +11,8 @@ import de.voasis.nebula.Data.Messages;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Maps.HoldServer;
+import net.kyori.adventure.text.Component;
+
 import java.net.InetSocketAddress;
 
 public class ServerManager {
@@ -80,22 +82,25 @@ public class ServerManager {
         return backendServer;
     }
 
-    public void kill(BackendServer serverToDelete, CommandSource source) {
-        String name = serverToDelete.getServerName();
-        if(!serverToDelete.isOnline()) {
+    public void kill(BackendServer serverToKill, CommandSource source) {
+        String name = serverToKill.getServerName();
+        if(!serverToKill.isOnline()) {
             Nebula.util.sendMessage(source, Messages.SERVER_STOPPED.replace("<name>", name));
             return;
         }
-        server.getServer(name).ifPresent(serverInfo -> {
-            for (Player p : serverInfo.getPlayersConnected()) {
-                Nebula.util.connectPlayer(p, Nebula.defaultsManager.getTarget(), true);
-            }
-        });
+        kickAll(serverToKill);
         Nebula.util.sendMessage(source, Messages.KILL_CONTAINER.replace("<name>", name));
-        executeSSHCommand(serverToDelete.getHoldServer(), "docker kill " + name,
+        executeSSHCommand(serverToKill.getHoldServer(), "docker kill " + name,
                 () -> Nebula.util.sendMessage(source, Messages.DONE),
                 () -> Nebula.util.sendMessage(source, Messages.ERROR_KILL.replace("<name>", name))
         );
+    }
+    public void kickAll(BackendServer backendServer) {
+        server.getServer(backendServer.getServerName()).ifPresent(serverInfo -> {
+            for (Player p : serverInfo.getPlayersConnected()) {
+                p.disconnect(Component.empty());
+            }
+        });
     }
 
     public void start(BackendServer serverToStart, CommandSource source) {
@@ -123,7 +128,7 @@ public class ServerManager {
     }
 
     public void delete(BackendServer serverToDelete, CommandSource source) {
-        kill(serverToDelete, source);
+        kickAll(serverToDelete);
         String name = serverToDelete.getServerName();
         HoldServer externalServer = serverToDelete.getHoldServer();
         Nebula.util.sendMessage(source, Messages.DELETE_CONTAINER.replace("<name>", name));
