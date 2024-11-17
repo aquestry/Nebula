@@ -118,11 +118,9 @@ public class ServerManager {
 
     public void pull(HoldServer externalServer, String template, CommandSource source) {
         String externName = externalServer.getServerName();
+        Nebula.util.sendMessage(source, Messages.PULL_TEMPLATE.replace("<name>", externName).replace("<template>", template));
         executeSSHCommand(externalServer, "docker pull " + template,
-                () -> {
-                    Nebula.util.sendMessage(source, Messages.PULL_TEMPLATE.replace("<name>", externName).replace("<template>", template));
-                    Nebula.util.sendMessage(source, Messages.DONE);
-                },
+                () -> Nebula.util.sendMessage(source, Messages.DONE),
                 () -> Nebula.util.sendMessage(source, Messages.ERROR_PULL.replace("<name>", externName).replace("<template>", template))
         );
     }
