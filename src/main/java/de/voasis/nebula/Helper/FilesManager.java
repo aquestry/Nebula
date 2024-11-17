@@ -37,6 +37,8 @@ public class FilesManager {
             Data.defaultmax = config.node("lobby-max").getInt();
             Data.defaultmin = config.node("lobby-min").getInt();
             Data.vsecret = config.node("vsecret").getString();
+            String envVars = config.node("env-vars").getString();
+            Data.envVars = envVars != null ? envVars : "";
             String adminList = config.node("admins").getString();
             Data.adminUUIDs = adminList != null ? List.of(adminList.split(",")) : List.of();
             logger.info("Admin UUIDS: {}", Data.adminUUIDs);
