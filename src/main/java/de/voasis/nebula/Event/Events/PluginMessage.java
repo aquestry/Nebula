@@ -15,8 +15,9 @@ public class PluginMessage {
         String messageContent = new String(event.getData(), StandardCharsets.UTF_8);
         if (event.getIdentifier().equals(Nebula.channel)) {
             if (messageContent.startsWith("lobby:")) {
-                logger.info("Sending to Lobby");
-                Nebula.util.connectPlayer(server.getPlayer(messageContent.replace("lobby:", "")).get(), Nebula.defaultsManager.getTarget(), true);
+                Player player = server.getPlayer(messageContent.replace("lobby:", "")).get();
+                Nebula.util.connectPlayer(player, Nebula.defaultsManager.getTarget(), true);
+                logger.info("Sending {} to a lobby", player.getUsername());
             } else if (messageContent.startsWith("queue:")) {
                 if (messageContent.split(":").length != 3) logger.warn("Incorrect queue plugin message format: {}", messageContent);
                 Optional<Player> player = server.getPlayer(messageContent.split(":")[1]);
