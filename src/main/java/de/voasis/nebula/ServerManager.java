@@ -65,7 +65,7 @@ public class ServerManager {
             }
         }
         int tempPort = externalServer.getFreePort();
-        String command = String.format("docker run -d -e PAPER_VELOCITY_SECRET=%s -p %d:25565 --name %s %s", Data.vsecret, tempPort, FinalNewName, templateName);
+        String command = String.format("docker run -d -e PAPER_VELOCITY_SECRET=%s %s -p %d:25565 --name %s %s", Data.vsecret, Data.envVars, tempPort, FinalNewName, templateName);
         Nebula.util.sendMessage(source, Messages.CREATE_CONTAINER.replace("<name>", FinalNewName));
         BackendServer backendServer = new BackendServer(FinalNewName, externalServer, tempPort, false, source, templateName, tag);
         HoldServer finalExternalServer = externalServer;

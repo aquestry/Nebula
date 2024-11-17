@@ -3,6 +3,8 @@ file-version: 1
 admins: 74401e14-f69c-48f3-b393-64be488dff8f,069a79f4-44e9-4726-a5be-fca90e38aaf5
 # Velocity Secret
 vsecret: <VELOCITY-SECRET>
+# Additional environment variables
+env-vars: FOO=bar,FOO2=bar2
 # Docherhub Template for the Default-Servers.
 lobby-template: anton691/simple-lobby:latest
 # Player limit for default server.
