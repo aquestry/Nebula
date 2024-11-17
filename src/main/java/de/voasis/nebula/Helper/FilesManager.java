@@ -16,8 +16,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class FilesManager {
 
@@ -38,7 +40,7 @@ public class FilesManager {
             Data.defaultmin = config.node("lobby-min").getInt();
             Data.vsecret = config.node("vsecret").getString();
             String envVars = config.node("env-vars").getString();
-            Data.envVars = envVars != null ? envVars : "";
+            Data.envVars = envVars != null ? Arrays.stream(envVars.split(",")).map(s -> " -e "+s).collect(Collectors.joining()) : "";
             String adminList = config.node("admins").getString();
             Data.adminUUIDs = adminList != null ? List.of(adminList.split(",")) : List.of();
             logger.info("Admin UUIDS: {}", Data.adminUUIDs);
