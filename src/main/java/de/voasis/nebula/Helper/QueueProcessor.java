@@ -18,10 +18,16 @@ public class QueueProcessor {
 
     public void process() {
         Data.gamemodeQueueMap.parallelStream().forEach(queue -> {
-            if (queue.isPreload() && !Data.preloadedGameServers.containsKey(queue)) {
-                Data.preloadedGameServers.put(queue, null);
-                BackendServer preloadedServer = queue.createServer(server);
-                Data.preloadedGameServers.put(queue, preloadedServer);
+            if (queue.getPreload() > 0) {
+                if (!Data.preloadedGameServers.containsKey(queue)) Data.preloadedGameServers.put(queue, new ArrayList<>());
+                List<BackendServer> queuePreloadedServer = Data.preloadedGameServers.get(queue);
+                if (queuePreloadedServer.size() < queue.getPreload()) {
+                    int i = queuePreloadedServer.size();
+                    queuePreloadedServer.add(null);
+                    BackendServer preloadedServer = queue.createServer(server);
+                    if (preloadedServer == null) queuePreloadedServer.remove(i);
+                    else queuePreloadedServer.set(i, preloadedServer);
+                }
             }
             int neededPlayers = queue.getNeededPlayers();
             if (queue.getInQueue().size() >= neededPlayers) {
@@ -31,12 +37,12 @@ public class QueueProcessor {
                     queue.getInQueue().removeFirst();
                 }
                 BackendServer newServer;
-                if (queue.isPreload()) newServer = Data.preloadedGameServers.get(queue);
+                if (queue.getPreload() > 0) newServer = Data.preloadedGameServers.get(queue).getFirst();
                 else newServer = queue.createServer(server);
                 for (Player player : playersToMove) {
                     newServer.addPendingPlayerConnection(player);
                 }
-                if (queue.isPreload()) Data.preloadedGameServers.remove(queue);
+                if (queue.getPreload() > 0) Data.preloadedGameServers.get(queue).remove(newServer);
             }
         });
     }

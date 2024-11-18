@@ -18,7 +18,7 @@ public class Data {
     public static List<HoldServer> holdServerMap = new ArrayList<>();
     public static List<BackendServer> backendInfoMap = new ArrayList<>();
     public static List<GamemodeQueue> gamemodeQueueMap = new ArrayList<>();
-    public static Map<GamemodeQueue, BackendServer> preloadedGameServers = new HashMap<>();
+    public static Map<GamemodeQueue, List<BackendServer>> preloadedGameServers = new HashMap<>();
     public static List<String> alltemplates = new ArrayList<>();
     public static String Icon = """
                 \n

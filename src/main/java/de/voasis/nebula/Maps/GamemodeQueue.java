@@ -13,10 +13,10 @@ public class GamemodeQueue {
     private final String name;
     private final String template;
     private final int neededPlayers;
-    private final boolean preload;
+    private final int preload;
     private List<Player> inQueue = new ArrayList<>();
 
-    public GamemodeQueue(String name, String template, int neededPlayers, boolean preload) {
+    public GamemodeQueue(String name, String template, int neededPlayers, int preload) {
         this.name = name;
         this.template = template;
         this.neededPlayers = neededPlayers;
@@ -36,5 +36,5 @@ public class GamemodeQueue {
     public String getTemplate() { return template; }
     public int getNeededPlayers() { return neededPlayers; }
     public List<Player> getInQueue() { return inQueue; }
-    public boolean isPreload() { return preload; }
+    public int getPreload() { return preload; }
 }

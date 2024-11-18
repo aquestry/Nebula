@@ -25,4 +25,4 @@ gamemodes:
   Duels:
     templateName: anton691/simple-duels:latest
     neededPlayers: 2
-    preload: false
+    preload: 0
