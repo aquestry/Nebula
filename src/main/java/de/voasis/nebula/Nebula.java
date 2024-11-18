@@ -60,6 +60,7 @@ public class Nebula {
                 .buildTask(this, this::Update)
                 .repeat(1, TimeUnit.SECONDS)
                 .schedule();
+        util.finalizeStartup();
     }
 
     private void Update() {
