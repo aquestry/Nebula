@@ -42,7 +42,7 @@ public class DefaultsManager {
     private List<BackendServer> getAvailableServers() {
         List<BackendServer> servers = new ArrayList<>();
         for (BackendServer server : Data.backendInfoMap) {
-            if (server.getTag().equals("lobby") && server.isOnline()) {
+            if (server.getFlags().contains("lobby") && server.isOnline()) {
                 servers.add(server);
             }
         }

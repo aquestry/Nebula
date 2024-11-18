@@ -70,8 +70,9 @@ public class FilesManager {
                 for (Object queueName : gamemodes.keySet()) {
                     String template = config.node("gamemodes", queueName, "templateName").getString();
                     int neededPlayers = config.node("gamemodes", queueName, "neededPlayers").getInt();
+                    int preload = config.node("gamemodes", queueName, "preload").getInt();
                     Data.alltemplates.add(template);
-                    Data.gamemodeQueueMap.add(new GamemodeQueue(queueName.toString(), template, neededPlayers));
+                    Data.gamemodeQueueMap.add(new GamemodeQueue(queueName.toString(), template, neededPlayers, preload));
                     logger.info("Added gamemode to pool: {}, {}, {}.", queueName, template, neededPlayers);
                 }
             }

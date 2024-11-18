@@ -26,17 +26,32 @@ public class QueueProcessor {
                     playersToMove.add(queue.getInQueue().getFirst());
                     queue.getInQueue().removeFirst();
                 }
-                String name = queue.getName() + "-" + Nebula.util.generateUniqueString();
-                BackendServer newServer = Nebula.serverManager.createFromTemplate(
-                        queue.getTemplate(),
-                        name,
-                        server.getConsoleCommandSource(),
-                        "gamemode:" + queue.getName()
-                );
+                BackendServer proccesServer = getServer(queue);
                 for (Player player : playersToMove) {
-                    newServer.addPendingPlayerConnection(player);
+                    proccesServer.addPendingPlayerConnection(player);
                 }
+                Nebula.util.callPending(proccesServer);
             }
         }
+    }
+
+    private BackendServer getServer(GamemodeQueue queue) {
+        for(BackendServer backendServer : Data.backendInfoMap) {
+            if(backendServer.getFlags().contains("gamemode:" + queue.getName()) && backendServer.getFlags().contains("preload") && backendServer.isOnline()) {
+                backendServer.removeFlag("preload");
+                createNew(queue).addFlag("preload");
+                return backendServer;
+            }
+        }
+        return createNew(queue);
+    }
+
+    public BackendServer createNew(GamemodeQueue queue) {
+        String name = queue.getName() + "-" + Nebula.util.generateUniqueString();
+        return Nebula.serverManager.createFromTemplate(
+                queue.getTemplate(),
+                name,
+                server.getConsoleCommandSource(),
+                "gamemode:" + queue.getName());
     }
 }

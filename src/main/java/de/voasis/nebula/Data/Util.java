@@ -72,9 +72,7 @@ public class Util {
             }
             channelExec.disconnect();
             session.disconnect();
-            if (freePort > 0) {
-                externalServer.setFreePort(freePort);
-            }
+            externalServer.setFreePort(Math.max(freePort, 0));
         } catch (Exception e) {
             logger.error("Failed to fetch free port via SSH on server: {}", externalServer.getServerName());
         }
@@ -87,22 +85,35 @@ public class Util {
         }
     }
 
+    public void finalizeStartup() {
+        for (GamemodeQueue queue : Data.gamemodeQueueMap) {
+            int preloadCount = queue.getPreload();
+            for (int i = 0; i < preloadCount; i++) {
+                Nebula.queueProcessor.createNew(queue).addFlag("preload");
+            }
+        }
+    }
+
     public Callable<Void> stateComplete(RegisteredServer registeredServer) {
         return () -> {
             for (BackendServer backendServer : Data.backendInfoMap) {
                 if (registeredServer.getServerInfo().getName().equals(backendServer.getServerName())) {
                     if (!backendServer.isOnline()) {
                         backendServer.setOnline(true);
+                        callPending(backendServer);
                         CommandSource creator = backendServer.getCreator();
-                        for(Player p : backendServer.getPendingPlayerConnections()) {
-                            connectPlayer(p, backendServer, false);
-                        }
                         sendMessage(creator, Messages.ONLINE.replace("<name>", backendServer.getServerName()));
                     }
                 }
             }
             return null;
         };
+    }
+
+    public void callPending(BackendServer backendServer) {
+        for(Player p : backendServer.getPendingPlayerConnections()) {
+            connectPlayer(p, backendServer, false);
+        }
     }
 
     public Callable<Void> stateCompleteFailed(RegisteredServer registeredServer) {
@@ -139,12 +150,12 @@ public class Util {
     }
 
     public void joinQueue(Player player, String queueName) {
-        if (isInAnyQueue(player)) {
-            player.sendMessage(mm.deserialize(Messages.ALREADY_IN_QUEUE));
+        if(!Nebula.util.getBackendServer(player.getCurrentServer().get().getServerInfo().getName()).getFlags().contains("lobby")) {
+            player.sendMessage(mm.deserialize(Messages.LOBBY_ONLY));
             return;
         }
-        if(!Objects.equals(Nebula.util.getBackendServer(player.getCurrentServer().get().getServerInfo().getName()).getTag(), "lobby")) {
-            player.sendMessage(mm.deserialize(Messages.LOBBY_ONLY));
+        if (isInAnyQueue(player)) {
+            player.sendMessage(mm.deserialize(Messages.ALREADY_IN_QUEUE));
             return;
         }
         Data.gamemodeQueueMap.stream()

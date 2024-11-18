@@ -50,36 +50,45 @@ public class ServerManager {
         }
     }
 
-    public BackendServer createFromTemplate(String templateName, String newName, CommandSource source, String tag) {
-        HoldServer externalServer = Data.holdServerMap.getFirst();
-        for(HoldServer holdServer : Data.holdServerMap) {
-            if(holdServer.getBackendServers().size() < externalServer.getBackendServers().size()) {
-                externalServer = holdServer;
+    public BackendServer createFromTemplate(String templateName, String newName, CommandSource source, String starterFlag) {
+        try {
+            HoldServer externalServer = Data.holdServerMap.getFirst();
+            for(HoldServer holdServer : Data.holdServerMap) {
+                if(holdServer.getBackendServers().size() < externalServer.getBackendServers().size()) {
+                    externalServer = holdServer;
+                }
             }
-        }
-        String FinalNewName = newName + "-" + externalServer.getServerName();
-        for (BackendServer backendServer : Data.backendInfoMap) {
-            if (backendServer.getServerName().equals(FinalNewName)) {
-                Nebula.util.sendMessage(source, Messages.ALREADY_EXISTS.replace("<name>", FinalNewName));
-                return null;
+            while(externalServer.getFreePort() == 0) {
+                Nebula.util.updateFreePort(externalServer);
+                Thread.sleep(100);
             }
+            int tempPort = externalServer.getFreePort();
+            String FinalNewName = newName + "-" + externalServer.getServerName();
+            for (BackendServer backendServer : Data.backendInfoMap) {
+                if (backendServer.getServerName().equals(FinalNewName)) {
+                    Nebula.util.sendMessage(source, Messages.ALREADY_EXISTS.replace("<name>", FinalNewName));
+                    return null;
+                }
+            }
+
+            String command = String.format("docker run -d -e PAPER_VELOCITY_SECRET=%s %s -p %d:25565 --name %s %s", Data.vsecret, Data.envVars, tempPort, FinalNewName, templateName);
+            Nebula.util.sendMessage(source, Messages.CREATE_CONTAINER.replace("<name>", FinalNewName));
+            BackendServer backendServer = new BackendServer(FinalNewName, externalServer, tempPort, false, source, templateName, starterFlag);
+            HoldServer finalExternalServer = externalServer;
+            executeSSHCommand(externalServer, command,
+                    () -> {
+                        ServerInfo newInfo = new ServerInfo(FinalNewName, new InetSocketAddress(finalExternalServer.getIp(), tempPort));
+                        server.registerServer(newInfo);
+                        Data.backendInfoMap.add(backendServer);
+                        Nebula.util.updateFreePort(finalExternalServer);
+                        Nebula.util.sendMessage(source, Messages.DONE);
+                    },
+                    () -> Nebula.util.sendMessage(source, Messages.ERROR_CREATE.replace("<name>", FinalNewName))
+            );
+            return backendServer;
+        } catch (Exception e) {
+            return null;
         }
-        int tempPort = externalServer.getFreePort();
-        String command = String.format("docker run -d -e PAPER_VELOCITY_SECRET=%s %s -p %d:25565 --name %s %s", Data.vsecret, Data.envVars, tempPort, FinalNewName, templateName);
-        Nebula.util.sendMessage(source, Messages.CREATE_CONTAINER.replace("<name>", FinalNewName));
-        BackendServer backendServer = new BackendServer(FinalNewName, externalServer, tempPort, false, source, templateName, tag);
-        HoldServer finalExternalServer = externalServer;
-        executeSSHCommand(externalServer, command,
-                () -> {
-                    ServerInfo newInfo = new ServerInfo(FinalNewName, new InetSocketAddress(finalExternalServer.getIp(), tempPort));
-                    server.registerServer(newInfo);
-                    Data.backendInfoMap.add(backendServer);
-                    Nebula.util.updateFreePort(finalExternalServer);
-                    Nebula.util.sendMessage(source, Messages.DONE);
-                },
-                () -> Nebula.util.sendMessage(source, Messages.ERROR_CREATE.replace("<name>", FinalNewName))
-        );
-        return backendServer;
     }
 
     public void kill(BackendServer serverToKill, CommandSource source) {
