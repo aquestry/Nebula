@@ -3,6 +3,7 @@ package de.voasis.nebula.Helper;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.nebula.Data.Data;
+import de.voasis.nebula.Data.Util;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.GamemodeQueue;
 import de.voasis.nebula.Nebula;
@@ -18,7 +19,18 @@ public class QueueProcessor {
     }
 
     public void process() {
-        for (GamemodeQueue queue : Data.gamemodeQueueMap) {
+        Data.gamemodeQueueMap.parallelStream().forEach(queue -> {
+            if (queue.isPreload() && !Data.preloadedGameServers.containsKey(queue)) {
+                Data.preloadedGameServers.put(queue, null);
+                String name = queue.getName() + "-" + Util.generateUniqueString();
+                BackendServer preloadedServer = Nebula.serverManager.createFromTemplate(
+                        queue.getTemplate(),
+                        name,
+                        server.getConsoleCommandSource(),
+                        "gamemode:" + queue.getName()
+                );
+                Data.preloadedGameServers.put(queue, preloadedServer);
+            }
             int neededPlayers = queue.getNeededPlayers();
             if (queue.getInQueue().size() >= neededPlayers) {
                 List<Player> playersToMove = new ArrayList<>();
@@ -26,17 +38,22 @@ public class QueueProcessor {
                     playersToMove.add(queue.getInQueue().getFirst());
                     queue.getInQueue().removeFirst();
                 }
-                String name = queue.getName() + "-" + Nebula.util.generateUniqueString();
-                BackendServer newServer = Nebula.serverManager.createFromTemplate(
-                        queue.getTemplate(),
-                        name,
-                        server.getConsoleCommandSource(),
-                        "gamemode:" + queue.getName()
-                );
+                BackendServer newServer;
+                if (queue.isPreload()) newServer = Data.preloadedGameServers.get(queue);
+                else {
+                    String name = queue.getName() + "-" + Util.generateUniqueString();
+                    newServer = Nebula.serverManager.createFromTemplate(
+                            queue.getTemplate(),
+                            name,
+                            server.getConsoleCommandSource(),
+                            "gamemode:" + queue.getName()
+                    );
+                }
                 for (Player player : playersToMove) {
                     newServer.addPendingPlayerConnection(player);
                 }
+                if (queue.isPreload()) Data.preloadedGameServers.remove(queue);
             }
-        }
+        });
     }
 }
