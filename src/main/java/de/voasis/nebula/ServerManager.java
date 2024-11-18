@@ -104,6 +104,7 @@ public class ServerManager {
                 () -> Nebula.util.sendMessage(source, Messages.ERROR_KILL.replace("<name>", name))
         );
     }
+
     public void kickAll(BackendServer backendServer) {
         server.getServer(backendServer.getServerName()).ifPresent(serverInfo -> {
             for (Player p : serverInfo.getPlayersConnected()) {
