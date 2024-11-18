@@ -23,7 +23,7 @@ public class AutoDeleter {
                 continue;
             }
             boolean conditionsMet = Nebula.util.getPlayerCount(backendServer) == 0 &&
-                    backendServer.getPendingPlayerConnections().isEmpty();
+                    backendServer.getPendingPlayerConnections().isEmpty() && !backendServer.isPreloadedGameServer();
             if (backendServer.getTag().equals("lobby")) {
                 conditionsMet = conditionsMet && !lobbyServerDeleted && canDeleteLobbyServer(backendServer);
             }
