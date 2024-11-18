@@ -22,13 +22,7 @@ public class QueueProcessor {
         Data.gamemodeQueueMap.parallelStream().forEach(queue -> {
             if (queue.isPreload() && !Data.preloadedGameServers.containsKey(queue)) {
                 Data.preloadedGameServers.put(queue, null);
-                String name = queue.getName() + "-" + Util.generateUniqueString();
-                BackendServer preloadedServer = Nebula.serverManager.createFromTemplate(
-                        queue.getTemplate(),
-                        name,
-                        server.getConsoleCommandSource(),
-                        "gamemode:" + queue.getName()
-                );
+                BackendServer preloadedServer = queue.createServer(server);
                 Data.preloadedGameServers.put(queue, preloadedServer);
             }
             int neededPlayers = queue.getNeededPlayers();
@@ -40,15 +34,7 @@ public class QueueProcessor {
                 }
                 BackendServer newServer;
                 if (queue.isPreload()) newServer = Data.preloadedGameServers.get(queue);
-                else {
-                    String name = queue.getName() + "-" + Util.generateUniqueString();
-                    newServer = Nebula.serverManager.createFromTemplate(
-                            queue.getTemplate(),
-                            name,
-                            server.getConsoleCommandSource(),
-                            "gamemode:" + queue.getName()
-                    );
-                }
+                else newServer = queue.createServer(server);
                 for (Player player : playersToMove) {
                     newServer.addPendingPlayerConnection(player);
                 }

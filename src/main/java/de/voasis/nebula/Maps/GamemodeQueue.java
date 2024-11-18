@@ -1,6 +1,11 @@
 package de.voasis.nebula.Maps;
 
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ProxyServer;
+import de.voasis.nebula.Data.Data;
+import de.voasis.nebula.Data.Util;
+import de.voasis.nebula.Nebula;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +22,15 @@ public class GamemodeQueue {
         this.template = template;
         this.neededPlayers = neededPlayers;
         this.preload = preload;
+    }
+
+    public BackendServer createServer(ProxyServer server) {
+        return Nebula.serverManager.createFromTemplate(
+                getTemplate(),
+                getName() + "-" + Util.generateUniqueString(),
+                server.getConsoleCommandSource(),
+                "gamemode:" + getName()
+        );
     }
 
     public String getName() { return name; }
