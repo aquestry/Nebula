@@ -2,7 +2,6 @@ package de.voasis.nebula.Maps;
 
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Data.Util;
 import de.voasis.nebula.Nebula;
 
