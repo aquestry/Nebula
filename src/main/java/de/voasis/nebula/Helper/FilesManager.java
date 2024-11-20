@@ -92,7 +92,6 @@ public class FilesManager {
         try {
             String prefix = messages.node("prefix").getString("[Server] ");
             Messages.PREFIX = prefix;
-            Messages.NO_PERMISSION = messages.node("no-permission").getString("<pre>You don't have permission to execute this command.").replace("<pre>", prefix);
             Messages.USAGE_ADMIN = messages.node("admin", "usage").getString("<pre>Usage: /admin <stop|delete|template> <args...>").replace("<pre>", prefix);
             Messages.KILL_CONTAINER = messages.node("admin", "kill-start").getString("<pre>Killing server instance <name>.").replace("<pre>", prefix);
             Messages.DELETE_CONTAINER = messages.node("admin", "delete-start").getString("<pre>Deleting server instance <name>.").replace("<pre>", prefix);
@@ -119,7 +118,6 @@ public class FilesManager {
             Messages.NOT_IN_QUEUE = messages.node("queue", "not-in-queue").getString("<pre>You are in no queue.").replace("<pre>", prefix);
             Messages.LOBBY_ONLY = messages.node("queue", "lobby-only").getString("<pre>You can only join a queue from the lobby.").replace("<pre>", prefix);
             Messages.QUEUE_NOT_FOUND = messages.node("queue", "queue-not-found").getString("<pre>Queue not found.").replace("<pre>", prefix);
-            Messages.SHUTDOWN = messages.node("shutdown", "message").getString("<pre>Shutdown! Reason: <reason>").replace("<pre>", prefix);
         } catch (Exception e) {
             logger.error("Error loading message strings", e);
             server.shutdown();

@@ -11,7 +11,6 @@ public class Messages {
     public static String START_CONTAINER;
     public static String SERVER_RUNNING;
     public static String SERVER_STOPPED;
-    public static String TEMPLATE_EXISTS;
     public static String SERVER_NOT_FOUND;
     public static String SERVER_CONNECT;
     public static String ALREADY_EXISTS;
@@ -29,6 +28,4 @@ public class Messages {
     public static String NOT_IN_QUEUE;
     public static String LOBBY_ONLY;
     public static String QUEUE_NOT_FOUND;
-    public static String SHUTDOWN;
-    public static String NO_PERMISSION;
 }

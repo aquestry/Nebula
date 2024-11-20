@@ -4,7 +4,6 @@ file-version: 1
 # Prefix before each message.
 prefix: "[Server] "
 # <pre> is a placeholder for the prefix.
-no-permission: "<pre>You don't have permission to execute this command."
 admin:
   usage: "<pre>Usage: /admin <stop|delete|template> <args...>"
   kill-start: "<pre>Killing server instance <name>."
@@ -35,5 +34,3 @@ util:
   server-online: "<pre>Server <name> is now online."
   server-offline: "<pre>Server <name> is now offline."
   server-connect: "<green>Connecting to server <name>..."
-shutdown:
-  message: "Shutdown! Reason: <reason>"
