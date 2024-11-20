@@ -17,7 +17,6 @@ public class AutoDeleter {
         long currentTime = System.currentTimeMillis();
         List<BackendServer> serversToDelete = new ArrayList<>();
         boolean lobbyServerDeleted = false;
-
         for (BackendServer backendServer : Data.backendInfoMap) {
             if (backendServer.getFlags().contains("custom")) {
                 continue;

@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("ALL")
 public class DefaultsManager {
 
     private final ProxyServer server;
@@ -97,9 +96,9 @@ public class DefaultsManager {
         return null;
     }
 
-    public BackendServer createDefault() {
+    public void createDefault() {
         String name = "Lobby-" + Nebula.util.generateUniqueString();
-        return Nebula.serverManager.createFromTemplate(
+        Nebula.serverManager.createFromTemplate(
                 Data.defaultServerTemplate,
                 name,
                 server.getConsoleCommandSource(),

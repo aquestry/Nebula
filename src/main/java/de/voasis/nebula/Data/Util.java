@@ -26,7 +26,7 @@ public class Util {
     private MiniMessage mm = MiniMessage.miniMessage();
     static Object plugin;
     private static final int LENGTH = 5;
-    private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyz0123456789";
+    private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyz0123456789#<>+";
     private static final Set<String> generatedStrings = new HashSet<>();
     private static final Random random = new Random();
 
@@ -94,7 +94,7 @@ public class Util {
         }
     }
 
-    public Callable<Void> stateComplete(RegisteredServer registeredServer) {
+    private Callable<Void> stateComplete(RegisteredServer registeredServer) {
         return () -> {
             for (BackendServer backendServer : Data.backendInfoMap) {
                 if (registeredServer.getServerInfo().getName().equals(backendServer.getServerName())) {

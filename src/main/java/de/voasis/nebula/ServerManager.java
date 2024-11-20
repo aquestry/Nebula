@@ -12,12 +12,12 @@ import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Maps.HoldServer;
 import net.kyori.adventure.text.Component;
-
 import java.net.InetSocketAddress;
 
 public class ServerManager {
 
     private final ProxyServer server;
+
     public ServerManager(ProxyServer proxyServer) {
         this.server = proxyServer;
     }
@@ -70,7 +70,6 @@ public class ServerManager {
                     return null;
                 }
             }
-
             String command = String.format("docker run -d -e PAPER_VELOCITY_SECRET=%s %s -p %d:25565 --name %s %s", Data.vsecret, Data.envVars, tempPort, FinalNewName, templateName);
             Nebula.util.sendMessage(source, Messages.CREATE_CONTAINER.replace("<name>", FinalNewName));
             BackendServer backendServer = new BackendServer(FinalNewName, externalServer, tempPort, false, source, templateName, starterFlag);
@@ -105,7 +104,7 @@ public class ServerManager {
         );
     }
 
-    public void kickAll(BackendServer backendServer) {
+    private void kickAll(BackendServer backendServer) {
         server.getServer(backendServer.getServerName()).ifPresent(serverInfo -> {
             for (Player p : serverInfo.getPlayersConnected()) {
                 p.disconnect(Component.empty());

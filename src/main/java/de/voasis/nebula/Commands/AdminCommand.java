@@ -6,21 +6,18 @@ import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Data.Messages;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Nebula;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 public class AdminCommand implements SimpleCommand {
 
-    private MiniMessage mm = MiniMessage.miniMessage();
-
     @Override
     public void execute(Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
         if (args.length == 0 || args.length < 2) {
-            source.sendMessage(mm.deserialize(Messages.USAGE_ADMIN));
+            Nebula.util.sendMessage(source, Messages.USAGE_ADMIN);
             return;
         }
         switch (args[0].toLowerCase()) {
@@ -35,13 +32,13 @@ public class AdminCommand implements SimpleCommand {
                 break;
             case "template":
                 if (args.length < 3) {
-                    source.sendMessage(mm.deserialize(Messages.USAGE_ADMIN));
+                    Nebula.util.sendMessage(source, Messages.USAGE_ADMIN);
                     return;
                 }
                 handleTemplateCommand(source, args);
                 break;
             default:
-                source.sendMessage(mm.deserialize(Messages.USAGE_ADMIN));
+                Nebula.util.sendMessage(source, Messages.USAGE_ADMIN);
                 break;
         }
     }
@@ -49,7 +46,7 @@ public class AdminCommand implements SimpleCommand {
     private void handleKillCommand(CommandSource source, String[] args) {
         BackendServer backendServer = Nebula.util.getBackendServer(args[1]);
         if(backendServer == null) {
-            source.sendMessage(mm.deserialize(Messages.SERVER_NOT_FOUND.replace("<name>", args[1])));
+            Nebula.util.sendMessage(source, Messages.SERVER_NOT_FOUND.replace("<name>", args[1]));
         } else {
             Nebula.serverManager.kill(backendServer, source);
         }
@@ -58,7 +55,7 @@ public class AdminCommand implements SimpleCommand {
     private void handleStartCommand(CommandSource source, String[] args) {
         BackendServer backendServer = Nebula.util.getBackendServer(args[1]);
         if(backendServer == null) {
-            source.sendMessage(mm.deserialize(Messages.SERVER_NOT_FOUND.replace("<name>", args[1])));
+            Nebula.util.sendMessage(source, Messages.SERVER_NOT_FOUND.replace("<name>", args[1]));
         } else {
             Nebula.serverManager.start(backendServer, source);
         }
@@ -67,7 +64,7 @@ public class AdminCommand implements SimpleCommand {
     private void handleDeleteCommand(CommandSource source, String[] args) {
         BackendServer backendServer = Nebula.util.getBackendServer(args[1]);
         if(backendServer == null) {
-            source.sendMessage(mm.deserialize(Messages.SERVER_NOT_FOUND.replace("<name>", args[1])));
+            Nebula.util.sendMessage(source, Messages.SERVER_NOT_FOUND.replace("<name>", args[1]));
         } else {
             Nebula.serverManager.delete(backendServer, source);
         }

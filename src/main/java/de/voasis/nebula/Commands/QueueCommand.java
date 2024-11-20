@@ -6,21 +6,18 @@ import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Data.Messages;
 import de.voasis.nebula.Maps.GamemodeQueue;
 import de.voasis.nebula.Nebula;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class QueueCommand implements SimpleCommand {
 
-    private MiniMessage mm = MiniMessage.miniMessage();
-
     @Override
     public void execute(Invocation invocation) {
         String[] args = invocation.arguments();
         if (invocation.source() instanceof Player player) {
             if (args.length == 0) {
-                player.sendMessage(mm.deserialize(Messages.USAGE_QUEUE));
+                Nebula.util.sendMessage(player, Messages.USAGE_QUEUE);
                 return;
             }
             switch (args[0]) {
@@ -29,10 +26,10 @@ public class QueueCommand implements SimpleCommand {
                     if (args.length == 2) {
                         Nebula.util.joinQueue(player, args[1]);
                     } else {
-                        player.sendMessage(mm.deserialize(Messages.USAGE_QUEUE));
+                        Nebula.util.sendMessage(player, Messages.USAGE_QUEUE);
                     }
                 }
-                default -> player.sendMessage(mm.deserialize(Messages.USAGE_QUEUE));
+                default -> Nebula.util.sendMessage(player, Messages.USAGE_QUEUE);
             }
         }
     }

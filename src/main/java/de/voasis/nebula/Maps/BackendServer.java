@@ -2,7 +2,6 @@ package de.voasis.nebula.Maps;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
-import de.voasis.nebula.Data.Data;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,16 +23,7 @@ public class BackendServer {
         this.online = online;
         this.creator = creator;
         this.template = template;
-        if(starterFlag != null) {
-            flags.add(starterFlag);
-        }
-    }
-
-    public boolean isPreloadedGameServer() {
-        for (List<BackendServer> backendServers: Data.preloadedGameServers.values()) {
-            if (backendServers.contains(this)) return true;
-        }
-        return false;
+        this.flags.add(starterFlag);
     }
 
     public String getServerName() { return serverName; }
