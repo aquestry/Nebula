@@ -106,17 +106,13 @@ public class Util {
             registeredServer.ifPresent(regServer -> regServer.ping().whenComplete((result, exception) -> {
                 if (exception == null) {
                     try {
-                        synchronized (plugin) {
-                            stateCompleteFailed(regServer);
-                        }
+                        stateComplete(regServer);
                     } catch (Exception e) {
                         logger.error("Error while executing success response for server: {}", regServer.getServerInfo().getName(), e);
                     }
                 } else {
                     try {
-                        synchronized (plugin) {
-                            stateComplete(regServer);
-                        }
+                        stateCompleteFailed(regServer);
                     } catch (Exception e) {
                         logger.error("Error while executing failure response for server: {}", regServer.getServerInfo().getName(), e);
                     }
