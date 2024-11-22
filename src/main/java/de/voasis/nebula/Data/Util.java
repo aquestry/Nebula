@@ -13,7 +13,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.InputStream;
 import java.util.*;
 
 public class Util {
@@ -24,6 +23,7 @@ public class Util {
     static Object plugin;
     private static final int LENGTH = 5;
     private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyz0123456789#<>+";
+    private static HashMap<CommandSource, String> lastMessages = new HashMap<>();
     private static final Set<String> generatedStrings = new HashSet<>();
     private static final Random random = new Random();
 
@@ -60,10 +60,9 @@ public class Util {
             String command = "ruby -e 'require \"socket\"; puts Addrinfo.tcp(\"\", 0).bind {|s| s.local_address.ip_port }'";
             ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
             channelExec.setCommand(command);
-            InputStream in = channelExec.getInputStream();
             channelExec.connect();
             byte[] tmp = new byte[1024];
-            int i = in.read(tmp, 0, 1024);
+            int i = channelExec.getInputStream().read(tmp, 0, 1024);
             if (i != -1) {
                 freePort = Integer.parseInt(new String(tmp, 0, i).trim());
             }
@@ -162,8 +161,11 @@ public class Util {
     public void sendMessage(CommandSource source, String message) {
         source = source != null ? source : server.getConsoleCommandSource();
         logger.info(message.replaceAll("<.*?>", ""));
-        if (source != server.getConsoleCommandSource()) {
-            source.sendMessage(mm.deserialize(message));
+        String lastMessage = lastMessages.get(source);
+        if (message.equals(lastMessage)) {
+            return;
         }
+        source.sendMessage(mm.deserialize(message));
+        lastMessages.put(source, message);
     }
 }
