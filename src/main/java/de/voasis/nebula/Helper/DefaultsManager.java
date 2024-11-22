@@ -4,15 +4,12 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Nebula;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultsManager {
 
     private final ProxyServer server;
-    private final Logger logger = LoggerFactory.getLogger("nebula");
     private final int max;
     private final int min;
 

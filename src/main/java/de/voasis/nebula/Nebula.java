@@ -16,8 +16,6 @@ import de.voasis.nebula.Data.Util;
 import de.voasis.nebula.Event.EventManager;
 import de.voasis.nebula.Helper.*;
 import de.voasis.nebula.Helper.PermissionManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
@@ -25,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 public class Nebula {
 
     private ProxyServer server;
-    private final Logger logger = LoggerFactory.getLogger("nebula");
     public static ChannelIdentifier channel = MinecraftChannelIdentifier.create("nebula", "main");
     public static FilesManager filesManager;
     public static ServerManager serverManager;
@@ -36,11 +33,11 @@ public class Nebula {
     public static Util util;
 
     @Inject
-    public Nebula(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
+    public Nebula(ProxyServer server, @DataDirectory Path dataDirectory) {
         this.server = server;
         permissionManager  = new PermissionManager();
-        filesManager = new FilesManager(server);
         util = new Util(server, this);
+        filesManager = new FilesManager(server);
         serverManager = new ServerManager(server);
         filesManager.loadFiles(dataDirectory);
         filesManager.load();
@@ -53,7 +50,7 @@ public class Nebula {
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         registerCommands();
-        logger.info(Data.Icon);
+        util.log(Data.Icon);
         server.getChannelRegistrar().register(channel);
         server.getEventManager().register(this, new EventManager(server));
         server.getScheduler()

@@ -6,8 +6,6 @@ import de.voasis.nebula.Data.Messages;
 import de.voasis.nebula.Maps.GamemodeQueue;
 import de.voasis.nebula.Maps.HoldServer;
 import de.voasis.nebula.Nebula;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 import java.io.File;
@@ -23,7 +21,6 @@ import java.util.stream.Collectors;
 
 public class FilesManager {
 
-    private final Logger logger = LoggerFactory.getLogger("nebula");
     private ConfigurationNode config;
     private ConfigurationNode messages;
     private final ProxyServer server;
@@ -43,7 +40,7 @@ public class FilesManager {
             Data.envVars = envVars != null ? Arrays.stream(envVars.split(",")).map(s -> " -e "+s).collect(Collectors.joining()) : "";
             String adminList = config.node("admins").getString();
             Data.adminUUIDs = adminList != null ? List.of(adminList.split(",")) : List.of();
-            logger.info("Admin UUIDS: {}", Data.adminUUIDs);
+            Nebula.util.log("Admin UUIDS: {}", Data.adminUUIDs);
             Data.holdServerMap.clear();
             Map<Object, ? extends ConfigurationNode> managerServers = config.node("manager-servers").childrenMap();
             if (managerServers != null) {
@@ -52,17 +49,17 @@ public class FilesManager {
                     String username = config.node("manager-servers", serverName, "username").getString();
                     String password = config.node("manager-servers", serverName, "password").getString();
                     if (ip == null || username == null || password == null) {
-                        logger.warn("Incomplete configuration for server '{}'. Skipping this server.", serverName);
+                        Nebula.util.log("Incomplete configuration for server '{}'. Skipping this server.", serverName);
                         continue;
                     }
                     HoldServer holdServer = new HoldServer(serverName.toString(), ip, password, 0, username);
                     Data.holdServerMap.add(holdServer);
                     Nebula.util.updateFreePort(holdServer);
-                    logger.info("Added hold server to pool: {}", serverName);
+                    Nebula.util.log("Added hold server to pool: {}", serverName);
                 }
             }
             if (Data.holdServerMap.isEmpty()) {
-                logger.warn("NO HOLD SERVERS FOUND!!! SHUTTING DOWN!!!");
+                Nebula.util.log("NO HOLD SERVERS FOUND!!! SHUTTING DOWN!!!");
                 server.shutdown();
             }
             Map<Object, ? extends ConfigurationNode> gamemodes = config.node("gamemodes").childrenMap();
@@ -73,7 +70,7 @@ public class FilesManager {
                     int preload = config.node("gamemodes", queueName, "preload").getInt();
                     Data.alltemplates.add(template);
                     Data.gamemodeQueueMap.add(new GamemodeQueue(queueName.toString(), template, neededPlayers, preload));
-                    logger.info("Added gamemode to pool: {}, {}, {}.", queueName, template, neededPlayers);
+                    Nebula.util.log("Added gamemode to pool: {}, {}, {}.", queueName, template, neededPlayers);
                 }
             }
             Data.alltemplates.add(Data.defaultServerTemplate);
@@ -83,7 +80,7 @@ public class FilesManager {
                 }
             }
         } catch (Exception e) {
-            logger.error("Error in configuration loading", e);
+            Nebula.util.log("Error in configuration loading", e);
             server.shutdown();
         }
     }
@@ -119,7 +116,7 @@ public class FilesManager {
             Messages.LOBBY_ONLY = messages.node("queue", "lobby-only").getString("<pre>You can only join a queue from the lobby.").replace("<pre>", prefix);
             Messages.QUEUE_NOT_FOUND = messages.node("queue", "queue-not-found").getString("<pre>Queue not found.").replace("<pre>", prefix);
         } catch (Exception e) {
-            logger.error("Error loading message strings", e);
+            Nebula.util.log("Error loading message strings", e);
             server.shutdown();
         }
     }
@@ -140,7 +137,7 @@ public class FilesManager {
             }
             messages = YamlConfigurationLoader.builder().file(messagesFile).build().load();
         } catch (IOException e) {
-            logger.error("Error loading configuration files.", e);
+            Nebula.util.log("Error loading configuration files.", e);
             server.shutdown();
         }
     }
@@ -149,14 +146,14 @@ public class FilesManager {
         try (InputStream resourceStream = getClass().getResourceAsStream("/" + resourceName);
              FileOutputStream outputStream = new FileOutputStream(destination)) {
             if (resourceStream == null) {
-                logger.warn("Resource '{}' not found in JAR.", resourceName);
+                Nebula.util.log("Resource '{}' not found in JAR.", resourceName);
                 destination.createNewFile();
             } else {
                 resourceStream.transferTo(outputStream);
-                logger.info("Copied default '{}' to plugin directory.", resourceName);
+                Nebula.util.log("Copied default '{}' to plugin directory.", resourceName);
             }
         } catch (IOException e) {
-            logger.error("Error copying resource file '{}'", resourceName, e);
+            Nebula.util.log("Error copying resource file '{}'", resourceName, e);
         }
     }
 }

@@ -6,8 +6,6 @@ import com.velocitypowered.api.permission.Tristate;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.permission.PermissionProvider;
 import com.velocitypowered.api.permission.PermissionSubject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -16,7 +14,6 @@ import java.util.Set;
 public class PermissionManager implements PermissionProvider {
 
     private final Map<Player, Set<String>> playerPermissions = new HashMap<>();
-    private final Logger logger = LoggerFactory.getLogger("nebula");
 
     public void addPermission(Player player, String permission) {
         playerPermissions.computeIfAbsent(player, k -> new HashSet<>()).add(permission);

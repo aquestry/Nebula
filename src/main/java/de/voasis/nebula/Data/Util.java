@@ -9,16 +9,14 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.Maps.BackendServer;
 import de.voasis.nebula.Maps.HoldServer;
+import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.*;
 
 public class Util {
 
     static ProxyServer server;
-    private final Logger logger = LoggerFactory.getLogger("nebula");
     private MiniMessage mm = MiniMessage.miniMessage();
     static Object plugin;
     private static final int LENGTH = 5;
@@ -70,7 +68,7 @@ public class Util {
             session.disconnect();
             externalServer.setFreePort(Math.max(freePort, 0));
         } catch (Exception e) {
-            logger.error("Failed to fetch free port via SSH on server: {}", externalServer.getServerName());
+            Nebula.util.log("Failed to fetch free port via SSH on server: {}", externalServer.getServerName());
         }
     }
 
@@ -107,13 +105,13 @@ public class Util {
                     try {
                         stateComplete(regServer);
                     } catch (Exception e) {
-                        logger.error("Error while executing success response for server: {}", regServer.getServerInfo().getName(), e);
+                        log("Error while executing success response for server: {}", regServer.getServerInfo().getName());
                     }
                 } else {
                     try {
                         stateCompleteFailed(regServer);
                     } catch (Exception e) {
-                        logger.error("Error while executing failure response for server: {}", regServer.getServerInfo().getName(), e);
+                        log("Error while executing failure response for server: {}", regServer.getServerInfo().getName());
                     }
                 }
             }));
@@ -160,12 +158,18 @@ public class Util {
 
     public void sendMessage(CommandSource source, String message) {
         source = source != null ? source : server.getConsoleCommandSource();
-        logger.info(message.replaceAll("<.*?>", ""));
         String lastMessage = lastMessages.get(source);
         if (message.equals(lastMessage)) {
             return;
         }
         source.sendMessage(mm.deserialize(message));
         lastMessages.put(source, message);
+    }
+
+    public void log(String message, Object... args) {
+        for (Object arg : args) {
+            message = message.replaceFirst("\\{}", arg != null ? arg.toString() : "null");
+        }
+        server.getConsoleCommandSource().sendMessage(mm.deserialize(message));
     }
 }
