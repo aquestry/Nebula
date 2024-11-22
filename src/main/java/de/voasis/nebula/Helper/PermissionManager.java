@@ -22,13 +22,6 @@ public class PermissionManager implements PermissionProvider {
         playerPermissions.computeIfAbsent(player, k -> new HashSet<>()).add(permission);
     }
 
-    public void removePermission(Player player, String permission) {
-        Set<String> permissions = playerPermissions.get(player);
-        if (permissions != null) {
-            permissions.remove(permission);
-        }
-    }
-
     public boolean hasPermission(Player player, String permission) {
         Set<String> permissions = playerPermissions.get(player);
         if (permissions == null) {

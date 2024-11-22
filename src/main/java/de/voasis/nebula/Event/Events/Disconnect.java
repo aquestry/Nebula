@@ -9,7 +9,7 @@ import de.voasis.nebula.Nebula;
 public class Disconnect {
     public Disconnect(DisconnectEvent event) {
         Player player = event.getPlayer();
-        Nebula.util.leaveQueue(player);
+        Nebula.queueProcessor.leaveQueue(player);
         for(BackendServer backendServer : Data.backendInfoMap) {
             backendServer.removePendingPlayerConnection(player);
         }

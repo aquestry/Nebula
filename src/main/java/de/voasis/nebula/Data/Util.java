@@ -8,16 +8,13 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.Maps.BackendServer;
-import de.voasis.nebula.Maps.GamemodeQueue;
 import de.voasis.nebula.Maps.HoldServer;
-import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.Callable;
 
 public class Util {
 
@@ -78,57 +75,54 @@ public class Util {
         }
     }
 
-    public void updateState() {
+    private void stateComplete(RegisteredServer registeredServer) {
+        for (BackendServer backendServer : Data.backendInfoMap) {
+            if (registeredServer.getServerInfo().getName().equals(backendServer.getServerName())) {
+                if (!backendServer.isOnline()) {
+                    backendServer.setOnline(true);
+                    callPending(backendServer);
+                    CommandSource creator = backendServer.getCreator();
+                    sendMessage(creator, Messages.ONLINE.replace("<name>", backendServer.getServerName()));
+                }
+            }
+        }
+    }
+
+    public void stateCompleteFailed(RegisteredServer registeredServer) {
+        for (BackendServer backendServer : Data.backendInfoMap) {
+            if (registeredServer.getServerInfo().getName().equals(backendServer.getServerName())) {
+                if (backendServer.isOnline()) {
+                    backendServer.setOnline(false);
+                    CommandSource creator = backendServer.getCreator();
+                    sendMessage(creator, Messages.OFFLINE.replace("<name>", backendServer.getServerName()));
+                }
+            }
+        }
+    }
+
+    public void pingServers() {
         for (BackendServer backendServer : Data.backendInfoMap) {
             Optional<RegisteredServer> registeredServer = server.getServer(backendServer.getServerName());
-            registeredServer.ifPresent(value -> pingServer(value, stateComplete(value), stateCompleteFailed(value), logger, plugin));
-        }
-    }
-
-    public void finalizeStartup() {
-        for (GamemodeQueue queue : Data.gamemodeQueueMap) {
-            int preloadCount = queue.getPreload();
-            for (int i = 0; i < preloadCount; i++) {
-                Nebula.queueProcessor.createNew(queue).addFlag("preload");
-            }
-        }
-    }
-
-    private Callable<Void> stateComplete(RegisteredServer registeredServer) {
-        return () -> {
-            for (BackendServer backendServer : Data.backendInfoMap) {
-                if (registeredServer.getServerInfo().getName().equals(backendServer.getServerName())) {
-                    if (!backendServer.isOnline()) {
-                        backendServer.setOnline(true);
-                        callPending(backendServer);
-                        CommandSource creator = backendServer.getCreator();
-                        sendMessage(creator, Messages.ONLINE.replace("<name>", backendServer.getServerName()));
+            registeredServer.ifPresent(regServer -> regServer.ping().whenComplete((result, exception) -> {
+                if (exception == null) {
+                    try {
+                        synchronized (plugin) {
+                            stateCompleteFailed(regServer);
+                        }
+                    } catch (Exception e) {
+                        logger.error("Error while executing success response for server: {}", regServer.getServerInfo().getName(), e);
+                    }
+                } else {
+                    try {
+                        synchronized (plugin) {
+                            stateComplete(regServer);
+                        }
+                    } catch (Exception e) {
+                        logger.error("Error while executing failure response for server: {}", regServer.getServerInfo().getName(), e);
                     }
                 }
-            }
-            return null;
-        };
-    }
-
-    public void callPending(BackendServer backendServer) {
-        for(Player p : backendServer.getPendingPlayerConnections()) {
-            connectPlayer(p, backendServer, false);
+            }));
         }
-    }
-
-    public Callable<Void> stateCompleteFailed(RegisteredServer registeredServer) {
-        return () -> {
-            for (BackendServer backendServer : Data.backendInfoMap) {
-                if (registeredServer.getServerInfo().getName().equals(backendServer.getServerName())) {
-                    if (backendServer.isOnline()) {
-                        backendServer.setOnline(false);
-                        CommandSource creator = backendServer.getCreator();
-                        sendMessage(creator, Messages.OFFLINE.replace("<name>", backendServer.getServerName()));
-                    }
-                }
-            }
-            return null;
-        };
     }
 
     public void connectPlayer(Player player, BackendServer backendServer, boolean quit) {
@@ -144,67 +138,6 @@ public class Util {
         }
     }
 
-    public boolean isInAnyQueue(Player player) {
-        return Data.gamemodeQueueMap.stream()
-                .anyMatch(queue -> queue.getInQueue().contains(player));
-    }
-
-    public void joinQueue(Player player, String queueName) {
-        if(!Nebula.util.getBackendServer(player.getCurrentServer().get().getServerInfo().getName()).getFlags().contains("lobby")) {
-            player.sendMessage(mm.deserialize(Messages.LOBBY_ONLY));
-            return;
-        }
-        if (isInAnyQueue(player)) {
-            player.sendMessage(mm.deserialize(Messages.ALREADY_IN_QUEUE));
-            return;
-        }
-        Data.gamemodeQueueMap.stream()
-                .filter(queue -> queue.getName().equalsIgnoreCase(queueName))
-                .findFirst()
-                .ifPresentOrElse(
-                        queue -> {
-                            queue.getInQueue().add(player);
-                            player.sendMessage(mm.deserialize(Messages.ADDED_TO_QUEUE.replace("<queue>", queueName)));
-                        },
-                        () -> player.sendMessage(mm.deserialize(Messages.QUEUE_NOT_FOUND))
-                );
-    }
-
-    public void leaveQueue(Player player) {
-        if (!Nebula.util.isInAnyQueue(player)) {
-            player.sendMessage(mm.deserialize(Messages.NOT_IN_QUEUE));
-            return;
-        }
-        for(GamemodeQueue queue :Data.gamemodeQueueMap) {
-            if (queue.getInQueue().contains(player)) {
-                player.sendMessage(mm.deserialize(Messages.REMOVED_FROM_QUEUE.replace("<queue>", queue.getName())));
-                queue.getInQueue().remove(player);
-            }
-        }
-    }
-
-    public void pingServer(RegisteredServer regServer, Callable<Void> response, Callable<Void> noResponse, Logger logger, Object plugin) {
-        regServer.ping().whenComplete((result, exception) -> {
-            if (exception == null) {
-                try {
-                    synchronized (plugin) {
-                        response.call();
-                    }
-                } catch (Exception e) {
-                    logger.error("Error while executing success response for server: {}", regServer.getServerInfo().getName(), e);
-                }
-            } else {
-                try {
-                    synchronized (plugin) {
-                        noResponse.call();
-                    }
-                } catch (Exception e) {
-                    logger.error("Error while executing failure response for server: {}", regServer.getServerInfo().getName(), e);
-                }
-            }
-        });
-    }
-
     public BackendServer getBackendServer(String name) {
         for (BackendServer server : Data.backendInfoMap) {
             if (server.getServerName().equals(name)) {
@@ -212,6 +145,12 @@ public class Util {
             }
         }
         return null;
+    }
+
+    public void callPending(BackendServer backendServer) {
+        for(Player p : backendServer.getPendingPlayerConnections()) {
+            connectPlayer(p, backendServer, false);
+        }
     }
 
     public int getPlayerCount(Object backendServer) {

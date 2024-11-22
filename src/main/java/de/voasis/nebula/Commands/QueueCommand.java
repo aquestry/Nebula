@@ -21,10 +21,10 @@ public class QueueCommand implements SimpleCommand {
                 return;
             }
             switch (args[0]) {
-                case "leave" -> leaveQueue(player);
+                case "leave" -> Nebula.queueProcessor.leaveQueue(player);
                 case "join" -> {
                     if (args.length == 2) {
-                        Nebula.util.joinQueue(player, args[1]);
+                        Nebula.queueProcessor.joinQueue(player, args[1]);
                     } else {
                         Nebula.util.sendMessage(player, Messages.USAGE_QUEUE);
                     }
@@ -52,9 +52,5 @@ public class QueueCommand implements SimpleCommand {
                     .collect(Collectors.toList());
         }
         return List.of();
-    }
-
-    private void leaveQueue(Player player) {
-        Nebula.util.leaveQueue(player);
     }
 }
