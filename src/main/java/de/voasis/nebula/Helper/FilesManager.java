@@ -74,8 +74,8 @@ public class FilesManager {
                     Nebula.util.log("Added gamemode to pool: {}, {}, {}.", queueName, template, neededPlayers);
                 }
             }
+            Data.alltemplates.add(Data.defaultServerTemplate);
             if(Data.pullStart) {
-                Data.alltemplates.add(Data.defaultServerTemplate);
                 for (HoldServer holdServer : Data.holdServerMap) {
                     for (String template : Data.alltemplates) {
                         Nebula.serverManager.pull(holdServer, template, server.getConsoleCommandSource());
