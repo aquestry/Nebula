@@ -9,6 +9,7 @@ import java.util.List;
 public class Data {
     public static String vsecret;
     public static String envVars;
+    public static boolean pullStart;
     public static String defaultServerTemplate;
     public static int defaultmax;
     public static int defaultmin;

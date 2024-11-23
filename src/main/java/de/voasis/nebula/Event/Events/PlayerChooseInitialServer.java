@@ -12,8 +12,8 @@ public class PlayerChooseInitialServer {
         if(target != null) {
             event.setInitialServer(server.getServer(target.getServerName()).get());
         } else {
-            Nebula.defaultsManager.createDefault();
             event.getPlayer().disconnect(Component.text("Please reconnect!"));
+            Nebula.defaultsManager.createDefault();
         }
     }
 }

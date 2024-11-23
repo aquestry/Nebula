@@ -36,6 +36,7 @@ public class FilesManager {
             Data.defaultmax = config.node("lobby-max").getInt();
             Data.defaultmin = config.node("lobby-min").getInt();
             Data.vsecret = config.node("vsecret").getString();
+            Data.pullStart = config.node("pull-start").equals("true");
             String envVars = config.node("env-vars").getString();
             Data.envVars = envVars != null ? Arrays.stream(envVars.split(",")).map(s -> " -e "+s).collect(Collectors.joining()) : "";
             String adminList = config.node("admins").getString();
@@ -72,6 +73,9 @@ public class FilesManager {
                     Data.gamemodeQueueMap.add(new GamemodeQueue(queueName.toString(), template, neededPlayers, preload));
                     Nebula.util.log("Added gamemode to pool: {}, {}, {}.", queueName, template, neededPlayers);
                 }
+            }
+            if(!Data.pullStart) {
+                return;
             }
             Data.alltemplates.add(Data.defaultServerTemplate);
             for (HoldServer holdServer : Data.holdServerMap) {
