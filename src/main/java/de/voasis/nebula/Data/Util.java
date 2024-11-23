@@ -158,12 +158,12 @@ public class Util {
 
     public void sendMessage(CommandSource source, String message) {
         source = source != null ? source : server.getConsoleCommandSource();
-        String lastMessage = lastMessages.get(source);
-        if (message.equals(lastMessage)) {
-            return;
+        if (source == server.getConsoleCommandSource()) {
+            source.sendMessage(mm.deserialize(message));
+        } else {
+            source.sendMessage(mm.deserialize(message));
+            server.getConsoleCommandSource().sendMessage(mm.deserialize(message));
         }
-        source.sendMessage(mm.deserialize(message));
-        lastMessages.put(source, message);
     }
 
     public void log(String message, Object... args) {
