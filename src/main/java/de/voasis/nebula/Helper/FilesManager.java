@@ -36,7 +36,7 @@ public class FilesManager {
             Data.defaultmax = config.node("lobby-max").getInt();
             Data.defaultmin = config.node("lobby-min").getInt();
             Data.vsecret = config.node("vsecret").getString();
-            Data.pullStart = config.node("pull-start").equals("true");
+            Data.pullStart = config.node("pull-start").getBoolean();
             String envVars = config.node("env-vars").getString();
             Data.envVars = envVars != null ? Arrays.stream(envVars.split(",")).map(s -> " -e "+s).collect(Collectors.joining()) : "";
             String adminList = config.node("admins").getString();
@@ -74,13 +74,12 @@ public class FilesManager {
                     Nebula.util.log("Added gamemode to pool: {}, {}, {}.", queueName, template, neededPlayers);
                 }
             }
-            if(!Data.pullStart) {
-                return;
-            }
-            Data.alltemplates.add(Data.defaultServerTemplate);
-            for (HoldServer holdServer : Data.holdServerMap) {
-                for (String template : Data.alltemplates) {
-                    Nebula.serverManager.pull(holdServer, template, server.getConsoleCommandSource());
+            if(Data.pullStart) {
+                Data.alltemplates.add(Data.defaultServerTemplate);
+                for (HoldServer holdServer : Data.holdServerMap) {
+                    for (String template : Data.alltemplates) {
+                        Nebula.serverManager.pull(holdServer, template, server.getConsoleCommandSource());
+                    }
                 }
             }
         } catch (Exception e) {
