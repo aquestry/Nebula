@@ -160,9 +160,9 @@ public class Util {
         source = source != null ? source : server.getConsoleCommandSource();
         if (source == server.getConsoleCommandSource()) {
             source.sendMessage(mm.deserialize(message));
-        } else {
-            source.sendMessage(mm.deserialize(message));
-            server.getConsoleCommandSource().sendMessage(mm.deserialize(message));
+        } else if(source instanceof Player player){
+            player.sendMessage(mm.deserialize(message));
+            server.getConsoleCommandSource().sendMessage(mm.deserialize(player.getUsername() + " --> " + message));
         }
     }
 
