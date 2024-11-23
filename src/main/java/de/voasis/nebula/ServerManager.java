@@ -81,8 +81,15 @@ public class ServerManager {
                         Data.backendInfoMap.add(backendServer);
                         Nebula.util.updateFreePort(finalExternalServer);
                         Nebula.util.sendMessage(source, Messages.DONE);
+                        backendServer.removeFlag("retry");
                     },
-                    () -> Nebula.util.sendMessage(source, Messages.ERROR_CREATE.replace("<name>", FinalNewName))
+                    () -> {
+                        Nebula.util.sendMessage(source, Messages.ERROR_CREATE.replace("<name>", FinalNewName));
+                        if(backendServer.getFlags().contains("retry")) {
+                            backendServer.removeFlag("retry");
+                            createFromTemplate(templateName, newName, source, starterFlag);
+                        }
+                    }
             );
             return backendServer;
         } catch (Exception e) {

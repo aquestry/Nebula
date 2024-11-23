@@ -22,7 +22,7 @@ public class QueueProcessor {
         for (GamemodeQueue queue : Data.gamemodeQueueMap) {
             int preloadCount = queue.getPreload();
             for (int i = 0; i < preloadCount; i++) {
-                createNew(queue).addFlag("preload");
+                createNew(queue).addFlags("preload", "retry");
             }
         }
     }

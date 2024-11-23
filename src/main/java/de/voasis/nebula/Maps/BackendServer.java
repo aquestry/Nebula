@@ -37,6 +37,7 @@ public class BackendServer {
     public void removePendingPlayerConnection(Player player) { pendingPlayerConnections.remove(player); }
     public void setOnline(boolean online) { this.online = online; }
     public void addFlag(String flag) { this.flags.add(flag); }
+    public void addFlags(String... flags) { this.flags.addAll(List.of(flags)); }
     public void removeFlag(String flag) { this.flags.remove(flag); }
     public List<String> getFlags() { return new ArrayList<>(flags); }
 }
