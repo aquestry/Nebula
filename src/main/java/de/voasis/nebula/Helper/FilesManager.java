@@ -98,6 +98,7 @@ public class FilesManager {
             Messages.CREATE_CONTAINER = messages.node("admin", "server-create").getString("<pre>Creating server instance from template...").replace("<pre>", prefix);
             Messages.START_CONTAINER = messages.node("admin", "server-start").getString("<pre>Starting server instance <name>.").replace("<pre>", prefix);
             Messages.PULL_TEMPLATE = messages.node("admin", "server-pull").getString("<pre>Pulling template <template> on server <name>.").replace("<pre>", prefix);
+            Messages.DONE_PULL = messages.node("admin", "done-pull").getString("<pre>Done pulling template <template> on server <name>.").replace("<pre>", prefix);
             Messages.ALREADY_EXISTS = messages.node("admin", "server-exists").getString("<pre>Server <name> already exists.").replace("<pre>", prefix);
             Messages.SERVER_CONNECT = messages.node("util", "server-connect").getString("<green>Connecting to server <name>...").replace("<pre>", prefix);
             Messages.SERVER_RUNNING = messages.node("admin", "server-running").getString("<pre>Server <name> is already running.").replace("<pre>", prefix);
