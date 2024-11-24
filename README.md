@@ -77,7 +77,5 @@ But here they are:
     ```
     
 ## Future Enhancements:
-- UI for easier server management.
 - Better perms system
-- Auto deletion for default servers
-- An API that can be used by other plugins
+- Bigger
