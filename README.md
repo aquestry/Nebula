@@ -1,6 +1,6 @@
 # Nebula
 
-![Velocity](https://flat.badgen.net/badge/Velocity/3.3.0/1197d1?icon=dockbit)
+![Velocity](https://flat.badgen.net/badge/Velocity/3.4.0/1197d1?icon=dockbit)
 
 **Nebula** is a server management tool built with Java and integrated with Velocity, designed to handle the dynamic creation, management, and control of Minecraft server instances. It uses Docker on Hold-Servers to manage Backend-Servers.
 
@@ -26,9 +26,11 @@
 On start, Velocity will try to create a server on the first backend server via the Lobby-Template in the config and name it "Lobby-0".
 Later on, it will create more lobby servers according to the player count.
 ## In-Game Commands
-Nebula also supports in-game commands for admins to manage server instances directly within Minecraft. Here are the available commands:
+Nebula also supports in-game commands for admins to manage server instances directly within Minecraft.
+You dont have to use them, Nebula does handle the queue and lobby scalign on its own.
+But here they are:
 
-### **Admin Commands:**
+### **Admin Commands:** 
 
 - **/admin template [template_name] [new_server_name]**  
   - **Description**: Creates a new server instance using the specified template.
