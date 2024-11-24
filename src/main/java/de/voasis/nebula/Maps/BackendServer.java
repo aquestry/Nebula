@@ -16,14 +16,14 @@ public class BackendServer {
     private final List<Player> pendingPlayerConnections = new ArrayList<>();
     public List<String> flags = new ArrayList<>();
 
-    public BackendServer(String serverName, HoldServer holdServer, int port, boolean online, CommandSource creator, String template, String starterFlag) {
+    public BackendServer(String serverName, HoldServer holdServer, int port, boolean online, CommandSource creator, String template, String... starterFlags) {
         this.serverName = serverName;
         this.holdServer = holdServer;
         this.port = port;
         this.online = online;
         this.creator = creator;
         this.template = template;
-        this.flags.add(starterFlag);
+        this.flags.addAll(List.of(starterFlags));
     }
 
     public String getServerName() { return serverName; }
@@ -36,8 +36,6 @@ public class BackendServer {
     public List<Player> getPendingPlayerConnections() { return new ArrayList<>(pendingPlayerConnections); }
     public void removePendingPlayerConnection(Player player) { pendingPlayerConnections.remove(player); }
     public void setOnline(boolean online) { this.online = online; }
-    public void addFlag(String flag) { this.flags.add(flag); }
-    public void addFlags(String... flags) { this.flags.addAll(List.of(flags)); }
     public void removeFlag(String flag) { this.flags.remove(flag); }
     public List<String> getFlags() { return new ArrayList<>(flags); }
 }

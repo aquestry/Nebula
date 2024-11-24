@@ -76,11 +76,9 @@ public class FilesManager {
             }
             Data.alltemplates.add(Data.defaultServerTemplate);
             if(Data.pullStart) {
-                Data.holdServerMap.parallelStream().forEach(holdServer -> {
-                    Data.alltemplates.parallelStream().forEach(template -> {
-                        Nebula.serverManager.pull(holdServer, template, server.getConsoleCommandSource());
-                    });
-                });
+                Data.holdServerMap.parallelStream().forEach(holdServer ->
+                        Data.alltemplates.parallelStream().forEach(template ->
+                                Nebula.serverManager.pull(holdServer, template, server.getConsoleCommandSource())));
             }
         } catch (Exception e) {
             Nebula.util.log("Error in configuration loading", e);

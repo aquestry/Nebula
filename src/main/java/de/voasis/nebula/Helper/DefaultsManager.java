@@ -95,11 +95,11 @@ public class DefaultsManager {
 
     public void createDefault() {
         String name = "Lobby-" + Nebula.util.generateUniqueString();
-        Nebula.serverManager.createFromTemplate(
+        BackendServer temp = Nebula.serverManager.createFromTemplate(
                 Data.defaultServerTemplate,
                 name,
                 server.getConsoleCommandSource(),
-                "lobby"
+                "lobby", "retry"
         );
     }
 }

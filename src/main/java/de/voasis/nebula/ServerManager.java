@@ -13,6 +13,8 @@ import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Maps.HoldServer;
 import net.kyori.adventure.text.Component;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ServerManager {
 
@@ -50,7 +52,7 @@ public class ServerManager {
         }
     }
 
-    public BackendServer createFromTemplate(String templateName, String newName, CommandSource source, String starterFlag) {
+    public BackendServer createFromTemplate(String templateName, String newName, CommandSource source, String... starterFlags) {
         try {
             HoldServer externalServer = Data.holdServerMap.getFirst();
             for(HoldServer holdServer : Data.holdServerMap) {
@@ -72,7 +74,7 @@ public class ServerManager {
             }
             String command = String.format("docker run -d -e PAPER_VELOCITY_SECRET=%s %s -p %d:25565 --name %s %s", Data.vsecret, Data.envVars, tempPort, FinalNewName, templateName);
             Nebula.util.sendMessage(source, Messages.CREATE_CONTAINER.replace("<name>", FinalNewName));
-            BackendServer backendServer = new BackendServer(FinalNewName, externalServer, tempPort, false, source, templateName, starterFlag);
+            BackendServer backendServer = new BackendServer(FinalNewName, externalServer, tempPort, false, source, templateName, starterFlags);
             HoldServer finalExternalServer = externalServer;
             executeSSHCommand(externalServer, command,
                     () -> {
@@ -85,9 +87,10 @@ public class ServerManager {
                     },
                     () -> {
                         Nebula.util.sendMessage(source, Messages.ERROR_CREATE.replace("<name>", FinalNewName));
-                        if(backendServer.getFlags().contains("retry")) {
-                            backendServer.removeFlag("retry");
-                            createFromTemplate(templateName, newName, source, starterFlag);
+                        if (backendServer.getFlags().contains("retry")) {
+                            List<String> flags = new ArrayList<>(List.of(starterFlags));
+                            flags.remove("retry");
+                            createFromTemplate(templateName, newName, source, flags.toArray(new String[0]));
                         }
                     }
             );
@@ -114,7 +117,11 @@ public class ServerManager {
     private void kickAll(BackendServer backendServer) {
         server.getServer(backendServer.getServerName()).ifPresent(serverInfo -> {
             for (Player p : serverInfo.getPlayersConnected()) {
-                p.disconnect(Component.empty());
+                if(backendServer.getFlags().contains("lobby")) {
+                    p.disconnect(Component.empty());
+                } else {
+                    Nebula.util.connectPlayer(p, Nebula.defaultsManager.getTarget(), true);
+                }
             }
         });
     }

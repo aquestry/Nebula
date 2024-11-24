@@ -18,7 +18,7 @@ public class AutoDeleter {
         List<BackendServer> serversToDelete = new ArrayList<>();
         boolean lobbyServerDeleted = false;
         for (BackendServer backendServer : Data.backendInfoMap) {
-            if (backendServer.getFlags().contains("custom")) {
+            if (backendServer.getFlags().contains("custom") || backendServer.getFlags().contains("retry")) {
                 continue;
             }
             boolean conditionsMet = Nebula.util.getPlayerCount(backendServer) == 0 &&
