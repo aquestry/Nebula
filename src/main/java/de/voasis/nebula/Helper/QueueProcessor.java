@@ -9,6 +9,7 @@ import de.voasis.nebula.Maps.GamemodeQueue;
 import de.voasis.nebula.Nebula;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class QueueProcessor {
 
@@ -22,7 +23,7 @@ public class QueueProcessor {
         for (GamemodeQueue queue : Data.gamemodeQueueMap) {
             int preloadCount = queue.getPreload();
             for (int i = 0; i < preloadCount; i++) {
-                createNew(queue, "preload", "retry");
+                createPreloadedServer(queue);
             }
         }
     }
@@ -33,53 +34,57 @@ public class QueueProcessor {
             if (queue.getInQueue().size() >= neededPlayers) {
                 List<Player> playersToMove = new ArrayList<>();
                 for (int i = 0; i < neededPlayers; i++) {
-                    playersToMove.add(queue.getInQueue().getFirst());
-                    queue.getInQueue().removeFirst();
+                    playersToMove.add(queue.getInQueue().removeFirst());
                 }
-                BackendServer processServer = getServer(queue);
-                for (Player player : playersToMove) {
-                    processServer.addPendingPlayerConnection(player);
-                }
-                if(processServer.getFlags().contains("preload")) {
-                    Nebula.util.callPending(processServer);
+                Optional<BackendServer> preloadedServer = findPreloadedServer(queue);
+                if (preloadedServer.isPresent()) {
+                    BackendServer server = preloadedServer.get();
+                    server.removeFlag("preload");
+                    for (Player player : playersToMove) {
+                        Nebula.util.connectPlayer(player, server, false);
+                    }
+                    createPreloadedServer(queue);
+                } else {
+                    BackendServer newServer = createNewServer(queue);
+                    for (Player player : playersToMove) {
+                        newServer.addPendingPlayerConnection(player);
+                    }
+                    Nebula.util.callPending(newServer);
                 }
             }
         }
     }
 
-    private BackendServer getServer(GamemodeQueue queue) {
-        for (BackendServer backendServer : Data.backendInfoMap) {
-            if (backendServer.getFlags().contains("gamemode:" + queue.getName()) &&
-                    backendServer.getFlags().contains("preload") &&
-                    backendServer.isOnline()) {
-                backendServer.removeFlag("preload");
-                createNew(queue, "preload");
-                return backendServer;
-            }
-        }
-        return createNew(queue);
+    private Optional<BackendServer> findPreloadedServer(GamemodeQueue queue) {
+        return Data.backendInfoMap.stream()
+                .filter(server -> {
+                    boolean hasGamemode = server.getFlags().contains("gamemode:" + queue.getName());
+                    boolean hasPreload = server.getFlags().contains("preload");
+                    boolean isOnline = server.isOnline();
+                    return hasGamemode && hasPreload && isOnline;
+                })
+                .findFirst();
     }
 
-    public BackendServer createNew(GamemodeQueue queue, String... flags) {
-        String name = queue.getName() + "-" + Nebula.util.generateUniqueString();
-        List<String> allFlags = new ArrayList<>(List.of(flags));
-        if (allFlags.contains("preload") && !allFlags.contains("retry")) {
-            allFlags.add("retry");
-        }
+    private void createPreloadedServer(GamemodeQueue queue) {
+        createNewServer(queue, "preload", "retry", "gamemode:" + queue.getName());
+    }
+
+    private BackendServer createNewServer(GamemodeQueue queue, String... flags) {
+        String serverName = queue.getName() + "-" + Nebula.util.generateUniqueString();
         return Nebula.serverManager.createFromTemplate(
                 queue.getTemplate(),
-                name,
+                serverName,
                 server.getConsoleCommandSource(),
-                allFlags.toArray(new String[0])
+                flags
         );
     }
 
-    public boolean isInAnyQueue(Player player) {
-        return Data.gamemodeQueueMap.stream().anyMatch(queue -> queue.getInQueue().contains(player));
-    }
-
     public void joinQueue(Player player, String queueName) {
-        if (!Nebula.util.getBackendServer(player.getCurrentServer().get().getServerInfo().getName()).getFlags().contains("lobby")) {
+        BackendServer currentServer = Nebula.util.getBackendServer(
+                player.getCurrentServer().get().getServerInfo().getName()
+        );
+        if (!currentServer.getFlags().contains("lobby")) {
             Nebula.util.sendMessage(player, Messages.LOBBY_ONLY);
             return;
         }
@@ -95,7 +100,8 @@ public class QueueProcessor {
                             queue.getInQueue().add(player);
                             Nebula.util.sendMessage(player, Messages.ADDED_TO_QUEUE.replace("<queue>", queueName));
                         },
-                        () -> Nebula.util.sendMessage(player, Messages.QUEUE_NOT_FOUND));
+                        () -> Nebula.util.sendMessage(player, Messages.QUEUE_NOT_FOUND)
+                );
     }
 
     public void leaveQueue(Player player) {
@@ -104,10 +110,14 @@ public class QueueProcessor {
             return;
         }
         for (GamemodeQueue queue : Data.gamemodeQueueMap) {
-            if (queue.getInQueue().contains(player)) {
+            if (queue.getInQueue().remove(player)) {
                 Nebula.util.sendMessage(player, Messages.REMOVED_FROM_QUEUE.replace("<queue>", queue.getName()));
-                queue.getInQueue().remove(player);
             }
         }
+    }
+
+    public boolean isInAnyQueue(Player player) {
+        return Data.gamemodeQueueMap.stream()
+                .anyMatch(queue -> queue.getInQueue().contains(player));
     }
 }
