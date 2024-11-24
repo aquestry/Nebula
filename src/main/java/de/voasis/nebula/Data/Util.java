@@ -20,7 +20,7 @@ public class Util {
     private MiniMessage mm = MiniMessage.miniMessage();
     static Object plugin;
     private static final int LENGTH = 5;
-    private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyz0123456789#<>+";
+    private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static HashMap<CommandSource, String> lastMessages = new HashMap<>();
     private static final Set<String> generatedStrings = new HashSet<>();
     private static final Random random = new Random();
@@ -121,7 +121,7 @@ public class Util {
     public void connectPlayer(Player player, BackendServer backendServer, boolean quit) {
         String name = backendServer.getServerName();
         Optional<RegisteredServer> target = server.getServer(name);
-        player.sendMessage(mm.deserialize(Messages.SERVER_CONNECT.replace("<name>", name)));
+        sendMessage(player, Messages.SERVER_CONNECT.replace("<name>", name));
         if(target.isPresent()) {
             player.createConnectionRequest(target.get()).fireAndForget();
             return;

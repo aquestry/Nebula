@@ -40,7 +40,9 @@ public class QueueProcessor {
                 for (Player player : playersToMove) {
                     processServer.addPendingPlayerConnection(player);
                 }
-                Nebula.util.callPending(processServer);
+                if(processServer.getFlags().contains("preload")) {
+                    Nebula.util.callPending(processServer);
+                }
             }
         }
     }
