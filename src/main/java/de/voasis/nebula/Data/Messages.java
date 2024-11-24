@@ -7,6 +7,7 @@ public class Messages {
     public static String KILL_CONTAINER;
     public static String DELETE_CONTAINER;
     public static String PULL_TEMPLATE;
+    public static String DONE_PULL;
     public static String CREATE_CONTAINER;
     public static String START_CONTAINER;
     public static String SERVER_RUNNING;

@@ -9,6 +9,7 @@ admin:
   kill-start: "<pre>Killing server instance <name>."
   delete-start: "<pre>Deleting server instance <name>."
   server-pull: "<pre>Pulling template <template> on server <name>."
+  done-pull: "<pre>Done pulling template <template> on server <name>."
   server-create: "<pre>Creating server instance <name>."
   server-start: "<pre>Starting server instance <name>."
   server-error: "<pre>Failed to create container: <name>."
