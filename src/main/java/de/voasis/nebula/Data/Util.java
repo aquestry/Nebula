@@ -98,7 +98,7 @@ public class Util {
     }
 
     public void pingServers() {
-        for (BackendServer backendServer : Data.backendInfoMap) {
+        for (BackendServer backendServer : new ArrayList<>(Data.backendInfoMap)) {
             Optional<RegisteredServer> registeredServer = server.getServer(backendServer.getServerName());
             registeredServer.ifPresent(regServer -> regServer.ping().whenComplete((result, exception) -> {
                 if (exception == null) {
