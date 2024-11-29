@@ -1,4 +1,4 @@
-package de.voasis.nebula.Event.Events;
+package de.voasis.nebula.Event.Event;
 
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;

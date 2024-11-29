@@ -11,7 +11,7 @@ import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.proxy.ProxyServer;
-import de.voasis.nebula.Event.Events.*;
+import de.voasis.nebula.Event.Event.*;
 import de.voasis.nebula.Nebula;
 
 public class EventManager {

@@ -4,7 +4,7 @@ import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Data.Data;
 import de.voasis.nebula.Data.Messages;
-import de.voasis.nebula.Maps.GamemodeQueue;
+import de.voasis.nebula.Map.GamemodeQueue;
 import de.voasis.nebula.Nebula;
 import java.util.List;
 import java.util.stream.Collectors;

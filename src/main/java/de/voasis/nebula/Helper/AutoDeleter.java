@@ -1,7 +1,7 @@
 package de.voasis.nebula.Helper;
 
 import de.voasis.nebula.Data.Data;
-import de.voasis.nebula.Maps.BackendServer;
+import de.voasis.nebula.Map.BackendServer;
 import de.voasis.nebula.Nebula;
 import java.util.HashMap;
 import java.util.Map;

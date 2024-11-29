@@ -1,8 +1,8 @@
-package de.voasis.nebula.Event.Events;
+package de.voasis.nebula.Event.Event;
 
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.proxy.ProxyServer;
-import de.voasis.nebula.Maps.BackendServer;
+import de.voasis.nebula.Map.BackendServer;
 import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.Component;
 

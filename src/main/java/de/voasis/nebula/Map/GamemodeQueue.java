@@ -1,4 +1,4 @@
-package de.voasis.nebula.Maps;
+package de.voasis.nebula.Map;
 
 import com.velocitypowered.api.proxy.Player;
 import java.util.ArrayList;
