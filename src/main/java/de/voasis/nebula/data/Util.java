@@ -1,4 +1,4 @@
-package de.voasis.nebula.Data;
+package de.voasis.nebula.data;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
@@ -7,8 +7,8 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import de.voasis.nebula.Map.BackendServer;
-import de.voasis.nebula.Map.HoldServer;
+import de.voasis.nebula.map.BackendServer;
+import de.voasis.nebula.map.HoldServer;
 import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;

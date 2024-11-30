@@ -1,9 +1,9 @@
-package de.voasis.nebula.Event.Event;
+package de.voasis.nebula.event.event;
 
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import de.voasis.nebula.Data.Data;
+import de.voasis.nebula.data.Data;
 import de.voasis.nebula.Nebula;
 import java.util.UUID;
 

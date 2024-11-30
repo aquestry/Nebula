@@ -1,4 +1,4 @@
-package de.voasis.nebula.Event;
+package de.voasis.nebula.event;
 
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.PlayerAvailableCommandsEvent;
@@ -11,7 +11,7 @@ import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.proxy.ProxyServer;
-import de.voasis.nebula.Event.Event.*;
+import de.voasis.nebula.event.event.*;
 import de.voasis.nebula.Nebula;
 
 public class EventManager {

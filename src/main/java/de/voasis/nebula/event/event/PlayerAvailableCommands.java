@@ -1,4 +1,4 @@
-package de.voasis.nebula.Event.Event;
+package de.voasis.nebula.event.event;
 
 import com.velocitypowered.api.event.command.PlayerAvailableCommandsEvent;
 import de.voasis.nebula.Nebula;

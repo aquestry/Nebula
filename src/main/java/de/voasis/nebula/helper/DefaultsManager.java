@@ -1,8 +1,8 @@
-package de.voasis.nebula.Helper;
+package de.voasis.nebula.helper;
 
 import com.velocitypowered.api.proxy.ProxyServer;
-import de.voasis.nebula.Data.Data;
-import de.voasis.nebula.Map.BackendServer;
+import de.voasis.nebula.data.Data;
+import de.voasis.nebula.map.BackendServer;
 import de.voasis.nebula.Nebula;
 import java.util.ArrayList;
 import java.util.List;

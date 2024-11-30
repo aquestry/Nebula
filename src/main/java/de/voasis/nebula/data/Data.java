@@ -1,8 +1,8 @@
-package de.voasis.nebula.Data;
+package de.voasis.nebula.data;
 
-import de.voasis.nebula.Map.BackendServer;
-import de.voasis.nebula.Map.GamemodeQueue;
-import de.voasis.nebula.Map.HoldServer;
+import de.voasis.nebula.map.BackendServer;
+import de.voasis.nebula.map.GamemodeQueue;
+import de.voasis.nebula.map.HoldServer;
 import java.util.ArrayList;
 import java.util.List;
 

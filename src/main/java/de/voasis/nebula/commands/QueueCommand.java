@@ -1,10 +1,10 @@
-package de.voasis.nebula.Commands;
+package de.voasis.nebula.commands;
 
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
-import de.voasis.nebula.Data.Data;
-import de.voasis.nebula.Data.Messages;
-import de.voasis.nebula.Map.GamemodeQueue;
+import de.voasis.nebula.data.Data;
+import de.voasis.nebula.data.Messages;
+import de.voasis.nebula.map.GamemodeQueue;
 import de.voasis.nebula.Nebula;
 import java.util.List;
 import java.util.stream.Collectors;

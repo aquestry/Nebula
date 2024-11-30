@@ -1,9 +1,9 @@
-package de.voasis.nebula.Event.Event;
+package de.voasis.nebula.event.event;
 
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.proxy.Player;
-import de.voasis.nebula.Data.Data;
-import de.voasis.nebula.Map.BackendServer;
+import de.voasis.nebula.data.Data;
+import de.voasis.nebula.map.BackendServer;
 import de.voasis.nebula.Nebula;
 
 public class Disconnect {

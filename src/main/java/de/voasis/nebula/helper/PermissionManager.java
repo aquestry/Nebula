@@ -1,4 +1,4 @@
-package de.voasis.nebula.Helper;
+package de.voasis.nebula.helper;
 
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.permission.PermissionFunction;

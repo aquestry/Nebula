@@ -1,10 +1,10 @@
-package de.voasis.nebula.Helper;
+package de.voasis.nebula.helper;
 
 import com.velocitypowered.api.proxy.ProxyServer;
-import de.voasis.nebula.Data.Data;
-import de.voasis.nebula.Data.Messages;
-import de.voasis.nebula.Map.GamemodeQueue;
-import de.voasis.nebula.Map.HoldServer;
+import de.voasis.nebula.data.Data;
+import de.voasis.nebula.data.Messages;
+import de.voasis.nebula.map.GamemodeQueue;
+import de.voasis.nebula.map.HoldServer;
 import de.voasis.nebula.Nebula;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;

@@ -1,9 +1,9 @@
-package de.voasis.nebula.Event.Event;
+package de.voasis.nebula.event.event;
 
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import de.voasis.nebula.Data.Data;
+import de.voasis.nebula.data.Data;
 import de.voasis.nebula.Nebula;
 
 public class ServerPreConnect {

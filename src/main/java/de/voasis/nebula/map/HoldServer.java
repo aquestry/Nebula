@@ -1,6 +1,6 @@
-package de.voasis.nebula.Map;
+package de.voasis.nebula.map;
 
-import de.voasis.nebula.Data.Data;
+import de.voasis.nebula.data.Data;
 import java.util.List;
 
 public class HoldServer {

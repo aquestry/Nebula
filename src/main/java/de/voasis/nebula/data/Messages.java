@@ -1,4 +1,4 @@
-package de.voasis.nebula.Data;
+package de.voasis.nebula.data;
 
 public class Messages {
     public static String PREFIX;
