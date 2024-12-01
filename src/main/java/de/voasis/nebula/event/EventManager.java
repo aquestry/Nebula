@@ -10,21 +10,14 @@ import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
-import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.nebula.event.event.*;
 import de.voasis.nebula.Nebula;
 
 public class EventManager {
 
-    private final ProxyServer server;
-
-    public EventManager(ProxyServer server) {
-        this.server = server;
-    }
-
     @Subscribe
     public void PlayerChooseInitialServer(PlayerChooseInitialServerEvent event) {
-        new PlayerChooseInitialServer(event, server);
+        new PlayerChooseInitialServer(event);
     }
     @Subscribe
     public void ServerPreConnect(ServerPreConnectEvent event) {
@@ -32,11 +25,11 @@ public class EventManager {
     }
     @Subscribe
     public void ProxyShutdown(ProxyShutdownEvent event) {
-        new ProxyShutdown(event, server);
+        new ProxyShutdown(event);
     }
     @Subscribe
     public void LoginEvent(LoginEvent event) {
-        new Login(event, server);
+        new Login(event);
     }
     @Subscribe
     public void PlayerAvailableCommands(PlayerAvailableCommandsEvent event) {
@@ -52,7 +45,7 @@ public class EventManager {
     }
     @Subscribe
     public void PluginMessage(PluginMessageEvent event) {
-        new PluginMessage(event, server);
+        new PluginMessage(event);
     }
     @Subscribe
     public void PermissionsSetup(PermissionsSetupEvent event) {

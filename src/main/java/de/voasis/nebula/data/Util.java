@@ -5,7 +5,6 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.map.BackendServer;
 import de.voasis.nebula.map.HoldServer;
@@ -16,19 +15,12 @@ import java.util.*;
 
 public class Util {
 
-    static ProxyServer server;
     private MiniMessage mm = MiniMessage.miniMessage();
-    static Object plugin;
     private static final int LENGTH = 5;
     private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static HashMap<CommandSource, String> lastMessages = new HashMap<>();
     private static final Set<String> generatedStrings = new HashSet<>();
     private static final Random random = new Random();
-
-    public Util(ProxyServer server, Object plugin) {
-        Util.server = server;
-        Util.plugin = plugin;
-    }
 
     public static String generateUniqueString() {
         StringBuilder sb;
@@ -99,7 +91,7 @@ public class Util {
 
     public void pingServers() {
         for (BackendServer backendServer : new ArrayList<>(Data.backendInfoMap)) {
-            Optional<RegisteredServer> registeredServer = server.getServer(backendServer.getServerName());
+            Optional<RegisteredServer> registeredServer = Nebula.server.getServer(backendServer.getServerName());
             registeredServer.ifPresent(regServer -> regServer.ping().whenComplete((result, exception) -> {
                 if (exception == null) {
                     try {
@@ -120,7 +112,7 @@ public class Util {
 
     public void connectPlayer(Player player, BackendServer backendServer, boolean quit) {
         String name = backendServer.getServerName();
-        Optional<RegisteredServer> target = server.getServer(name);
+        Optional<RegisteredServer> target = Nebula.server.getServer(name);
         sendMessage(player, Messages.SERVER_CONNECT.replace("<name>", name));
         if(target.isPresent()) {
             player.createConnectionRequest(target.get()).fireAndForget();
@@ -151,25 +143,25 @@ public class Util {
             return registeredServer.getPlayersConnected().size();
         }
         if(backendServer instanceof BackendServer backend && backendServer != null) {
-            return server.getServer(backend.getServerName()).get().getPlayersConnected().size();
+            return Nebula.server.getServer(backend.getServerName()).get().getPlayersConnected().size();
         }
         return 0;
     }
 
     public void sendMessage(CommandSource source, String message) {
-        source = source != null ? source : server.getConsoleCommandSource();
-        if (source == server.getConsoleCommandSource()) {
+        source = source != null ? source : Nebula.server.getConsoleCommandSource();
+        if (source == Nebula.server.getConsoleCommandSource()) {
             source.sendMessage(mm.deserialize(message));
         } else if(source instanceof Player player){
             player.sendMessage(mm.deserialize(message));
-            server.getConsoleCommandSource().sendMessage(mm.deserialize(player.getUsername() + " --> " + message));
+            Nebula.server.getConsoleCommandSource().sendMessage(mm.deserialize(player.getUsername() + " --> " + message));
         }
     }
 
     public void log(String message, Object... args) {
         for (Object arg : args) {
-            message = message.replaceFirst("\\{}", arg != null ? arg.toString() : "null");
+            message = message.replaceFirst("\\{}", arg != null ? arg.toString() : "");
         }
-        server.getConsoleCommandSource().sendMessage(mm.deserialize(message));
+        Nebula.server.getConsoleCommandSource().sendMessage(mm.deserialize(message));
     }
 }

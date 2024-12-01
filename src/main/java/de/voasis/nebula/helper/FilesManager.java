@@ -1,6 +1,5 @@
 package de.voasis.nebula.helper;
 
-import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.nebula.data.Data;
 import de.voasis.nebula.data.Messages;
 import de.voasis.nebula.map.GamemodeQueue;
@@ -23,10 +22,10 @@ public class FilesManager {
 
     private ConfigurationNode config;
     private ConfigurationNode messages;
-    private final ProxyServer server;
 
-    public FilesManager(ProxyServer server) {
-        this.server = server;
+    public FilesManager(Path dataDirectory) {
+        loadFiles(dataDirectory);
+        load();
     }
 
     public void load() {
@@ -61,7 +60,7 @@ public class FilesManager {
             }
             if (Data.holdServerMap.isEmpty()) {
                 Nebula.util.log("NO HOLD SERVERS FOUND!!! SHUTTING DOWN!!!");
-                server.shutdown();
+                Nebula.server.shutdown();
             }
             Map<Object, ? extends ConfigurationNode> gamemodes = config.node("gamemodes").childrenMap();
             if (gamemodes != null) {
@@ -78,11 +77,11 @@ public class FilesManager {
             if(Data.pullStart) {
                 Data.holdServerMap.parallelStream().forEach(holdServer ->
                         Data.alltemplates.parallelStream().forEach(template ->
-                                Nebula.serverManager.pull(holdServer, template, server.getConsoleCommandSource())));
+                                Nebula.serverManager.pull(holdServer, template, Nebula.server.getConsoleCommandSource())));
             }
         } catch (Exception e) {
             Nebula.util.log("Error in configuration loading", e);
-            server.shutdown();
+            Nebula.server.shutdown();
         }
     }
 
@@ -119,7 +118,7 @@ public class FilesManager {
             Messages.QUEUE_NOT_FOUND = messages.node("queue", "queue-not-found").getString("<pre>Queue not found.").replace("<pre>", prefix);
         } catch (Exception e) {
             Nebula.util.log("Error loading message strings", e);
-            server.shutdown();
+            Nebula.server.shutdown();
         }
     }
 
@@ -140,7 +139,7 @@ public class FilesManager {
             messages = YamlConfigurationLoader.builder().file(messagesFile).build().load();
         } catch (IOException e) {
             Nebula.util.log("Error loading configuration files.", e);
-            server.shutdown();
+            Nebula.server.shutdown();
         }
     }
 

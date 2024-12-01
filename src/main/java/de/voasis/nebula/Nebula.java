@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 @Plugin(id = "nebula", name = "Nebula", description = "Nebula can create servers on demand using Docker on multiple machines.", version = "1.0", authors = "Aquestry")
 public class Nebula {
 
-    private ProxyServer server;
+    public static ProxyServer server;
     public static ChannelIdentifier channel = MinecraftChannelIdentifier.create("nebula", "main");
     public static FilesManager filesManager;
     public static ServerManager serverManager;
@@ -33,16 +33,15 @@ public class Nebula {
     public static Util util;
 
     @Inject
-    public Nebula(ProxyServer server, @DataDirectory Path dataDirectory) {
-        this.server = server;
+    public Nebula(ProxyServer proxy, @DataDirectory Path dataDirectory) {
+        server = proxy;
         permissionManager  = new PermissionManager();
-        util = new Util(server, this);
-        filesManager = new FilesManager(server);
-        serverManager = new ServerManager(server);
-        filesManager.loadFiles(dataDirectory);
-        filesManager.load();
-        defaultsManager = new DefaultsManager(server);
-        queueProcessor = new QueueProcessor(server);
+        util = new Util();
+        filesManager = new FilesManager(dataDirectory);
+        serverManager = new ServerManager();
+        defaultsManager = new DefaultsManager();
+        defaultsManager.createDefault();
+        queueProcessor = new QueueProcessor();
         queueProcessor.init();
         autoDeleter = new AutoDeleter();
     }
@@ -52,7 +51,7 @@ public class Nebula {
         registerCommands();
         util.log(Data.Icon);
         server.getChannelRegistrar().register(channel);
-        server.getEventManager().register(this, new EventManager(server));
+        server.getEventManager().register(this, new EventManager());
         server.getScheduler()
                 .buildTask(this, this::Update)
                 .repeat(1, TimeUnit.SECONDS)

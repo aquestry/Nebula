@@ -1,6 +1,5 @@
 package de.voasis.nebula.helper;
 
-import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.nebula.data.Data;
 import de.voasis.nebula.map.BackendServer;
 import de.voasis.nebula.Nebula;
@@ -9,22 +8,11 @@ import java.util.List;
 
 public class DefaultsManager {
 
-    private final ProxyServer server;
-    private final int max;
-    private final int min;
-
-    public DefaultsManager(ProxyServer server) {
-        this.max = Data.defaultmax;
-        this.min = Data.defaultmin;
-        this.server = server;
-        createDefault();
-    }
-
     public BackendServer getTarget() {
         BackendServer target = getServerWithLowestPlayerCount();
         if(target != null) {
-            int count = server.getServer(target.getServerName()).get().getPlayersConnected().size();
-            if(count + 1 == min && !isOtherUnderMin(target)) {
+            int count = Nebula.server.getServer(target.getServerName()).get().getPlayersConnected().size();
+            if(count + 1 == Data.defaultmin && !isOtherUnderMin(target)) {
                 createDefault();
             }
         }
@@ -50,12 +38,12 @@ public class DefaultsManager {
             return null;
         }
         BackendServer serverWithLowestCount = getAvailableServers().getFirst();
-        int lowestPlayerCount = server.getServer(serverWithLowestCount.getServerName())
+        int lowestPlayerCount = Nebula.server.getServer(serverWithLowestCount.getServerName())
                 .get()
                 .getPlayersConnected()
                 .size();
         for (BackendServer backendServer : getAvailableServers()) {
-            int playerCount = server.getServer(backendServer.getServerName())
+            int playerCount = Nebula.server.getServer(backendServer.getServerName())
                     .get()
                     .getPlayersConnected()
                     .size();
@@ -69,11 +57,11 @@ public class DefaultsManager {
 
     private boolean isOtherUnderMin(BackendServer other) {
         for (BackendServer backendServer : getAvailableServers()) {
-            int playerCount = server.getServer(backendServer.getServerName())
+            int playerCount = Nebula.server.getServer(backendServer.getServerName())
                     .get()
                     .getPlayersConnected()
                     .size();
-            if (playerCount < min && !backendServer.equals(other)) {
+            if (playerCount < Data.defaultmin && !backendServer.equals(other)) {
                 return true;
             }
         }
@@ -82,11 +70,11 @@ public class DefaultsManager {
 
     private BackendServer getServerBetweenMinAndMaxPlayers() {
         for (BackendServer backendServer : getAvailableServers()) {
-            int playerCount = server.getServer(backendServer.getServerName())
+            int playerCount = Nebula.server.getServer(backendServer.getServerName())
                     .get()
                     .getPlayersConnected()
                     .size();
-            if (playerCount >= min && playerCount < max) {
+            if (playerCount >= Data.defaultmin && playerCount < Data.defaultmax) {
                 return backendServer;
             }
         }
@@ -98,7 +86,7 @@ public class DefaultsManager {
         BackendServer temp = Nebula.serverManager.createFromTemplate(
                 Data.defaultServerTemplate,
                 name,
-                server.getConsoleCommandSource(),
+                Nebula.server.getConsoleCommandSource(),
                 "lobby", "retry"
         );
     }

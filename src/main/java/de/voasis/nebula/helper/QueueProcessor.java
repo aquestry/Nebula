@@ -1,7 +1,6 @@
 package de.voasis.nebula.helper;
 
 import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.proxy.ProxyServer;
 import de.voasis.nebula.data.Data;
 import de.voasis.nebula.data.Messages;
 import de.voasis.nebula.map.BackendServer;
@@ -12,12 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class QueueProcessor {
-
-    private final ProxyServer server;
-
-    public QueueProcessor(ProxyServer server) {
-        this.server = server;
-    }
 
     public void init() {
         for (GamemodeQueue queue : Data.gamemodeQueueMap) {
@@ -75,7 +68,7 @@ public class QueueProcessor {
         return Nebula.serverManager.createFromTemplate(
                 queue.getTemplate(),
                 serverName,
-                server.getConsoleCommandSource(),
+                Nebula.server.getConsoleCommandSource(),
                 flags
         );
     }

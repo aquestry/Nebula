@@ -5,7 +5,6 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import de.voasis.nebula.data.Messages;
 import de.voasis.nebula.map.BackendServer;
@@ -17,12 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServerManager {
-
-    private final ProxyServer server;
-
-    public ServerManager(ProxyServer proxyServer) {
-        this.server = proxyServer;
-    }
 
     private void executeSSHCommand(HoldServer externalServer, String command, Runnable onSuccess, Runnable onError) {
         Session session = null;
@@ -79,7 +72,7 @@ public class ServerManager {
             executeSSHCommand(externalServer, command,
                     () -> {
                         ServerInfo newInfo = new ServerInfo(FinalNewName, new InetSocketAddress(finalExternalServer.getIp(), tempPort));
-                        server.registerServer(newInfo);
+                        Nebula.server.registerServer(newInfo);
                         Data.backendInfoMap.add(backendServer);
                         Nebula.util.updateFreePort(finalExternalServer);
                         Nebula.util.sendMessage(source, Messages.DONE);
@@ -115,7 +108,7 @@ public class ServerManager {
     }
 
     private void kickAll(BackendServer backendServer) {
-        server.getServer(backendServer.getServerName()).ifPresent(serverInfo -> {
+        Nebula.server.getServer(backendServer.getServerName()).ifPresent(serverInfo -> {
             for (Player p : serverInfo.getPlayersConnected()) {
                 if(backendServer.getFlags().contains("lobby")) {
                     p.disconnect(Component.empty());
@@ -155,7 +148,7 @@ public class ServerManager {
         Nebula.util.sendMessage(source, Messages.DELETE_CONTAINER.replace("<name>", name));
         executeSSHCommand(externalServer, "docker rm -f " + name,
                 () -> {
-                    server.unregisterServer(new ServerInfo(name, new InetSocketAddress(externalServer.getIp(), serverToDelete.getPort())));
+                    Nebula.server.unregisterServer(new ServerInfo(name, new InetSocketAddress(externalServer.getIp(), serverToDelete.getPort())));
                     Data.backendInfoMap.remove(serverToDelete);
                     Nebula.util.sendMessage(source, Messages.DONE);
                 },
