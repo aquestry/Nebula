@@ -5,12 +5,10 @@ import de.voasis.nebula.data.Data;
 import de.voasis.nebula.map.BackendServer;
 import de.voasis.nebula.Nebula;
 import java.util.ArrayList;
-import java.util.List;
 
 public class ProxyShutdown {
     public ProxyShutdown(ProxyShutdownEvent event) {
-        List<BackendServer> serversToDelete = new ArrayList<>(Data.backendInfoMap);
-        for(BackendServer backendServer : serversToDelete) {
+        for(BackendServer backendServer : new ArrayList<>(Data.backendInfoMap)) {
             if(backendServer != null) {
                 Nebula.serverManager.delete(backendServer, null);
             }

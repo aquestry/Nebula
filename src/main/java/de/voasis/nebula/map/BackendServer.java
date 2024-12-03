@@ -32,7 +32,7 @@ public class BackendServer {
     public HoldServer getHoldServer() { return holdServer; }
     public boolean isOnline() { return online; }
     public CommandSource getCreator() { return creator; }
-    public void addPendingPlayerConnection(Player player) { if (!pendingPlayerConnections.contains(player)) {pendingPlayerConnections.add(player);} }
+    public void addPendingPlayerConnection(Player player) { if (!pendingPlayerConnections.contains(player)) { pendingPlayerConnections.add(player);} }
     public List<Player> getPendingPlayerConnections() { return new ArrayList<>(pendingPlayerConnections); }
     public void removePendingPlayerConnection(Player player) { pendingPlayerConnections.remove(player); }
     public void setOnline(boolean online) { this.online = online; }
