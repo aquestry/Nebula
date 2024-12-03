@@ -37,7 +37,11 @@ public class FilesManager {
             Data.vsecret = config.node("vsecret").getString();
             Data.pullStart = config.node("pull-start").getBoolean();
             String envVars = config.node("env-vars").getString();
-            Data.envVars = envVars != null ? Arrays.stream(envVars.split(",")).map(s -> " -e "+s).collect(Collectors.joining()) : "";
+            Data.envVars = (envVars != null && !"none".equals(envVars))
+                    ? Arrays.stream(envVars.split(","))
+                    .map(s -> " -e " + s)
+                    .collect(Collectors.joining())
+                    : "";
             String adminList = config.node("admins").getString();
             Data.adminUUIDs = adminList != null ? List.of(adminList.split(",")) : List.of();
             Nebula.util.log("Admin UUIDS: {}", Data.adminUUIDs);
