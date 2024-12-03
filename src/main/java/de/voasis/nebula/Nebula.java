@@ -37,8 +37,8 @@ public class Nebula {
         server = proxy;
         permissionManager  = new PermissionManager();
         util = new Util();
-        filesManager = new FilesManager(dataDirectory);
         serverManager = new ServerManager();
+        filesManager = new FilesManager(dataDirectory);
         defaultsManager = new DefaultsManager();
         defaultsManager.createDefault();
         queueProcessor = new QueueProcessor();

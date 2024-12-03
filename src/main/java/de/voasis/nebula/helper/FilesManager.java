@@ -84,7 +84,7 @@ public class FilesManager {
                                 Nebula.serverManager.pull(holdServer, template, Nebula.server.getConsoleCommandSource())));
             }
         } catch (Exception e) {
-            Nebula.util.log("Error in configuration loading", e);
+            Nebula.util.log("Error in configuration loading {}", e);
             Nebula.server.shutdown();
         }
     }
