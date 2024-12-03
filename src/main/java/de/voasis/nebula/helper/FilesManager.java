@@ -149,7 +149,7 @@ public class FilesManager {
 
     private void copyResource(String resourceName, File destination) {
         try (InputStream resourceStream = getClass().getResourceAsStream("/" + resourceName);
-             FileOutputStream outputStream = new FileOutputStream(destination)) {
+            FileOutputStream outputStream = new FileOutputStream(destination)) {
             if (resourceStream == null) {
                 Nebula.util.log("Resource '{}' not found in JAR.", resourceName);
                 destination.createNewFile();
