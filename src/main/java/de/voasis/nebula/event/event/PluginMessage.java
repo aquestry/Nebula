@@ -2,14 +2,19 @@ package de.voasis.nebula.event.event;
 
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ServerConnection;
 import de.voasis.nebula.Nebula;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 public class PluginMessage {
     public PluginMessage(PluginMessageEvent event) {
+        if(!(event.getSource() instanceof ServerConnection)) {
+            return;
+        }
         String messageContent = new String(event.getData(), StandardCharsets.UTF_8);
         if (event.getIdentifier().equals(Nebula.channel)) {
+            event.setResult(PluginMessageEvent.ForwardResult.handled());
             if (messageContent.startsWith("lobby:")) {
                 Player player = Nebula.server.getPlayer(messageContent.replace("lobby:", "")).get();
                 Nebula.util.connectPlayer(player, Nebula.defaultsManager.getTarget(), true);
