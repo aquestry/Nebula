@@ -26,8 +26,15 @@ public class QueueProcessor {
             int neededPlayers = queue.getNeededPlayers();
             if (queue.getInQueue().size() >= neededPlayers) {
                 List<Player> playersToMove = new ArrayList<>();
-                for (int i = 0; i < neededPlayers; i++) {
-                    playersToMove.add(queue.getInQueue().removeFirst());
+                if(Nebula.partyManager.isInParty(queue.getInQueue().getFirst())) {
+                    playersToMove = Nebula.partyManager.getParty(queue.getInQueue().getFirst()).getMembers();
+                    for(Player player : playersToMove) {
+                        queue.getInQueue().remove(player);
+                    }
+                } else {
+                    for (int i = 0; i < neededPlayers; i++) {
+                        playersToMove.add(queue.getInQueue().removeFirst());
+                    }
                 }
                 Optional<BackendServer> preloadedServer = findPreloadedServer(queue);
                 if (preloadedServer.isPresent()) {

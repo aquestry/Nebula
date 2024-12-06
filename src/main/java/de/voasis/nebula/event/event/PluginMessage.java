@@ -4,14 +4,11 @@ import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import de.voasis.nebula.Nebula;
+import de.voasis.nebula.data.Data;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class PluginMessage {
-
-    private static final Map<String, Long> cooldowns = new ConcurrentHashMap<>();
 
     public PluginMessage(PluginMessageEvent event) {
         if(!(event.getSource() instanceof ServerConnection)) return;
@@ -20,7 +17,8 @@ public class PluginMessage {
             event.setResult(PluginMessageEvent.ForwardResult.handled());
             String playerName = messageContent.contains(":") ? messageContent.split(":")[1] : "";
             long now = System.currentTimeMillis();
-            if (cooldowns.compute(playerName, (key, lastTime) -> (lastTime == null || now - lastTime >= 1000) ? now : lastTime) != now) { return; }
+            if (Data.cooldownsPluginMessage.containsKey(playerName) && now - Data.cooldownsPluginMessage.get(playerName) < 1000) return;
+            Data.cooldownsPluginMessage.put(playerName, now);
             if (messageContent.startsWith("lobby:")) {
                 Player player = Nebula.server.getPlayer(messageContent.replace("lobby:", "")).get();
                 Nebula.util.connectPlayer(player, Nebula.defaultsManager.getTarget(), true);
