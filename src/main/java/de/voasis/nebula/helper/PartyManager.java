@@ -104,8 +104,8 @@ public class PartyManager {
                     Nebula.queueProcessor.leaveQueue(member, false);
                 }
             }
-            party.removeMember(player);
             Nebula.util.sendMemberMessage(party, Messages.LEFT_PARTY.replace("<leader>", party.getLeader().getUsername()).replace("<player>", player.getUsername()));
+            party.removeMember(player);
             if (party.getMembers().size() <= 1) {
                 parties.remove(party);
                 return;
