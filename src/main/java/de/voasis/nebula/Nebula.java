@@ -10,6 +10,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import de.voasis.nebula.commands.AdminCommand;
+import de.voasis.nebula.commands.PartyCommand;
 import de.voasis.nebula.commands.QueueCommand;
 import de.voasis.nebula.data.Data;
 import de.voasis.nebula.data.Util;
@@ -30,6 +31,7 @@ public class Nebula {
     public static DefaultsManager defaultsManager;
     public static QueueProcessor queueProcessor;
     public static AutoDeleter autoDeleter;
+    public static PartyManager partyManager;
     public static Util util;
 
     @Inject
@@ -44,6 +46,7 @@ public class Nebula {
         queueProcessor = new QueueProcessor();
         queueProcessor.init();
         autoDeleter = new AutoDeleter();
+        partyManager = new PartyManager();
     }
 
     @Subscribe
@@ -62,11 +65,14 @@ public class Nebula {
         util.pingServers();
         queueProcessor.process();
         autoDeleter.process();
+        partyManager.refresh();
     }
 
     private void registerCommands() {
         CommandManager commandManager = server.getCommandManager();
         commandManager.register("admin", new AdminCommand());
+        commandManager.register("p", new PartyCommand());
+        commandManager.register("party", new PartyCommand());
         commandManager.register("queue", new QueueCommand());
     }
 }

@@ -93,6 +93,8 @@ public class FilesManager {
         try {
             String prefix = messages.node("prefix").getString("[Server] ");
             Messages.PREFIX = prefix;
+
+            // Admin Messages
             Messages.USAGE_ADMIN = messages.node("admin", "usage").getString("<pre>Usage: /admin <stop|delete|template> <args...>").replace("<pre>", prefix);
             Messages.KILL_CONTAINER = messages.node("admin", "kill-start").getString("<pre>Killing server instance <name>.").replace("<pre>", prefix);
             Messages.DELETE_CONTAINER = messages.node("admin", "delete-start").getString("<pre>Deleting server instance <name>.").replace("<pre>", prefix);
@@ -113,6 +115,8 @@ public class FilesManager {
             Messages.DONE = messages.node("admin", "done").getString("<pre>Done.").replace("<pre>", prefix);
             Messages.ONLINE = messages.node("util", "server-online").getString("<pre>Server <name> is now online.").replace("<pre>", prefix);
             Messages.OFFLINE = messages.node("util", "server-offline").getString("<pre>Server <name> is now offline.").replace("<pre>", prefix);
+
+            // Queue Messages
             Messages.USAGE_QUEUE = messages.node("queue", "usage").getString("<pre>Usage: /queue leave or /queue join <name>").replace("<pre>", prefix);
             Messages.ADDED_TO_QUEUE = messages.node("queue", "added-to-queue").getString("<pre>You got added to queue: <queue>.").replace("<pre>", prefix);
             Messages.REMOVED_FROM_QUEUE = messages.node("queue", "removed-from-queue").getString("<pre>You got removed from queue: <queue>.").replace("<pre>", prefix);
@@ -120,6 +124,25 @@ public class FilesManager {
             Messages.NOT_IN_QUEUE = messages.node("queue", "not-in-queue").getString("<pre>You are in no queue.").replace("<pre>", prefix);
             Messages.LOBBY_ONLY = messages.node("queue", "lobby-only").getString("<pre>You can only join a queue from the lobby.").replace("<pre>", prefix);
             Messages.QUEUE_NOT_FOUND = messages.node("queue", "queue-not-found").getString("<pre>Queue not found.").replace("<pre>", prefix);
+
+            // Party Messages
+            Messages.TARGET_INVITE_NOT_FOUND = messages.node("party", "target-invite-not-found").getString("<pre>The player <target> is not online.").replace("<pre>", prefix);
+            Messages.TARGET_INVITE_ALREADY = messages.node("party", "target-invite-already").getString("<pre>The player <target> is already invited.").replace("<pre>", prefix);
+            Messages.SENT_INVITE = messages.node("party", "sent-invite").getString("<pre>You have sent an invite to <target>.").replace("<pre>", prefix);
+            Messages.NO_INVITE_FROM_LEADER = messages.node("party", "no-invite-from-leader").getString("<pre>You have no invite from <leader>'s party.").replace("<pre>", prefix);
+            Messages.ALREADY_IN_PARTY = messages.node("party", "already-in-party").getString("<pre>You are already in a party. Use /p leave to leave your current party.").replace("<pre>", prefix);
+            Messages.JOINED_PARTY = messages.node("party", "joined-party").getString("<pre><player> joined the party of <leader>.").replace("<pre>", prefix);
+            Messages.NOT_INVITED = messages.node("party", "not-invited").getString("<pre>You are not invited to any party.").replace("<pre>", prefix);
+            Messages.LEFT_PARTY = messages.node("party", "left-party").getString("<pre><player> left the party led by <leader>.").replace("<pre>", prefix);
+            Messages.NO_PARTY_TO_LEAVE = messages.node("party", "no-party-to-leave").getString("<pre>You are not in a party to leave.").replace("<pre>", prefix);
+            Messages.INVITED_MESSAGE = messages.node("party", "invited-message").getString("<pre>You have been invited to join <leader>'s party.").replace("<pre>", prefix);
+            Messages.INVITE_EXPIRED = messages.node("party", "invite-expired").getString("<pre>The invite from <leader>'s party has expired.").replace("<pre>", prefix);
+            Messages.INVITE_TO_PLAYER_EXPIRED = messages.node("party", "invite-to-player-expired").getString("<pre>Your invite to <player> has expired.").replace("<pre>", prefix);
+            Messages.USAGE_PARTY = messages.node("party", "command-usage").getString("<pre>Usage: /party <accept|invite|leave> [player].").replace("<pre>", prefix);
+            // QueueProcessor Party-Specific Messages
+            Messages.LEADER_CANNOT_JOIN_QUEUE = messages.node("queue", "leader-cannot-join").getString("<pre>You cannot join the queue because the player count in your party does not match.").replace("<pre>", prefix);
+            Messages.NOT_PARTY_LEADER = messages.node("queue", "not-party-leader").getString("<pre>You cannot join a game mode because you are not the party leader. Use /p leave to leave the party.").replace("<pre>", prefix);
+
         } catch (Exception e) {
             Nebula.util.log("Error loading message strings", e);
             Nebula.server.shutdown();

@@ -90,8 +90,23 @@ public class QueueProcessor {
                 .findFirst()
                 .ifPresentOrElse(
                         queue -> {
-                            queue.getInQueue().add(player);
-                            Nebula.util.sendMessage(player, Messages.ADDED_TO_QUEUE.replace("<queue>", queueName));
+                            if(Nebula.partyManager.isInParty(player)) {
+                                if(queue.getNeededPlayers() != Nebula.partyManager.getParty(player).getMembers().size()) {
+                                    // Add Message for wrong Player count
+                                    return;
+                                }
+                                if(Nebula.partyManager.getParty(player).getLeader().equals(player)) {
+                                    // Add Message for not beeing the leader
+                                    return;
+                                }
+                                Nebula.partyManager.getParty(player).getMembers().forEach(member -> {
+                                    queue.getInQueue().add(member);
+                                    Nebula.util.sendMessage(member, Messages.ADDED_TO_QUEUE.replace("<queue>", queueName));
+                                });
+                            } else  {
+                                queue.getInQueue().add(player);
+                                Nebula.util.sendMessage(player, Messages.ADDED_TO_QUEUE.replace("<queue>", queueName));
+                            }
                         },
                         () -> Nebula.util.sendMessage(player, Messages.QUEUE_NOT_FOUND)
                 );
