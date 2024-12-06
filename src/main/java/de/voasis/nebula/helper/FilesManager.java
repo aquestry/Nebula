@@ -132,13 +132,15 @@ public class FilesManager {
             Messages.NO_INVITE_FROM_LEADER = messages.node("party", "no-invite-from-leader").getString("<pre>You have no invite from <leader>'s party.").replace("<pre>", prefix);
             Messages.ALREADY_IN_PARTY = messages.node("party", "already-in-party").getString("<pre>You are already in a party. Use /p leave to leave your current party.").replace("<pre>", prefix);
             Messages.JOINED_PARTY = messages.node("party", "joined-party").getString("<pre><player> joined the party of <leader>.").replace("<pre>", prefix);
-            Messages.NOT_INVITED = messages.node("party", "not-invited").getString("<pre>You are not invited to any party.").replace("<pre>", prefix);
             Messages.LEFT_PARTY = messages.node("party", "left-party").getString("<pre><player> left the party led by <leader>.").replace("<pre>", prefix);
             Messages.NO_PARTY_TO_LEAVE = messages.node("party", "no-party-to-leave").getString("<pre>You are not in a party to leave.").replace("<pre>", prefix);
             Messages.INVITED_MESSAGE = messages.node("party", "invited-message").getString("<pre>You have been invited to join <leader>'s party.").replace("<pre>", prefix);
             Messages.INVITE_EXPIRED = messages.node("party", "invite-expired").getString("<pre>The invite from <leader>'s party has expired.").replace("<pre>", prefix);
             Messages.INVITE_TO_PLAYER_EXPIRED = messages.node("party", "invite-to-player-expired").getString("<pre>Your invite to <player> has expired.").replace("<pre>", prefix);
+            Messages.QUEUE_PLAYER_COUNT_MISMATCH = messages.node("party", "queue-count-not-matching").getString("<pre>The player count in your party does not match the required queue size.").replace("<pre>", prefix);
+            Messages.PARTY_NOT_ALLOWED = messages.node("party", "party-not-allowed").getString("<pre>You need to be leader to do that.").replace("<pre>", prefix);
             Messages.USAGE_PARTY = messages.node("party", "command-usage").getString("<pre>Usage: /party <accept|invite|leave> [player].").replace("<pre>", prefix);
+
             // QueueProcessor Party-Specific Messages
             Messages.LEADER_CANNOT_JOIN_QUEUE = messages.node("queue", "leader-cannot-join").getString("<pre>You cannot join the queue because the player count in your party does not match.").replace("<pre>", prefix);
             Messages.NOT_PARTY_LEADER = messages.node("queue", "not-party-leader").getString("<pre>You cannot join a game mode because you are not the party leader. Use /p leave to leave the party.").replace("<pre>", prefix);

@@ -2,6 +2,8 @@ package de.voasis.nebula.map;
 
 import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
+import de.voasis.nebula.data.Messages;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,8 +36,8 @@ public class Party {
         invites.entrySet().removeIf(entry -> {
             boolean isExpired = currentTime - entry.getValue() > 60000;
             if (isExpired) {
-                // Sned ran out mesages
-                Nebula.util.log("Removing expired invite for player: {}", entry.getKey().getUsername());
+                Nebula.util.sendMessage(entry.getKey(), Messages.INVITE_EXPIRED.replace("<leader>", leader.getUsername()));
+                Nebula.util.sendMessage(leader, Messages.INVITE_TO_PLAYER_EXPIRED.replace("<player>", entry.getKey().getUsername()));
             }
             return isExpired;
         });

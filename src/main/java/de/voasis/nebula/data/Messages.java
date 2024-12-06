@@ -42,12 +42,13 @@ public class Messages {
     public static String NO_INVITE_FROM_LEADER;
     public static String ALREADY_IN_PARTY;
     public static String JOINED_PARTY;
-    public static String NOT_INVITED;
     public static String LEFT_PARTY;
     public static String NO_PARTY_TO_LEAVE;
     public static String INVITED_MESSAGE;
     public static String INVITE_EXPIRED;
     public static String INVITE_TO_PLAYER_EXPIRED;
+    public static String QUEUE_PLAYER_COUNT_MISMATCH ;
+    public static String PARTY_NOT_ALLOWED;
     public static String USAGE_PARTY;
 
     // QueueProcessor-Specific Party Messages

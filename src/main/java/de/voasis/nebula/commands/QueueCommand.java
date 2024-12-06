@@ -21,7 +21,7 @@ public class QueueCommand implements SimpleCommand {
                 return;
             }
             switch (args[0]) {
-                case "leave" -> Nebula.queueProcessor.leaveQueue(player);
+                case "leave" -> Nebula.queueProcessor.leaveQueue(player, true);
                 case "join" -> {
                     if (args.length == 2) {
                         Nebula.queueProcessor.joinQueue(player, args[1]);

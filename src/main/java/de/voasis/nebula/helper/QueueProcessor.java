@@ -91,12 +91,12 @@ public class QueueProcessor {
                 .ifPresentOrElse(
                         queue -> {
                             if(Nebula.partyManager.isInParty(player)) {
-                                if(queue.getNeededPlayers() != Nebula.partyManager.getParty(player).getMembers().size()) {
-                                    // Add Message for wrong Player count
+                                if(Nebula.partyManager.getParty(player).getLeader().equals(player)) {
+                                    Nebula.util.sendMessage(player, Messages.NOT_PARTY_LEADER);
                                     return;
                                 }
-                                if(Nebula.partyManager.getParty(player).getLeader().equals(player)) {
-                                    // Add Message for not beeing the leader
+                                if(queue.getNeededPlayers() != Nebula.partyManager.getParty(player).getMembers().size()) {
+                                    Nebula.util.sendMessage(player, Messages.QUEUE_PLAYER_COUNT_MISMATCH);
                                     return;
                                 }
                                 Nebula.partyManager.getParty(player).getMembers().forEach(member -> {
@@ -112,9 +112,9 @@ public class QueueProcessor {
                 );
     }
 
-    public void leaveQueue(Player player) {
+    public void leaveQueue(Player player, boolean warn) {
         if (!isInAnyQueue(player)) {
-            Nebula.util.sendMessage(player, Messages.NOT_IN_QUEUE);
+            if(warn) { Nebula.util.sendMessage(player, Messages.NOT_IN_QUEUE); }
             return;
         }
         for (GamemodeQueue queue : Data.gamemodeQueueMap) {

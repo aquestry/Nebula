@@ -27,6 +27,10 @@ public class PartyManager {
                 Nebula.util.sendMessage(player, Messages.TARGET_INVITE_ALREADY.replace("<target>", targetName));
                 return;
             }
+            if(!getParty(player).getLeader().equals(player)) {
+                Nebula.util.sendMessage(player, Messages.PARTY_NOT_ALLOWED);
+                return;
+            }
             Nebula.util.sendMessage(player, Messages.SENT_INVITE.replace("<target>", targetName));
             Nebula.util.sendMessage(target, Messages.INVITED_MESSAGE.replace("<leader>", player.getUsername()));
             getParty(player).addInvite(target);
@@ -50,16 +54,17 @@ public class PartyManager {
             return;
         }
         if (isInParty(player)) {
-            Nebula.util.sendMessage(player, Messages.ALREADY_IN_PARTY);
-            return;
+            if(getParty(player).getMembers().size() > 1) {
+                Nebula.util.sendMessage(player, Messages.ALREADY_IN_PARTY);
+                return;
+            }
         }
         Party party = getParty(target);
         if (party.isInvited(player)) {
-            for(Player member : party.getMembers()) {
-                Nebula.util.sendMessage(member, Messages.JOINED_PARTY.replace("<leader>", targetName).replace("<player>", player.getUsername()));
-            }
             party.removeInvite(player);
             party.addMember(player);
+            Nebula.util.sendMemberMessage(party, Messages.JOINED_PARTY.replace("<leader>", targetName).replace("<player>", player.getUsername()));
+
         } else {
             Nebula.util.sendMessage(player, Messages.NO_INVITE_FROM_LEADER.replace("<leader>", targetName));
         }
@@ -94,8 +99,13 @@ public class PartyManager {
     public void quit(Player player) {
         Party party = getParty(player);
         if (party != null) {
+            for(Player member : party.getMembers()) {
+                if(Nebula.queueProcessor.isInAnyQueue(member)) {
+                    Nebula.queueProcessor.leaveQueue(member, false);
+                }
+            }
             party.removeMember(player);
-            Nebula.util.sendMessage(player, Messages.LEFT_PARTY.replace("<leader>", party.getLeader().getUsername()).replace("<player>", player.getUsername()));
+            Nebula.util.sendMemberMessage(party, Messages.LEFT_PARTY.replace("<leader>", party.getLeader().getUsername()).replace("<player>", player.getUsername()));
             if (party.getMembers().size() <= 1) {
                 parties.remove(party);
                 return;
@@ -104,10 +114,13 @@ public class PartyManager {
                 Player newLeader = party.getMembers().getFirst();
                 party.newLeader(newLeader);
             } else {
-                Nebula.util.sendMessage(player, Messages.LEFT_PARTY.replace("<leader>", party.getLeader().getUsername()).replace("<player>", player.getUsername()));
+                Nebula.util.sendMemberMessage(party, Messages.LEFT_PARTY.replace("<leader>", party.getLeader().getUsername()).replace("<player>", player.getUsername()));
             }
         } else {
             Nebula.util.sendMessage(player, Messages.NO_PARTY_TO_LEAVE);
+            if(Nebula.queueProcessor.isInAnyQueue(player)) {
+                Nebula.queueProcessor.leaveQueue(player, false);
+            }
         }
     }
 }

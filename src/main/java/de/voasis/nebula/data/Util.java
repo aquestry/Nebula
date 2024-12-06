@@ -9,6 +9,7 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.map.BackendServer;
 import de.voasis.nebula.map.HoldServer;
 import de.voasis.nebula.Nebula;
+import de.voasis.nebula.map.Party;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import java.util.*;
@@ -155,6 +156,12 @@ public class Util {
         } else if(source instanceof Player player){
             player.sendMessage(mm.deserialize(message));
             Nebula.server.getConsoleCommandSource().sendMessage(mm.deserialize(player.getUsername() + " --> " + message));
+        }
+    }
+
+    public void sendMemberMessage(Party party, String message) {
+        for(Player member : party.getMembers()) {
+            sendMessage(member, message);
         }
     }
 

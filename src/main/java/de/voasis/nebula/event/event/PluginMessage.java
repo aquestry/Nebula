@@ -36,7 +36,7 @@ public class PluginMessage {
             } else if (messageContent.startsWith("leave_queue:")) {
                 if (messageContent.split(":").length != 2) Nebula.util.log("Incorrect leave queue plugin message format: {}", messageContent);
                 Optional<Player> player = Nebula.server.getPlayer(playerName);
-                player.ifPresent(p -> Nebula.queueProcessor.leaveQueue(p));
+                player.ifPresent(p -> Nebula.queueProcessor.leaveQueue(p, true));
             }
         }
     }

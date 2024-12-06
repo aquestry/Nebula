@@ -10,9 +10,6 @@ public class Disconnect {
     public Disconnect(DisconnectEvent event) {
         Player player = event.getPlayer();
         Nebula.partyManager.quit(player);
-        if(Nebula.queueProcessor.isInAnyQueue(player)) {
-            Nebula.queueProcessor.leaveQueue(player);
-        }
         for(BackendServer backendServer : Data.backendInfoMap) {
             backendServer.removePendingPlayerConnection(player);
         }
