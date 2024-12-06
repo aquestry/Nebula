@@ -20,8 +20,7 @@ public class PluginMessage {
             event.setResult(PluginMessageEvent.ForwardResult.handled());
             String playerName = messageContent.contains(":") ? messageContent.split(":")[1] : "";
             long now = System.currentTimeMillis();
-            if (cooldowns.containsKey(playerName) && now - cooldowns.get(playerName) < 1000) return;
-            cooldowns.put(playerName, now);
+            if (cooldowns.compute(playerName, (key, lastTime) -> (lastTime == null || now - lastTime >= 1000) ? now : lastTime) != now) { return; }
             if (messageContent.startsWith("lobby:")) {
                 Player player = Nebula.server.getPlayer(messageContent.replace("lobby:", "")).get();
                 Nebula.util.connectPlayer(player, Nebula.defaultsManager.getTarget(), true);

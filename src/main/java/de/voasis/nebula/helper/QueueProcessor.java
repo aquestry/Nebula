@@ -91,7 +91,7 @@ public class QueueProcessor {
                 .ifPresentOrElse(
                         queue -> {
                             if(Nebula.partyManager.isInParty(player)) {
-                                if(Nebula.partyManager.getParty(player).getLeader().equals(player)) {
+                                if(!Nebula.partyManager.getParty(player).getLeader().equals(player)) {
                                     Nebula.util.sendMessage(player, Messages.NOT_PARTY_LEADER);
                                     return;
                                 }
