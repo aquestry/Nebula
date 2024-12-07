@@ -144,7 +144,6 @@ public class FilesManager {
             // QueueProcessor Party-Specific Messages
             Messages.LEADER_CANNOT_JOIN_QUEUE = messages.node("queue", "leader-cannot-join").getString("<pre>You cannot join the queue because the player count in your party does not match.").replace("<pre>", prefix);
             Messages.NOT_PARTY_LEADER = messages.node("queue", "not-party-leader").getString("<pre>You cannot join a game mode because you are not the party leader. Use /p leave to leave the party.").replace("<pre>", prefix);
-
         } catch (Exception e) {
             Nebula.util.log("Error loading message strings", e);
             Nebula.server.shutdown();

@@ -7,7 +7,6 @@ import de.voasis.nebula.map.BackendServer;
 import de.voasis.nebula.map.GamemodeQueue;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.map.Party;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

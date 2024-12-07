@@ -21,7 +21,6 @@ public class PartyManager {
             Nebula.util.sendMessage(player, Messages.TARGET_INVITE_NOT_FOUND.replace("<target>", targetName));
             return;
         }
-
         Party party = getParty(player);
         if (party != null) {
             if (party.isInvited(target)) {
@@ -75,10 +74,6 @@ public class PartyManager {
                 .filter(p -> p.isMember(player))
                 .findFirst()
                 .orElse(null);
-    }
-
-    public boolean isInParty(Player player) {
-        return parties.stream().anyMatch(p -> p.isMember(player));
     }
 
     public boolean isInvitedInMyParty(Player player, Player target) {
