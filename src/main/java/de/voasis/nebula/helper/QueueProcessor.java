@@ -6,6 +6,8 @@ import de.voasis.nebula.data.Messages;
 import de.voasis.nebula.map.BackendServer;
 import de.voasis.nebula.map.GamemodeQueue;
 import de.voasis.nebula.Nebula;
+import de.voasis.nebula.map.Party;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,8 +28,9 @@ public class QueueProcessor {
             int neededPlayers = queue.getNeededPlayers();
             if (queue.getInQueue().size() >= neededPlayers) {
                 List<Player> playersToMove = new ArrayList<>();
-                if(Nebula.partyManager.isInParty(queue.getInQueue().getFirst())) {
-                    playersToMove = Nebula.partyManager.getParty(queue.getInQueue().getFirst()).getMembers();
+                Party p = Nebula.partyManager.getParty(queue.getInQueue().getFirst());
+                if(p != null) {
+                    playersToMove = p.getMembers();
                     for(Player player : playersToMove) {
                         queue.getInQueue().remove(player);
                     }
@@ -97,16 +100,17 @@ public class QueueProcessor {
                 .findFirst()
                 .ifPresentOrElse(
                         queue -> {
-                            if(Nebula.partyManager.isInParty(player)) {
-                                if(!Nebula.partyManager.getParty(player).getLeader().equals(player)) {
+                            Party playerParty = Nebula.partyManager.getParty(player);
+                            if(playerParty != null) {
+                                if(!playerParty.getLeader().equals(player)) {
                                     Nebula.util.sendMessage(player, Messages.NOT_PARTY_LEADER);
                                     return;
                                 }
-                                if(queue.getNeededPlayers() != Nebula.partyManager.getParty(player).getMembers().size()) {
+                                if(queue.getNeededPlayers() != playerParty.getMembers().size()) {
                                     Nebula.util.sendMessage(player, Messages.QUEUE_PLAYER_COUNT_MISMATCH);
                                     return;
                                 }
-                                Nebula.partyManager.getParty(player).getMembers().forEach(member -> {
+                                playerParty.getMembers().forEach(member -> {
                                     queue.getInQueue().add(member);
                                     Nebula.util.sendMessage(member, Messages.ADDED_TO_QUEUE.replace("<queue>", queueName));
                                 });

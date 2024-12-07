@@ -22,25 +22,24 @@ public class PartyManager {
             return;
         }
 
-        if (isInParty(player)) {
-            if (getParty(player).isInvited(target)) {
+        Party party = getParty(player);
+        if (party != null) {
+            if (party.isInvited(target)) {
                 Nebula.util.sendMessage(player, Messages.TARGET_INVITE_ALREADY.replace("<target>", targetName));
                 return;
             }
-            if(!getParty(player).getLeader().equals(player)) {
+            if(!party.getLeader().equals(player)) {
                 Nebula.util.sendMessage(player, Messages.PARTY_NOT_ALLOWED);
                 return;
             }
-            Nebula.util.sendMessage(player, Messages.SENT_INVITE.replace("<target>", targetName));
-            Nebula.util.sendMessage(target, Messages.INVITED_MESSAGE.replace("<leader>", player.getUsername()));
-            getParty(player).addInvite(target);
-        } else {
-            Party party = new Party(player);
             party.addInvite(target);
-            Nebula.util.sendMessage(player, Messages.SENT_INVITE.replace("<target>", targetName));
-            Nebula.util.sendMessage(target, Messages.INVITED_MESSAGE.replace("<leader>", player.getUsername()));
-            parties.add(party);
+        } else {
+            Party newParty = new Party(player);
+            newParty.addInvite(target);
+            parties.add(newParty);
         }
+        Nebula.util.sendMessage(player, Messages.SENT_INVITE.replace("<target>", targetName));
+        Nebula.util.sendMessage(target, Messages.INVITED_MESSAGE.replace("<leader>", player.getUsername()));
     }
 
     public void tryJoin(Player player, String targetName) {
@@ -49,21 +48,22 @@ public class PartyManager {
             Nebula.util.sendMessage(player, Messages.NO_INVITE_FROM_LEADER.replace("<leader>", targetName));
             return;
         }
-        if (!isInParty(target)) {
+        Party targetParty = getParty(target);
+        if (targetParty == null) {
             Nebula.util.sendMessage(player, Messages.NO_INVITE_FROM_LEADER.replace("<leader>", targetName));
             return;
         }
-        if (isInParty(player)) {
-            if(getParty(player).getMembers().size() > 1) {
+        Party playerParty = getParty(player);
+        if (playerParty != null) {
+            if(playerParty.getMembers().size() > 1) {
                 Nebula.util.sendMessage(player, Messages.ALREADY_IN_PARTY);
                 return;
             }
         }
-        Party party = getParty(target);
-        if (party.isInvited(player)) {
-            party.removeInvite(player);
-            party.addMember(player);
-            Nebula.util.sendMemberMessage(party, Messages.JOINED_PARTY.replace("<leader>", targetName).replace("<player>", player.getUsername()));
+        if (targetParty.isInvited(player)) {
+            targetParty.removeInvite(player);
+            targetParty.addMember(player);
+            Nebula.util.sendMemberMessage(targetParty, Messages.JOINED_PARTY.replace("<leader>", targetName).replace("<player>", player.getUsername()));
 
         } else {
             Nebula.util.sendMessage(player, Messages.NO_INVITE_FROM_LEADER.replace("<leader>", targetName));
@@ -72,7 +72,7 @@ public class PartyManager {
 
     public Party getParty(Player player) {
         return parties.stream()
-                .filter(p -> p.getMembers().contains(player))
+                .filter(p -> p.isMember(player))
                 .findFirst()
                 .orElse(null);
     }
@@ -82,8 +82,9 @@ public class PartyManager {
     }
 
     public boolean isInvitedInMyParty(Player player, Player target) {
-        if (isInParty(player)) {
-            return getParty(player).isInvited(target);
+        Party playerParty = getParty(player);
+        if (playerParty != null) {
+            return playerParty.isInvited(target);
         }
         return false;
     }
