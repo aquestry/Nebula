@@ -9,7 +9,9 @@ import de.voasis.nebula.Nebula;
 public class Disconnect {
     public Disconnect(DisconnectEvent event) {
         Player player = event.getPlayer();
-        Nebula.partyManager.quit(player);
+        if(Nebula.partyManager.getParty(player) != null) {
+            Nebula.partyManager.quit(player);
+        }
         for(BackendServer backendServer : Data.backendInfoMap) {
             backendServer.removePendingPlayerConnection(player);
         }

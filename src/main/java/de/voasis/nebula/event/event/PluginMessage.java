@@ -1,40 +1,46 @@
 package de.voasis.nebula.event.event;
 
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
-import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Data;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 public class PluginMessage {
-
     public PluginMessage(PluginMessageEvent event) {
-        if(!(event.getSource() instanceof ServerConnection)) return;
-        String messageContent = new String(event.getData(), StandardCharsets.UTF_8);
-        if (event.getIdentifier().equals(Nebula.channel)) {
-            event.setResult(PluginMessageEvent.ForwardResult.handled());
-            String playerName = messageContent.contains(":") ? messageContent.split(":")[1] : "";
-            long now = System.currentTimeMillis();
-            if (Data.cooldownsPluginMessage.containsKey(playerName) && now - Data.cooldownsPluginMessage.get(playerName) < 1000) return;
-            Data.cooldownsPluginMessage.put(playerName, now);
-            if (messageContent.startsWith("lobby:")) {
-                Player player = Nebula.server.getPlayer(messageContent.replace("lobby:", "")).get();
-                Nebula.util.connectPlayer(player, Nebula.defaultsManager.getTarget(), true);
-            } else if (messageContent.startsWith("queue:")) {
-                if (messageContent.split(":").length != 3) Nebula.util.log("Incorrect queue plugin message format: {}", messageContent);
-                Optional<Player> player = Nebula.server.getPlayer(playerName);
-                if (player.isEmpty()) {
-                    Nebula.util.log("Player {} not found", playerName);
-                    return;
+        if (!(event.getSource() instanceof ServerConnection)) return;
+        String message = new String(event.getData(), StandardCharsets.UTF_8);
+        if (!event.getIdentifier().equals(Nebula.channel)) return;
+        event.setResult(PluginMessageEvent.ForwardResult.handled());
+        String[] parts = message.split(":");
+        if (parts.length < 2) return;
+        String action = parts[0];
+        String playerName = parts[1];
+        long now = System.currentTimeMillis();
+        if (Data.cooldownsPluginMessage.getOrDefault(playerName, 0L) + 1000 > now) return;
+        Data.cooldownsPluginMessage.put(playerName, now);
+        switch (action) {
+            case "lobby" ->
+                    Nebula.server.getPlayer(playerName).ifPresent(player ->
+                            Nebula.util.connectPlayer(player, Nebula.defaultsManager.getTarget(), true));
+            case "queue" -> {
+                if (parts.length == 3) {
+                    Nebula.server.getPlayer(playerName).ifPresentOrElse(
+                            player -> Nebula.queueProcessor.joinQueue(player, parts[2]),
+                            () -> Nebula.util.log("Player {} not found", playerName));
+                } else {
+                    Nebula.util.log("Incorrect queue plugin message format: {}", message);
                 }
-                Nebula.queueProcessor.joinQueue(player.get(), messageContent.split(":")[2]);
-            } else if (messageContent.startsWith("leave_queue:")) {
-                if (messageContent.split(":").length != 2) Nebula.util.log("Incorrect leave queue plugin message format: {}", messageContent);
-                Optional<Player> player = Nebula.server.getPlayer(playerName);
-                player.ifPresent(p -> Nebula.queueProcessor.leaveQueue(p, true));
             }
+            case "leave_queue" -> {
+                if (parts.length == 2) {
+                    Nebula.server.getPlayer(playerName).ifPresent(player ->
+                            Nebula.queueProcessor.leaveQueue(player, true));
+                } else {
+                    Nebula.util.log("Incorrect leave queue plugin message format: {}", message);
+                }
+            }
+            default -> Nebula.util.log("Unknown plugin message action: {}", action);
         }
     }
 }

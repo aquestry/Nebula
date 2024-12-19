@@ -14,7 +14,6 @@ import de.voasis.nebula.event.event.*;
 import de.voasis.nebula.Nebula;
 
 public class EventManager {
-
     @Subscribe
     public void PlayerChooseInitialServer(PlayerChooseInitialServerEvent event) {
         new PlayerChooseInitialServer(event);
