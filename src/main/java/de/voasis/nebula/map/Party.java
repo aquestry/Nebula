@@ -3,7 +3,6 @@ package de.voasis.nebula.map;
 import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Messages;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
