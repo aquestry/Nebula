@@ -33,7 +33,6 @@ public class Nebula {
     public static QueueProcessor queueProcessor;
     public static AutoDeleter autoDeleter;
     public static PartyManager partyManager;
-    public static RankSystem rankSystem;
     public static Util util;
 
     @Inject
@@ -49,7 +48,6 @@ public class Nebula {
         queueProcessor.init();
         autoDeleter = new AutoDeleter();
         partyManager = new PartyManager();
-        rankSystem = new RankSystem();
     }
 
     @Subscribe
