@@ -7,7 +7,7 @@ import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
-import com.velocitypowered.api.event.player.ServerConnectedEvent;
+import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import de.voasis.nebula.event.event.*;
@@ -35,8 +35,8 @@ public class EventManager {
         new PlayerAvailableCommands(event);
     }
     @Subscribe
-    public void ServerConnected(ServerConnectedEvent event) {
-        new ServerConnected(event);
+    public void ServerConnected(ServerPostConnectEvent event) {
+        new ServerPostConnect(event);
     }
     @Subscribe
     public void Disconnect(DisconnectEvent event) {

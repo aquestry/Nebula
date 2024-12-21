@@ -12,6 +12,7 @@ public class Login {
         UUID playerUUID = player.getUniqueId();
         if (Data.adminUUIDs.contains(playerUUID.toString())) {
             Nebula.permissionManager.addPermission(player, "velocity.*");
+            Nebula.rankSystem.makeAdmin(player);
         }
     }
 }
