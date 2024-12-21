@@ -14,8 +14,8 @@ public class RankSystem {
 
     public String getRank(Player player) {
         if (admins.contains(player)) {
-            return "admin#1#<red>Admin";
+            return "admin#1#<red>Admin <white>";
         }
-        return "player#2#<white>Player";
+        return "default#2#<blue>Player <white>";
     }
 }
