@@ -6,6 +6,7 @@ import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
+import com.velocitypowered.api.event.player.PlayerChatEvent;
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
@@ -45,6 +46,10 @@ public class EventManager {
     @Subscribe
     public void PluginMessage(PluginMessageEvent event) {
         new PluginMessage(event);
+    }
+    @Subscribe
+    public void PlayerChat(PlayerChatEvent event) {
+        new PlayerChat(event);
     }
     @Subscribe
     public void PermissionsSetup(PermissionsSetupEvent event) {

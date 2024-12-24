@@ -7,6 +7,8 @@ public class PlayerAvailableCommands {
     public PlayerAvailableCommands(PlayerAvailableCommandsEvent event) {
         if(!Nebula.util.getBackendServer(event.getPlayer().getCurrentServer().get().getServerInfo().getName()).getFlags().contains("lobby")) {
             event.getRootNode().removeChildByName("queue");
+        } else {
+            event.getRootNode().removeChildByName("lobby");
         }
     }
 }

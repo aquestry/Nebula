@@ -90,6 +90,18 @@ public class AdminCommand implements SimpleCommand {
                 return CompletableFuture.completedFuture(Data.alltemplates.stream()
                         .filter(template -> template.toLowerCase().startsWith(args[1].toLowerCase()))
                         .toList());
+            } else if("start".equalsIgnoreCase(args[0])) {
+                return CompletableFuture.completedFuture(Data.backendInfoMap.stream()
+                        .filter(backendServer -> !backendServer.isOnline())
+                        .map(BackendServer::getServerName)
+                        .filter(serverName -> serverName.startsWith(args[1]))
+                        .toList());
+            } else if("kill".equalsIgnoreCase(args[0])) {
+                return CompletableFuture.completedFuture(Data.backendInfoMap.stream()
+                        .filter(BackendServer::isOnline)
+                        .map(BackendServer::getServerName)
+                        .filter(serverName -> serverName.startsWith(args[1]))
+                        .toList());
             } else {
                 return CompletableFuture.completedFuture(Data.backendInfoMap.stream()
                         .map(BackendServer::getServerName)

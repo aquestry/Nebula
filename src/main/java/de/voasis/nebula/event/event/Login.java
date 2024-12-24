@@ -11,7 +11,7 @@ public class Login {
         Player player = event.getPlayer();
         UUID playerUUID = player.getUniqueId();
         if (Data.adminUUIDs.contains(playerUUID.toString())) {
-            Nebula.permissionManager.addPermission(player, "velocity.*");
+            Nebula.permissionManager.updateGroup(player, "admin");
         }
     }
 }

@@ -18,6 +18,8 @@ import de.voasis.nebula.data.Util;
 import de.voasis.nebula.event.EventManager;
 import de.voasis.nebula.helper.*;
 import de.voasis.nebula.helper.PermissionManager;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
@@ -34,10 +36,12 @@ public class Nebula {
     public static AutoDeleter autoDeleter;
     public static PartyManager partyManager;
     public static Util util;
+    public static MiniMessage mm;
 
     @Inject
     public Nebula(ProxyServer proxy, @DataDirectory Path dataDirectory) {
         server = proxy;
+        mm = MiniMessage.miniMessage();
         permissionManager  = new PermissionManager();
         util = new Util();
         serverManager = new ServerManager();

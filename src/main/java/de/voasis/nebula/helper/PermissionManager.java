@@ -6,34 +6,34 @@ import com.velocitypowered.api.permission.Tristate;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.permission.PermissionProvider;
 import com.velocitypowered.api.permission.PermissionSubject;
-import de.voasis.nebula.data.Data;
-import java.util.*;
+import de.voasis.nebula.map.Group;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PermissionManager implements PermissionProvider {
 
-    private final Map<Player, Set<String>> playerPermissions = new HashMap<>();
+    private final Group adminGroup = new Group("admin", "<blue>[Admin] ", 2);
+    private final Group defaultGroup = new Group("default", "<white>[Player] ", 1);
+    private final Map<Player, Group> playerGroups = new HashMap<>();
 
-    public String getRank(Player player) {
-        if (Data.adminUUIDs.contains(player.getUniqueId().toString())) {
-            return "admin#1#<red>Admin <white>";
-        }
-        return "default#2#<blue>Player <white>";
+    public PermissionManager() {
+        adminGroup.addPermission("velocity.admin");
     }
 
-    public void addPermission(Player player, String permission) {
-        playerPermissions.computeIfAbsent(player, k -> new HashSet<>()).add(permission);
+    public Group getGroup(Player player) {
+        return playerGroups.getOrDefault(player, defaultGroup);
     }
 
     public boolean hasPermission(Player player, String permission) {
-        Set<String> permissions = playerPermissions.getOrDefault(player, Collections.emptySet());
-        if (permissions.contains(permission)) return true;
-        String[] parts = permission.split("\\.");
-        StringBuilder wildcard = new StringBuilder();
-        for (String part : parts) {
-            wildcard.append(part).append(".");
-            if (permissions.contains(wildcard + "*")) return true;
+        return getGroup(player).hasPermission(permission);
+    }
+
+    public void updateGroup(Player player, String groupName) {
+        if ("admin".equalsIgnoreCase(groupName)) {
+            playerGroups.put(player, adminGroup);
+        } else {
+            playerGroups.put(player, defaultGroup);
         }
-        return false;
     }
 
     @Subscribe
@@ -41,5 +41,10 @@ public class PermissionManager implements PermissionProvider {
         return permission -> Tristate.fromBoolean(
                 subject instanceof Player && hasPermission((Player) subject, permission)
         );
+    }
+
+    public String getGroupInfo(Player player) {
+        Group group = playerGroups.getOrDefault(player, defaultGroup);
+        return player.getUsername() + ":" + group.getName() + "#" + group.getLevel() + "#" + group.getPrefix();
     }
 }
