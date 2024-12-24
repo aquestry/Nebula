@@ -12,8 +12,8 @@ import java.util.Map;
 
 public class PermissionManager implements PermissionProvider {
 
-    private final Group adminGroup = new Group("admin", "<blue>[Admin] ", 2);
-    private final Group defaultGroup = new Group("default", "<white>[Player] ", 1);
+    private final Group adminGroup = new Group("admin", "<dark_gray>[<red>Admin<dark_gray>] <white>", 2);
+    private final Group defaultGroup = new Group("default", "<dark_gray>[<white>Player<dark_gray>] <white>", 1);
     private final Map<Player, Group> playerGroups = new HashMap<>();
 
     public PermissionManager() {
