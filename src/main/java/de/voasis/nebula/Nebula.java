@@ -9,10 +9,7 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
-import de.voasis.nebula.commands.AdminCommand;
-import de.voasis.nebula.commands.LobbyCommand;
-import de.voasis.nebula.commands.PartyCommand;
-import de.voasis.nebula.commands.QueueCommand;
+import de.voasis.nebula.commands.*;
 import de.voasis.nebula.data.Data;
 import de.voasis.nebula.data.Util;
 import de.voasis.nebula.event.EventManager;
@@ -79,6 +76,7 @@ public class Nebula {
     private void registerCommands() {
         CommandManager commandManager = server.getCommandManager();
         commandManager.register("admin", new AdminCommand());
+        commandManager.register("group", new GroupCommand());
         commandManager.register("lobby", new LobbyCommand());
         commandManager.register("party", new PartyCommand());
         commandManager.register("queue", new QueueCommand());
