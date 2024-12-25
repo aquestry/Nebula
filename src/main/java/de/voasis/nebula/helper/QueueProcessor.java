@@ -46,7 +46,6 @@ public class QueueProcessor {
                         server.addPendingPlayerConnection(player);
                     }
                     createPreloadedServer(queue);
-                    Nebula.util.callPending(server);
                 } else {
                     BackendServer newServer = createNewServer(queue);
                     for (Player player : playersToMove) {
@@ -110,8 +109,10 @@ public class QueueProcessor {
                                     return;
                                 }
                                 playerParty.getMembers().forEach(member -> {
-                                    queue.getInQueue().add(member);
-                                    Nebula.util.sendMessage(member, Messages.ADDED_TO_QUEUE.replace("<queue>", queueName));
+                                    if (!queue.getInQueue().contains(member)) {
+                                        queue.getInQueue().add(member);
+                                        Nebula.util.sendMessage(member, Messages.ADDED_TO_QUEUE.replace("<queue>", queueName));
+                                    }
                                 });
                             } else  {
                                 queue.getInQueue().add(player);

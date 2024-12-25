@@ -135,7 +135,9 @@ public class Util {
 
     public void callPending(BackendServer backendServer) {
         for(Player p : backendServer.getPendingPlayerConnections()) {
-            connectPlayer(p, backendServer, false);
+            if (p.getCurrentServer().isEmpty() || !p.getCurrentServer().get().getServerInfo().getName().equals(backendServer.getServerName())) {
+                connectPlayer(p, backendServer, false);
+            }
         }
     }
 

@@ -61,16 +61,21 @@ public class Nebula {
         server.getChannelRegistrar().register(channelScore);
         server.getEventManager().register(this, new EventManager());
         server.getScheduler()
-                .buildTask(this, this::Update)
-                .repeat(1, TimeUnit.SECONDS)
+                .buildTask(this, util::pingServers)
+                .repeat(500, TimeUnit.MILLISECONDS)
                 .schedule();
-    }
-
-    private void Update() {
-        util.pingServers();
-        queueProcessor.process();
-        autoDeleter.process();
-        partyManager.refresh();
+        server.getScheduler()
+                .buildTask(this, queueProcessor::process)
+                .repeat(1000, TimeUnit.MILLISECONDS)
+                .schedule();
+        server.getScheduler()
+                .buildTask(this, autoDeleter::process)
+                .repeat(1250, TimeUnit.MILLISECONDS)
+                .schedule();
+        server.getScheduler()
+                .buildTask(this, partyManager::refresh)
+                .repeat(1500, TimeUnit.MILLISECONDS)
+                .schedule();
     }
 
     private void registerCommands() {

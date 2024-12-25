@@ -3,7 +3,6 @@ package de.voasis.nebula.data;
 public class Messages {
     // Prefix
     public static String PREFIX;
-
     // Admin Messages
     public static String USAGE_ADMIN;
     public static String KILL_CONTAINER;
@@ -25,7 +24,6 @@ public class Messages {
     public static String DONE;
     public static String ONLINE;
     public static String OFFLINE;
-
     // Queue Messages
     public static String USAGE_QUEUE;
     public static String ADDED_TO_QUEUE;
@@ -34,7 +32,6 @@ public class Messages {
     public static String NOT_IN_QUEUE;
     public static String LOBBY_ONLY;
     public static String QUEUE_NOT_FOUND;
-
     // Party Messages
     public static String TARGET_INVITE_NOT_FOUND;
     public static String TARGET_INVITE_ALREADY;
@@ -50,7 +47,6 @@ public class Messages {
     public static String QUEUE_PLAYER_COUNT_MISMATCH ;
     public static String PARTY_NOT_ALLOWED;
     public static String USAGE_PARTY;
-
     // QueueProcessor-Specific Party Messages
     public static String LEADER_CANNOT_JOIN_QUEUE;
     public static String NOT_PARTY_LEADER;
