@@ -43,15 +43,15 @@ public class QueueProcessor {
                     BackendServer server = preloadedServer.get();
                     server.removeFlag("preload");
                     for (Player player : playersToMove) {
-                        Nebula.util.connectPlayer(player, server, false);
+                        server.addPendingPlayerConnection(player);
                     }
                     createPreloadedServer(queue);
+                    Nebula.util.callPending(server);
                 } else {
                     BackendServer newServer = createNewServer(queue);
                     for (Player player : playersToMove) {
                         newServer.addPendingPlayerConnection(player);
                     }
-                    Nebula.util.callPending(newServer);
                 }
             }
         }
