@@ -10,7 +10,7 @@ public class PluginMessage {
     public PluginMessage(PluginMessageEvent event) {
         if (!(event.getSource() instanceof ServerConnection)) return;
         String message = new String(event.getData(), StandardCharsets.UTF_8);
-        if (!event.getIdentifier().equals(Nebula.channel)) return;
+        if (!event.getIdentifier().equals(Nebula.channelMain)) return;
         event.setResult(PluginMessageEvent.ForwardResult.handled());
         String[] parts = message.split(":");
         if (parts.length < 2) return;

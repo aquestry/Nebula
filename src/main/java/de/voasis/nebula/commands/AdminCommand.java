@@ -11,7 +11,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 public class AdminCommand implements SimpleCommand {
-
     @Override
     public void execute(Invocation invocation) {
         CommandSource source = invocation.source();

@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class QueueCommand implements SimpleCommand {
-
     @Override
     public void execute(Invocation invocation) {
         String[] args = invocation.arguments();

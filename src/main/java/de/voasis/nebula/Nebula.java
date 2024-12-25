@@ -19,7 +19,6 @@ import de.voasis.nebula.event.EventManager;
 import de.voasis.nebula.helper.*;
 import de.voasis.nebula.helper.PermissionManager;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
@@ -27,7 +26,8 @@ import java.util.concurrent.TimeUnit;
 public class Nebula {
 
     public static ProxyServer server;
-    public static ChannelIdentifier channel = MinecraftChannelIdentifier.create("nebula", "main");
+    public static ChannelIdentifier channelMain = MinecraftChannelIdentifier.create("nebula", "main");
+    public static ChannelIdentifier channelScore = MinecraftChannelIdentifier.create("nebula", "scoreboard");
     public static FilesManager filesManager;
     public static ServerManager serverManager;
     public static PermissionManager permissionManager;
@@ -58,7 +58,8 @@ public class Nebula {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         registerCommands();
         util.log(Data.Icon);
-        server.getChannelRegistrar().register(channel);
+        server.getChannelRegistrar().register(channelMain);
+        server.getChannelRegistrar().register(channelScore);
         server.getEventManager().register(this, new EventManager());
         server.getScheduler()
                 .buildTask(this, this::Update)

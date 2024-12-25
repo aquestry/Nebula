@@ -10,6 +10,8 @@ public class ServerPostConnect {
         Player player = event.getPlayer();
         RegisteredServer server = player.getCurrentServer().get().getServer();
         Nebula.util.getBackendServer(server.getServerInfo().getName()).removePendingPlayerConnection(player);
-        server.sendPluginMessage(Nebula.channel, Nebula.permissionManager.getGroupInfo(player).getBytes());
+        server.sendPluginMessage(Nebula.channelMain, Nebula.permissionManager.getGroupInfo(player).getBytes());
+        String score = player.getUsername() + ":<red>Test:<white>Line 1#<blue>Line 2#<gray>Line 3";
+        server.sendPluginMessage(Nebula.channelScore, score.getBytes());
     }
 }

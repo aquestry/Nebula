@@ -4,11 +4,9 @@ import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Messages;
-
 import java.util.List;
 
 public class PartyCommand implements SimpleCommand {
-
     @Override
     public void execute(Invocation invocation) {
         String[] args = invocation.arguments();
