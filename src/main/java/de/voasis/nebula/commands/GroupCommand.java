@@ -35,6 +35,9 @@ public class GroupCommand implements SimpleCommand {
             case "list":
                 handleList();
                 break;
+            case "info":
+                handleInfo(args);
+                break;
             default:
                 System.out.println("Unknown subcommand. Usage: /group <assign|create|delete|list|info>");
                 break;
@@ -111,6 +114,30 @@ public class GroupCommand implements SimpleCommand {
         System.out.println("Available Groups:");
         for (String groupName : groupNames) {
             System.out.println("- " + groupName);
+        }
+    }
+
+    private void handleInfo(String[] args) {
+        if (args.length < 2) {
+            System.out.println("Usage: /group info <name>");
+            return;
+        }
+        String groupName = args[1];
+        Group group = Nebula.permissionManager.getGroupByName(groupName);
+        if (group == null) {
+            System.out.println("Group not found: " + groupName);
+            return;
+        }
+        System.out.println("Name: " + groupName);
+        System.out.println("Prefix: " + group.getPrefix());
+        System.out.println("Level: " + group.getLevel());
+        System.out.println("Members: ");
+        for(String p : Nebula.permissionFile.getGroupMembers(groupName)) {
+            System.out.println(p);
+        }
+        System.out.println("Permissions: ");
+        for(String p : group.getPermissions()) {
+            System.out.println(p);
         }
     }
 

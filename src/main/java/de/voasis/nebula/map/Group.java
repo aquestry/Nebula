@@ -22,14 +22,5 @@ public class Group {
     public void addPermission(String permission) { permissions.add(permission); }
     public void removePermission(String permission) { permissions.remove(permission); }
     public boolean hasPermission(String permission) { return permissions.contains(permission); }
-
-    @Override
-    public String toString() {
-        return "Group{" +
-                "name='" + name + '\'' +
-                ", prefix='" + prefix + '\'' +
-                ", level=" + level +
-                ", permissions=" + permissions +
-                '}';
-    }
+    public List<String> getPermissions() { return new ArrayList<>(permissions); }
 }
