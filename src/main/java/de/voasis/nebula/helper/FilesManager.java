@@ -89,7 +89,6 @@ public class FilesManager {
         try {
             String prefix = messages.node("prefix").getString("[Server] ");
             Messages.PREFIX = prefix;
-
             // Admin Messages
             Messages.USAGE_ADMIN = messages.node("admin", "usage").getString("<pre>Usage: /admin <stop|delete|template> <args...>").replace("<pre>", prefix);
             Messages.KILL_CONTAINER = messages.node("admin", "kill-start").getString("<pre>Killing server instance <name>.").replace("<pre>", prefix);
@@ -111,7 +110,6 @@ public class FilesManager {
             Messages.DONE = messages.node("admin", "done").getString("<pre>Done.").replace("<pre>", prefix);
             Messages.ONLINE = messages.node("util", "server-online").getString("<pre>Server <name> is now online.").replace("<pre>", prefix);
             Messages.OFFLINE = messages.node("util", "server-offline").getString("<pre>Server <name> is now offline.").replace("<pre>", prefix);
-
             // Queue Messages
             Messages.USAGE_QUEUE = messages.node("queue", "usage").getString("<pre>Usage: /queue leave or /queue join <name>").replace("<pre>", prefix);
             Messages.ADDED_TO_QUEUE = messages.node("queue", "added-to-queue").getString("<pre>You got added to queue: <queue>.").replace("<pre>", prefix);
@@ -120,7 +118,6 @@ public class FilesManager {
             Messages.NOT_IN_QUEUE = messages.node("queue", "not-in-queue").getString("<pre>You are in no queue.").replace("<pre>", prefix);
             Messages.LOBBY_ONLY = messages.node("queue", "lobby-only").getString("<pre>You can only join a queue from the lobby.").replace("<pre>", prefix);
             Messages.QUEUE_NOT_FOUND = messages.node("queue", "queue-not-found").getString("<pre>Queue not found.").replace("<pre>", prefix);
-
             // Party Messages
             Messages.TARGET_INVITE_NOT_FOUND = messages.node("party", "target-invite-not-found").getString("<pre>The player <target> is not online.").replace("<pre>", prefix);
             Messages.TARGET_INVITE_ALREADY = messages.node("party", "target-invite-already").getString("<pre>The player <target> is already invited.").replace("<pre>", prefix);
