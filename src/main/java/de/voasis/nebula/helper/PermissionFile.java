@@ -27,9 +27,6 @@ public class PermissionFile {
                 try (InputStream resource = getClass().getClassLoader().getResourceAsStream("perms.conf")) {
                     if (resource != null) {
                         Files.copy(resource, configFilePath);
-                        System.out.println("Default perms.conf copied from resources.");
-                    } else {
-                        System.out.println("Could not find perms.conf in resources.");
                     }
                 }
             }
@@ -46,7 +43,6 @@ public class PermissionFile {
         try {
             return rootNode.node("default-group").getString("default");
         } catch (Exception e) {
-            System.out.println("Failed to fetch default group name: " + e.getMessage());
             return "default";
         }
     }
@@ -56,7 +52,6 @@ public class PermissionFile {
             ConfigurationNode membersNode = rootNode.node("groups", groupName, "members");
             return membersNode.getList(String.class, Collections.emptyList());
         } catch (IOException e) {
-            System.out.println("Failed to fetch group members for group: " + groupName);
             return Collections.emptyList();
         }
     }
@@ -69,7 +64,6 @@ public class PermissionFile {
                 members.add(playerUUID);
                 membersNode.set(members);
                 saveConfig();
-                System.out.println("Added player " + playerUUID + " to group " + groupName + " members list.");
             }
         } catch (IOException e) {
             System.out.println("Failed to add player to group members: " + e.getMessage());
@@ -83,7 +77,6 @@ public class PermissionFile {
                     .map(Object::toString)
                     .collect(Collectors.toList());
         } catch (Exception e) {
-            System.out.println("Failed to fetch group names: " + e.getMessage());
             return Collections.emptyList();
         }
     }
@@ -95,7 +88,6 @@ public class PermissionFile {
     public void saveConfig() {
         try {
             loader.save(rootNode);
-            System.out.println("Configuration saved successfully.");
         } catch (IOException e) {
             System.out.println("Failed to save configuration: " + e.getMessage());
         }

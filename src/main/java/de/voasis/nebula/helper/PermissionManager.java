@@ -9,6 +9,7 @@ import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Data;
 import de.voasis.nebula.map.Group;
+import org.spongepowered.configurate.ConfigurationNode;
 import java.util.*;
 
 public class PermissionManager implements PermissionProvider {
@@ -33,12 +34,46 @@ public class PermissionManager implements PermissionProvider {
         );
     }
 
+    public void logGroupInfo(Group group) {
+        String groupName = group.getName();
+        List<String> members = Nebula.permissionFile.getGroupMembers(groupName);
+        ConfigurationNode groupNode = Nebula.permissionFile.getGroupNode(groupName);
+        List<String> permissions = new ArrayList<>();
+        try {
+            permissions = groupNode.node("permissions").getList(String.class, Collections.emptyList());
+        } catch (Exception e) {
+            System.out.println("Failed to fetch permissions for group \"" + groupName + "\": " + e.getMessage());
+        }
+        StringBuilder log = new StringBuilder();
+        log.append("╔════════════════════════════════════════╗\n");
+        log.append("║ Group Information                       ║\n");
+        log.append("╠════════════════════════════════════════╣\n");
+        log.append("║ Name:      ").append(group.getName()).append("\n");
+        log.append("║ Prefix:    ").append(group.getPrefix()).append("\n");
+        log.append("║ Level:     ").append(group.getLevel()).append("\n");
+        log.append("║ Members:   ").append(members.size()).append("\n");
+        for (String member : members) {
+            log.append("║   - ").append(member).append("\n");
+        }
+        log.append("║ Permissions: ").append(permissions.size()).append("\n");
+        for (String permission : permissions) {
+            log.append("║   - ").append(permission).append("\n");
+        }
+        log.append("╚════════════════════════════════════════╝");
+        System.out.println(log);
+    }
+
     private void loadGroupsFromConfig() {
         PermissionFile permissionFile = Nebula.permissionFile;
         groups.clear();
         for (String groupName : permissionFile.getGroupNames()) {
-            Group group = getGroupByName(groupName);
-            if (group != null) {
+            ConfigurationNode groupNode = permissionFile.getGroupNode(groupName);
+            if (groupNode != null) {
+                String prefix = groupNode.node("prefix").getString("");
+                int level = groupNode.node("level").getInt(0);
+                Group group = new Group(groupName, prefix, level);
+                groups.add(group);
+                logGroupInfo(group);
                 List<String> members = permissionFile.getGroupMembers(groupName);
                 for (String memberUUID : members) {
                     try {
@@ -63,12 +98,10 @@ public class PermissionManager implements PermissionProvider {
                 .orElse(null);
         if (highestLevelGroup != null) {
             playerGroups.put(playerUUID, highestLevelGroup);
-            System.out.println("Player " + player.getUsername() + " assigned to group: " + highestLevelGroup.getName());
             return highestLevelGroup;
         }
         String defaultGroupName = Data.defaultGroupName;
         if (defaultGroupName == null || defaultGroupName.isEmpty()) {
-            System.out.println("Default group name is not defined in config. Assigning fallback group.");
             Group fallbackGroup = new Group("fallback", "<gray>[Fallback]<white>", 0);
             playerGroups.put(playerUUID, fallbackGroup);
             return fallbackGroup;
@@ -76,11 +109,9 @@ public class PermissionManager implements PermissionProvider {
         Group defaultGroup = getGroupByName(defaultGroupName);
         if (defaultGroup != null) {
             playerGroups.put(playerUUID, defaultGroup);
-            System.out.println("Player " + player.getUsername() + " assigned to default group: " + defaultGroupName);
             Nebula.permissionFile.addMemberToGroup(defaultGroupName, playerUUID.toString());
             return defaultGroup;
         }
-        System.out.println("Default group \"" + defaultGroupName + "\" is not found in loaded groups. Assigning fallback group.");
         Group fallbackGroup = new Group("fallback", "<dark_gray>[<gray>Fallback<dark_gray>] <white>", 0);
         playerGroups.put(playerUUID, fallbackGroup);
         return fallbackGroup;
@@ -91,9 +122,6 @@ public class PermissionManager implements PermissionProvider {
         if (group != null) {
             playerGroups.put(player.getUniqueId(), group);
             Nebula.permissionFile.addMemberToGroup(groupName, player.getUniqueId().toString());
-            System.out.println("Player " + player.getUsername() + " assigned to group: " + groupName);
-        } else {
-            System.out.println("Group not found: " + groupName);
         }
     }
 
@@ -101,9 +129,6 @@ public class PermissionManager implements PermissionProvider {
         if (getGroupByName(name) == null) {
             groups.add(new Group(name, prefix, level));
             Nebula.permissionFile.saveConfig();
-            System.out.println("Group created: " + name);
-        } else {
-            System.out.println("Group already exists: " + name);
         }
     }
 
@@ -111,9 +136,6 @@ public class PermissionManager implements PermissionProvider {
         if (!name.equalsIgnoreCase(Data.defaultGroupName)) {
             groups.removeIf(group -> group.getName().equalsIgnoreCase(name));
             Nebula.permissionFile.saveConfig();
-            System.out.println("Group removed: " + name);
-        } else {
-            System.out.println("Cannot remove default group: " + name);
         }
     }
 
