@@ -12,9 +12,12 @@ public class ServerPostConnect {
         Nebula.util.getBackendServer(server.getServerInfo().getName()).removePendingPlayerConnection(player);
         server.sendPluginMessage(Nebula.channelMain, Nebula.permissionManager.getGroupInfo(player).getBytes());
         String rankName = Nebula.permissionManager.getGroup(player).getPrefix();
-        String serverName = server.getServerInfo().getName();
-        String score = player.getUsername() + ":<blue>Nebula:<white>-----#<white>Rank " + rankName + "#<white>Server: " + serverName + "#<white>-----";
-        System.out.println("Sending Scoreboard: " + score);
+        String serverName = Nebula.util.getBackendServer(server.getServerInfo().getName())
+                .getFlags()
+                .getFirst()
+                .toLowerCase();
+        serverName = serverName.substring(0, 1).toUpperCase() + serverName.substring(1);
+        String score = player.getUsername() + "&<blue>Nebula&<white>-----#<white>Rank: " + rankName + "#<white>Service: " + serverName + "#<white>-----";
         server.sendPluginMessage(Nebula.channelScore, score.getBytes());
     }
 }
