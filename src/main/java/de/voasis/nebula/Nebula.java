@@ -62,15 +62,15 @@ public class Nebula {
         server.getEventManager().register(this, new EventManager());
         server.getScheduler()
                 .buildTask(this, util::pingServers)
-                .repeat(500, TimeUnit.MILLISECONDS)
+                .repeat(800, TimeUnit.MILLISECONDS)
                 .schedule();
         server.getScheduler()
                 .buildTask(this, queueProcessor::process)
-                .repeat(1000, TimeUnit.MILLISECONDS)
+                .repeat(300, TimeUnit.MILLISECONDS)
                 .schedule();
         server.getScheduler()
                 .buildTask(this, autoDeleter::process)
-                .repeat(1250, TimeUnit.MILLISECONDS)
+                .repeat(500, TimeUnit.MILLISECONDS)
                 .schedule();
         server.getScheduler()
                 .buildTask(this, partyManager::refresh)

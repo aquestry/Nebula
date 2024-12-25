@@ -20,5 +20,6 @@ public class ServerPostConnect {
         serverName = serverName.substring(0, 1).toUpperCase() + serverName.substring(1);
         String score = player.getUsername() + "&<blue>Nebula&<reset>#<white>Rank: " + rankName + "#<white>Service: " + serverName + "#<white>Hub: " + hubName + "#<reset>";
         server.sendPluginMessage(Nebula.channelScore, score.getBytes());
+        player.sendPlayerListHeader(Nebula.mm.deserialize("<blue>Nebula</blue>\nYou are on: " + server.getServerInfo().getName()));
     }
 }
