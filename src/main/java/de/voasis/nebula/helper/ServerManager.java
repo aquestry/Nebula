@@ -1,4 +1,4 @@
-package de.voasis.nebula;
+package de.voasis.nebula.helper;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
@@ -6,6 +6,7 @@ import com.jcraft.jsch.Session;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.ServerInfo;
+import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Messages;
 import de.voasis.nebula.map.BackendServer;
 import de.voasis.nebula.data.Data;
