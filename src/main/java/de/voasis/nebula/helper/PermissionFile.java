@@ -6,6 +6,9 @@ import org.spongepowered.configurate.loader.ConfigurationLoader;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class PermissionFile {
 
@@ -40,8 +43,42 @@ public class PermissionFile {
         }
     }
 
-    public ConfigurationNode getRootNode() {
-        return rootNode;
+    public String getDefaultGroupName() {
+        try {
+            return rootNode.node("default-group").getString("default");
+        } catch (Exception e) {
+            System.out.println("Failed to fetch default group name: " + e.getMessage());
+            return "default";
+        }
+    }
+
+    public List<String> getGroupMembers(String groupName) {
+        try {
+            ConfigurationNode membersNode = rootNode.node("groups", groupName, "members");
+            return membersNode.getList(String.class, Collections.emptyList());
+        } catch (IOException e) {
+            System.out.println("Failed to fetch group members for group: " + groupName);
+            return Collections.emptyList();
+        }
+    }
+
+    public void addMemberToGroup(String groupName, String playerUUID) {
+        try {
+            ConfigurationNode membersNode = rootNode.node("groups", groupName, "members");
+            List<String> members = membersNode.getList(String.class, new ArrayList<>());
+            if (!members.contains(playerUUID)) {
+                members.add(playerUUID);
+                membersNode.set(members);
+                saveConfig();
+                System.out.println("Added player " + playerUUID + " to group " + groupName + " members list.");
+            }
+        } catch (IOException e) {
+            System.out.println("Failed to add player to group members: " + e.getMessage());
+        }
+    }
+
+    public ConfigurationNode getGroupNode(String groupName) {
+        return rootNode.node("groups", groupName);
     }
 
     public void saveConfig() {
@@ -53,11 +90,7 @@ public class PermissionFile {
         }
     }
 
-    public ConfigurationLoader<?> getLoader() {
-        return loader;
-    }
-
-    public Path getConfigFilePath() {
-        return configFilePath;
+    public ConfigurationNode getRootNode() {
+        return rootNode;
     }
 }
