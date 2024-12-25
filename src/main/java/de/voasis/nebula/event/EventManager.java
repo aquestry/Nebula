@@ -6,10 +6,7 @@ import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
-import com.velocitypowered.api.event.player.PlayerChatEvent;
-import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
-import com.velocitypowered.api.event.player.ServerPostConnectEvent;
-import com.velocitypowered.api.event.player.ServerPreConnectEvent;
+import com.velocitypowered.api.event.player.*;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import de.voasis.nebula.event.event.*;
 import de.voasis.nebula.Nebula;
@@ -50,6 +47,10 @@ public class EventManager {
     @Subscribe
     public void PlayerChat(PlayerChatEvent event) {
         new PlayerChat(event);
+    }
+    @Subscribe
+    public void ServerConnected(ServerConnectedEvent event) {
+        new ServerConnected(event);
     }
     @Subscribe
     public void PermissionsSetup(PermissionsSetupEvent event) {
