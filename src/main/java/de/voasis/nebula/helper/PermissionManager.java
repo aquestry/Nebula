@@ -38,28 +38,15 @@ public class PermissionManager implements PermissionProvider {
         String groupName = group.getName();
         List<String> members = Nebula.permissionFile.getGroupMembers(groupName);
         ConfigurationNode groupNode = Nebula.permissionFile.getGroupNode(groupName);
-        List<String> permissions = new ArrayList<>();
-        try {
-            permissions = groupNode.node("permissions").getList(String.class, Collections.emptyList());
-        } catch (Exception e) {
-            System.out.println("Failed to fetch permissions for group \"" + groupName + "\": " + e.getMessage());
-        }
         StringBuilder log = new StringBuilder();
-        log.append("╔════════════════════════════════════════╗\n");
-        log.append("║ Group Information                       ║\n");
-        log.append("╠════════════════════════════════════════╣\n");
-        log.append("║ Name:      ").append(group.getName()).append("\n");
-        log.append("║ Prefix:    ").append(group.getPrefix()).append("\n");
-        log.append("║ Level:     ").append(group.getLevel()).append("\n");
-        log.append("║ Members:   ").append(members.size()).append("\n");
+        log.append("Group Information");
+        log.append("Name:      ").append(group.getName()).append("\n");
+        log.append("Prefix:    ").append(group.getPrefix()).append("\n");
+        log.append("Level:     ").append(group.getLevel()).append("\n");
+        log.append("Members:   ").append(members.size()).append("\n");
         for (String member : members) {
-            log.append("║   - ").append(member).append("\n");
+            log.append(member).append("\n");
         }
-        log.append("║ Permissions: ").append(permissions.size()).append("\n");
-        for (String permission : permissions) {
-            log.append("║   - ").append(permission).append("\n");
-        }
-        log.append("╚════════════════════════════════════════╝");
         System.out.println(log);
     }
 
