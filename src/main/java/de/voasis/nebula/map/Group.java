@@ -8,7 +8,7 @@ public class Group {
     private final String name;
     private final String prefix;
     private final int level;
-    private static List<String> permissions = new ArrayList<>();
+    private final  List<String> permissions = new ArrayList<>();
 
     public Group(String name, String prefix, int level) {
         this.name = name;

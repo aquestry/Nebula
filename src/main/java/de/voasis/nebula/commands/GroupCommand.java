@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class GroupCommand implements SimpleCommand {
+
     @Override
     public void execute(Invocation invocation) {
         CommandSource source = invocation.source();
@@ -19,7 +20,7 @@ public class GroupCommand implements SimpleCommand {
         }
         String[] args = invocation.arguments();
         if (args.length == 0) {
-            System.out.println("Usage: /group <assign|create|delete|list|info>");
+            System.out.println("Usage: /group <assign|create|delete|list|info|permission>");
             return;
         }
         switch (args[0].toLowerCase()) {
@@ -38,8 +39,11 @@ public class GroupCommand implements SimpleCommand {
             case "info":
                 handleInfo(args);
                 break;
+            case "permission":
+                handlePermission(args);
+                break;
             default:
-                System.out.println("Unknown subcommand. Usage: /group <assign|create|delete|list|info>");
+                System.out.println("Unknown subcommand. Usage: /group <assign|create|delete|list|info|permission>");
                 break;
         }
     }
@@ -129,6 +133,44 @@ public class GroupCommand implements SimpleCommand {
             return;
         }
         Nebula.permissionManager.logGroupInfo(group);
+    }
+
+    private void handlePermission(String[] args) {
+        if (args.length < 4) {
+            System.out.println("Usage: /group permission <add|remove> <group> <permission>");
+            return;
+        }
+        String action = args[1].toLowerCase();
+        String groupName = args[2];
+        String permission = args[3];
+        Group group = Nebula.permissionManager.getGroupByName(groupName);
+        if (group == null) {
+            System.out.println("Group not found: " + groupName);
+            return;
+        }
+        switch (action) {
+            case "add":
+                if (!group.hasPermission(permission)) {
+                    group.addPermission(permission);
+                    Nebula.permissionFile.saveConfig();
+                    System.out.println("Permission \"" + permission + "\" added to group: " + groupName);
+                } else {
+                    System.out.println("Group already has permission: " + permission);
+                }
+                break;
+            case "remove":
+                if (group.hasPermission(permission)) {
+                    group.getPermissions().remove(permission);
+                    Nebula.permissionFile.saveConfig();
+                    System.out.println("Permission \"" + permission + "\" removed from group: " + groupName);
+                } else {
+                    System.out.println("Group does not have permission: " + permission);
+                }
+                break;
+            default:
+                System.out.println("Unknown action. Use /group permission <add|remove> <group> <permission>");
+                break;
+        }
     }
 
     @Override

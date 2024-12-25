@@ -58,6 +58,7 @@ public class PermissionManager implements PermissionProvider {
     private void loadGroupsFromConfig() {
         PermissionFile permissionFile = Nebula.permissionFile;
         groups.clear();
+        playerGroups.clear();
         for (String groupName : permissionFile.getGroupNames()) {
             ConfigurationNode groupNode = permissionFile.getGroupNode(groupName);
             if (groupNode != null) {
@@ -65,21 +66,21 @@ public class PermissionManager implements PermissionProvider {
                 int level = groupNode.node("level").getInt(0);
                 List<String> permissions = new ArrayList<>();
                 try {
-                    permissions = groupNode.node("permissions").getList(String.class, Collections.emptyList());
+                    permissions = groupNode.node("permissions").getList(String.class, new ArrayList<>());
                 } catch (Exception e) {
                     System.out.println("Failed to load permissions for group \"" + groupName + "\": " + e.getMessage());
                 }
                 Group group = new Group(groupName, prefix, level);
-                for (String permission : permissions) {
-                    group.addPermission(permission);
-                }
+                permissions.forEach(group::addPermission);
                 groups.add(group);
                 logGroupInfo(group);
                 List<String> members = permissionFile.getGroupMembers(groupName);
                 for (String memberUUID : members) {
                     try {
                         UUID uuid = UUID.fromString(memberUUID);
-                        playerGroups.put(uuid, group);
+                        if (!playerGroups.containsKey(uuid)) {
+                            playerGroups.put(uuid, group);
+                        }
                     } catch (IllegalArgumentException e) {
                         System.out.println("Invalid UUID in group " + groupName + ": " + memberUUID);
                     }
@@ -87,6 +88,7 @@ public class PermissionManager implements PermissionProvider {
             }
         }
     }
+
 
     public Group getGroup(Player player) {
         UUID playerUUID = player.getUniqueId();
@@ -102,8 +104,8 @@ public class PermissionManager implements PermissionProvider {
             return highestLevelGroup;
         }
         String defaultGroupName = Data.defaultGroupName;
-        if (defaultGroupName == null || defaultGroupName.isEmpty()) {
-            Group fallbackGroup = new Group("fallback", "<gray>[Fallback]<white>", 0);
+        Group fallbackGroup = new Group("fallback", "<dark_gray>[<gray>Fallback<dark_gray>] <white>", 0);
+        if (defaultGroupName == null) {
             playerGroups.put(playerUUID, fallbackGroup);
             return fallbackGroup;
         }
@@ -113,7 +115,6 @@ public class PermissionManager implements PermissionProvider {
             Nebula.permissionFile.addMemberToGroup(defaultGroupName, playerUUID.toString());
             return defaultGroup;
         }
-        Group fallbackGroup = new Group("fallback", "<dark_gray>[<gray>Fallback<dark_gray>] <white>", 0);
         playerGroups.put(playerUUID, fallbackGroup);
         return fallbackGroup;
     }
