@@ -49,10 +49,6 @@ public class EventManager {
         new PlayerChat(event);
     }
     @Subscribe
-    public void ServerConnected(ServerConnectedEvent event) {
-        new ServerConnected(event);
-    }
-    @Subscribe
     public void PermissionsSetup(PermissionsSetupEvent event) {
         event.setProvider(Nebula.permissionManager);
     }

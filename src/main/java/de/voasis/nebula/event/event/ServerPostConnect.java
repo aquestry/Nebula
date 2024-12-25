@@ -11,5 +11,14 @@ public class ServerPostConnect {
         RegisteredServer server = player.getCurrentServer().get().getServer();
         Nebula.util.getBackendServer(server.getServerInfo().getName()).removePendingPlayerConnection(player);
         server.sendPluginMessage(Nebula.channelMain, Nebula.permissionManager.getGroupInfo(player).getBytes());
+        String rankName = Nebula.permissionManager.getGroup(player).getPrefix();
+        String serverName = Nebula.util.getBackendServer(server.getServerInfo().getName())
+                .getFlags()
+                .getFirst()
+                .toLowerCase()
+                .replace("gamemode:", "");
+        serverName = serverName.substring(0, 1).toUpperCase() + serverName.substring(1);
+        String score = player.getUsername() + "&<blue>Nebula&<reset>#<white>Rank: " + rankName + "#<white>Service: " + serverName + "#<reset>";
+        server.sendPluginMessage(Nebula.channelScore, score.getBytes());
     }
 }
