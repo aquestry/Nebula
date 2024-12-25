@@ -37,6 +37,7 @@ public class PermissionManager implements PermissionProvider {
     public void logGroupInfo(Group group) {
         String groupName = group.getName();
         List<String> members = Nebula.permissionFile.getGroupMembers(groupName);
+        List<String> permissions = group.getPermissions();
         ConfigurationNode groupNode = Nebula.permissionFile.getGroupNode(groupName);
         StringBuilder log = new StringBuilder();
         log.append("Group Information\n");
@@ -46,6 +47,10 @@ public class PermissionManager implements PermissionProvider {
         log.append("Members:   ").append(members.size()).append("\n");
         for (String member : members) {
             log.append(member).append("\n");
+        }
+        log.append("Permissions:   ").append(permissions.size()).append("\n");
+        for (String perm : permissions) {
+            log.append(perm).append("\n");
         }
         System.out.println(log);
     }
@@ -58,7 +63,16 @@ public class PermissionManager implements PermissionProvider {
             if (groupNode != null) {
                 String prefix = groupNode.node("prefix").getString("");
                 int level = groupNode.node("level").getInt(0);
+                List<String> permissions = new ArrayList<>();
+                try {
+                    permissions = groupNode.node("permissions").getList(String.class, Collections.emptyList());
+                } catch (Exception e) {
+                    System.out.println("Failed to load permissions for group \"" + groupName + "\": " + e.getMessage());
+                }
                 Group group = new Group(groupName, prefix, level);
+                for (String permission : permissions) {
+                    group.addPermission(permission);
+                }
                 groups.add(group);
                 logGroupInfo(group);
                 List<String> members = permissionFile.getGroupMembers(groupName);
