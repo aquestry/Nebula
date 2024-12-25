@@ -31,6 +31,7 @@ public class Nebula {
     public static FilesManager filesManager;
     public static ServerManager serverManager;
     public static PermissionManager permissionManager;
+    public static PermissionFile permissionFile;
     public static DefaultsManager defaultsManager;
     public static QueueProcessor queueProcessor;
     public static AutoDeleter autoDeleter;
@@ -42,6 +43,7 @@ public class Nebula {
     public Nebula(ProxyServer proxy, @DataDirectory Path dataDirectory) {
         server = proxy;
         mm = MiniMessage.miniMessage();
+        permissionFile = new PermissionFile(dataDirectory);
         permissionManager  = new PermissionManager();
         util = new Util();
         serverManager = new ServerManager();

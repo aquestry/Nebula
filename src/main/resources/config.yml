@@ -1,6 +1,6 @@
 file-version: 1
 # UUID's of the Player that should have admins perms.
-admins: 74401e14-f69c-48f3-b393-64be488dff8f,069a79f4-44e9-4726-a5be-fca90e38aaf5
+admins:
 # Velocity Secret
 vsecret: <VELOCITY-SECRET>
 # Additional environment variables for backend Servers (use "none" for none)

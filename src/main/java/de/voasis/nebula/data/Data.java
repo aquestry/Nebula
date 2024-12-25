@@ -15,7 +15,6 @@ public class Data {
     public static String defaultServerTemplate;
     public static int defaultmax;
     public static int defaultmin;
-    public static List<String> adminUUIDs = new ArrayList<>();
     public static List<HoldServer> holdServerMap = new ArrayList<>();
     public static List<BackendServer> backendInfoMap = new ArrayList<>();
     public static List<GamemodeQueue> gamemodeQueueMap = new ArrayList<>();
