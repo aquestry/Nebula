@@ -15,9 +15,10 @@ public class ServerPostConnect {
         String serverName = Nebula.util.getBackendServer(server.getServerInfo().getName())
                 .getFlags()
                 .getFirst()
-                .toLowerCase();
+                .toLowerCase()
+                .replace("gamemode:", "");
         serverName = serverName.substring(0, 1).toUpperCase() + serverName.substring(1);
-        String score = player.getUsername() + "&<blue>Nebula&<white>-----#<white>Rank: " + rankName + "#<white>Service: " + serverName + "#<white>-----";
+        String score = player.getUsername() + "&<blue>Nebula&<reset>#<white>Rank: " + rankName + "#<white>Service: " + serverName + "#<reset>";
         server.sendPluginMessage(Nebula.channelScore, score.getBytes());
     }
 }
