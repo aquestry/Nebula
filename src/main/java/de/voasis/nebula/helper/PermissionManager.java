@@ -39,7 +39,7 @@ public class PermissionManager implements PermissionProvider {
         List<String> members = Nebula.permissionFile.getGroupMembers(groupName);
         ConfigurationNode groupNode = Nebula.permissionFile.getGroupNode(groupName);
         StringBuilder log = new StringBuilder();
-        log.append("Group Information");
+        log.append("Group Information\n");
         log.append("Name:      ").append(group.getName()).append("\n");
         log.append("Prefix:    ").append(group.getPrefix()).append("\n");
         log.append("Level:     ").append(group.getLevel()).append("\n");

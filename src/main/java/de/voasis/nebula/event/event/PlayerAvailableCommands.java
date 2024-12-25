@@ -1,14 +1,17 @@
 package de.voasis.nebula.event.event;
 
+import com.mojang.brigadier.tree.RootCommandNode;
 import com.velocitypowered.api.event.command.PlayerAvailableCommandsEvent;
 import de.voasis.nebula.Nebula;
 
 public class PlayerAvailableCommands {
     public PlayerAvailableCommands(PlayerAvailableCommandsEvent event) {
+        RootCommandNode<?> node = event.getRootNode();
+        node.removeChildByName("group");
         if(!Nebula.util.getBackendServer(event.getPlayer().getCurrentServer().get().getServerInfo().getName()).getFlags().contains("lobby")) {
-            event.getRootNode().removeChildByName("queue");
+            node.removeChildByName("queue");
         } else {
-            event.getRootNode().removeChildByName("lobby");
+            node.removeChildByName("lobby");
         }
     }
 }
