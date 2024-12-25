@@ -6,9 +6,8 @@ import org.spongepowered.configurate.loader.ConfigurationLoader;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class PermissionFile {
 
@@ -74,6 +73,18 @@ public class PermissionFile {
             }
         } catch (IOException e) {
             System.out.println("Failed to add player to group members: " + e.getMessage());
+        }
+    }
+
+    public List<String> getGroupNames() {
+        try {
+            ConfigurationNode groupsNode = rootNode.node("groups");
+            return groupsNode.childrenMap().keySet().stream()
+                    .map(Object::toString)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            System.out.println("Failed to fetch group names: " + e.getMessage());
+            return Collections.emptyList();
         }
     }
 
