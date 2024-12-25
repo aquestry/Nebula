@@ -22,5 +22,5 @@ public class Group {
     public void addPermission(String permission) { permissions.add(permission); }
     public void removePermission(String permission) { permissions.remove(permission); }
     public boolean hasPermission(String permission) { return permissions.contains(permission); }
-    public List<String> getPermissions() { return new ArrayList<>(permissions); }
+    public List<String> getPermissions() { return permissions; }
 }

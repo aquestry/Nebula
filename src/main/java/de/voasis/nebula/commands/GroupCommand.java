@@ -132,8 +132,8 @@ public class GroupCommand implements SimpleCommand {
         System.out.println("Prefix: " + group.getPrefix());
         System.out.println("Level: " + group.getLevel());
         System.out.println("Members: ");
-        for(String p : Nebula.permissionFile.getGroupMembers(groupName)) {
-            System.out.println(p);
+        for(String m : Nebula.permissionFile.getGroupMembers(groupName)) {
+            System.out.println(m);
         }
         System.out.println("Permissions: ");
         for(String p : group.getPermissions()) {
