@@ -1,18 +1,35 @@
 package de.voasis.nebula.helper;
 
+import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.permission.PermissionFunction;
+import com.velocitypowered.api.permission.PermissionProvider;
+import com.velocitypowered.api.permission.PermissionSubject;
+import com.velocitypowered.api.permission.Tristate;
 import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.map.Group;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class PermissionManager {
+public class PermissionManager implements PermissionProvider {
 
     private final List<Group> groups = new ArrayList<>();
     private final Map<UUID, Group> playerGroups = new HashMap<>();
 
     public PermissionManager() {
         loadGroupsFromConfig();
+    }
+
+    public boolean hasPermission(Player player, String permission) {
+        Group group = getGroup(player);
+        return group != null && group.hasPermission(permission);
+    }
+
+    @Subscribe
+    public PermissionFunction createFunction(PermissionSubject subject) {
+        return permission -> Tristate.fromBoolean(
+                subject instanceof Player && hasPermission((Player) subject, permission)
+        );
     }
 
     private void loadGroupsFromConfig() {
