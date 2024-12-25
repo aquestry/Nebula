@@ -47,6 +47,36 @@ public class PermissionFile {
         }
     }
 
+    public void addPermissionToGroup(String groupName, String permission) {
+        try {
+            ConfigurationNode permissionsNode = rootNode.node("groups", groupName, "permissions");
+            List<String> permissions = permissionsNode.getList(String.class, new ArrayList<>());
+            if (!permissions.contains(permission)) {
+                permissions.add(permission);
+                permissionsNode.set(permissions);
+                saveConfig();
+                System.out.println("Added permission \"" + permission + "\" to group \"" + groupName + "\" in config.");
+            }
+        } catch (IOException e) {
+            System.out.println("Failed to add permission to group: " + e.getMessage());
+        }
+    }
+
+    public void removePermissionFromGroup(String groupName, String permission) {
+        try {
+            ConfigurationNode permissionsNode = rootNode.node("groups", groupName, "permissions");
+            List<String> permissions = permissionsNode.getList(String.class, new ArrayList<>());
+            if (permissions.contains(permission)) {
+                permissions.remove(permission);
+                permissionsNode.set(permissions);
+                saveConfig();
+                System.out.println("Removed permission \"" + permission + "\" from group \"" + groupName + "\" in config.");
+            }
+        } catch (IOException e) {
+            System.out.println("Failed to remove permission from group: " + e.getMessage());
+        }
+    }
+
     public List<String> getGroupMembers(String groupName) {
         try {
             ConfigurationNode membersNode = rootNode.node("groups", groupName, "members");

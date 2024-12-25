@@ -156,6 +156,7 @@ public class GroupCommand implements SimpleCommand {
                 String addPermission = args[3];
                 if (!group.hasPermission(addPermission)) {
                     group.addPermission(addPermission);
+                    Nebula.permissionFile.addPermissionToGroup(groupName, addPermission);
                     Nebula.permissionFile.saveConfig();
                     System.out.println("Permission \"" + addPermission + "\" added to group: " + groupName);
                 } else {
@@ -170,6 +171,7 @@ public class GroupCommand implements SimpleCommand {
                 String removePermission = args[3];
                 if (group.hasPermission(removePermission)) {
                     group.getPermissions().remove(removePermission);
+                    Nebula.permissionFile.removePermissionFromGroup(groupName, removePermission);
                     Nebula.permissionFile.saveConfig();
                     System.out.println("Permission \"" + removePermission + "\" removed from group: " + groupName);
                 } else {
