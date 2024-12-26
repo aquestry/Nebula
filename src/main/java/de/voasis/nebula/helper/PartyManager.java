@@ -21,6 +21,9 @@ public class PartyManager {
             Nebula.util.sendMessage(player, Messages.TARGET_INVITE_NOT_FOUND.replace("<target>", targetName));
             return;
         }
+        if(target.equals(player)) {
+            return;
+        }
         Party party = getParty(player);
         if (party != null) {
             if (party.isInvited(target)) {
