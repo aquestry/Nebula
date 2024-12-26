@@ -146,6 +146,7 @@ public class PermissionManager implements PermissionProvider {
 
     public void assignGroup(Player player, Group group) {
         if (group != null) {
+            cachedGroups.remove(player);
             Nebula.permissionFile.removeMemberFromGroup(getGroup(player), player);
             Nebula.permissionFile.addMemberToGroup(group, player);
         }
