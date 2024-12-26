@@ -2,7 +2,7 @@
 file-version: 1
 # MiniMessage support
 # Prefix before each message.
-prefix: "[Server] "
+prefix: "<dark_gray>[<#AA00AA>Server<dark_gray>] <white>"
 # <pre> is a placeholder for the prefix.
 admin:
   usage: "<pre>Usage: /admin <stop|delete|template> <args...>"
@@ -47,7 +47,7 @@ party:
   party-not-allowed: "<pre>You need to be leader to do that."
   command-usage: "<pre>Usage: /party <accept|invite|leave> [player]."
 group:
-  command-usage: "<pre>Usage: /group <assign|create|delete|list|permission|info>"
+  command-usage: "<pre>Usage: /group <assign | create | delete | list | permission | info>"
   assign-success: "<pre>Assigned player <player> to group <group>."
   assign-player-not-found: "<pre>Player <player> not found."
   assign-group-not-found: "<pre>Group <group> not found."
