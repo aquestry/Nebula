@@ -156,7 +156,10 @@ public class GroupCommand implements SimpleCommand {
                 Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_REMOVE_SUCCESS.replace("<permission>", permissionToRemove));
                 break;
             case "list":
-                Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_LIST_HEADER);
+                Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_LIST_HEADER.replace("<group>", groupName));
+                for(String permission : group.getPermissions()) {
+                    Nebula.util.sendMessage(source, permission);
+                }
                 break;
         }
     }
