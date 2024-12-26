@@ -25,6 +25,7 @@ public class Nebula {
     public static ProxyServer server;
     public static ChannelIdentifier channelMain = MinecraftChannelIdentifier.create("nebula", "main");
     public static ChannelIdentifier channelScore = MinecraftChannelIdentifier.create("nebula", "scoreboard");
+    public static MiniMessage mm = MiniMessage.miniMessage();
     public static FilesManager filesManager;
     public static ServerManager serverManager;
     public static PermissionManager permissionManager;
@@ -34,12 +35,10 @@ public class Nebula {
     public static AutoDeleter autoDeleter;
     public static PartyManager partyManager;
     public static Util util;
-    public static MiniMessage mm;
 
     @Inject
     public Nebula(ProxyServer proxy, @DataDirectory Path dataDirectory) {
         server = proxy;
-        mm = MiniMessage.miniMessage();
         util = new Util();
         permissionFile = new PermissionFile(dataDirectory);
         permissionManager  = new PermissionManager();
