@@ -17,7 +17,11 @@ public class PartyCommand implements SimpleCommand {
                         if (args.length >= 2) {
                             Nebula.partyManager.tryJoin(player, args[1]);
                         } else {
-                            Nebula.util.sendMessage(player, Messages.USAGE_PARTY);
+                            if(!Nebula.partyManager.getAllInvites(player).isEmpty()) {
+                                Nebula.partyManager.tryJoin(player, Nebula.partyManager.getAllInvites(player).getFirst());
+                            } else {
+                                Nebula.util.sendMessage(player, Messages.USAGE_PARTY);
+                            }
                         }
                         break;
                     case "invite":
