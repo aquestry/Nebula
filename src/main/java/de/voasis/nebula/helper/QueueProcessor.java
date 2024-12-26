@@ -128,6 +128,13 @@ public class QueueProcessor {
             if(warn) { Nebula.util.sendMessage(player, Messages.NOT_IN_QUEUE); }
             return;
         }
+        Party party = Nebula.partyManager.getParty(player);
+        if(party != null) {
+            if(!party.getLeader().equals(player)) {
+                Nebula.util.sendMessage(player, Messages.PARTY_NOT_ALLOWED);
+                return;
+            }
+        }
         for (GamemodeQueue queue : Data.gamemodeQueueMap) {
             if (queue.getInQueue().remove(player)) {
                 Nebula.util.sendMessage(player, Messages.REMOVED_FROM_QUEUE.replace("<queue>", queue.getName()));
