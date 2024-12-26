@@ -82,6 +82,7 @@ public class Util {
         for (BackendServer backendServer : Data.backendInfoMap) {
             if (registeredServer.getServerInfo().getName().equals(backendServer.getServerName())) {
                 if (backendServer.isOnline()) {
+                    checkLobbys(true);
                     backendServer.setOnline(false);
                     CommandSource creator = backendServer.getCreator();
                     sendMessage(creator, Messages.OFFLINE.replace("<name>", backendServer.getServerName()));
@@ -91,11 +92,8 @@ public class Util {
     }
 
     public void pingServers() {
-        int lobbys = 0;
+        checkLobbys(false);
         for (BackendServer backendServer : new ArrayList<>(Data.backendInfoMap)) {
-            if(backendServer.getFlags().contains("lobby")) {
-                lobbys++;
-            }
             Optional<RegisteredServer> registeredServer = Nebula.server.getServer(backendServer.getServerName());
             registeredServer.ifPresent(regServer -> regServer.ping().whenComplete((result, exception) -> {
                 if (exception == null) {
@@ -112,6 +110,19 @@ public class Util {
                     }
                 }
             }));
+        }
+    }
+
+    public void checkLobbys(boolean online) {
+        int lobbys = 0;
+        for(BackendServer backendServer : Data.backendInfoMap) {
+            if(backendServer.getFlags().contains("lobby")) {
+                if(online && backendServer.isOnline()) {
+                    lobbys++;
+                } else if(!online){
+                    lobbys++;
+                }
+            }
         }
         if(lobbys == 0) {
             Nebula.defaultsManager.createDefault();

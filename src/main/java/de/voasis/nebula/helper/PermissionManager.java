@@ -129,7 +129,7 @@ public class PermissionManager implements PermissionProvider {
             }
         }
         if (highestLevelGroup != null) {
-            Nebula.util.log("Final highest-level group for player {}: {}", playerUUID, highestLevelGroup.getName());
+            Nebula.util.log("Player: {}, UUID: {}, Group: {}", player.getUniqueId(), playerUUID, highestLevelGroup.getName());
             cachedGroups.put(player, highestLevelGroup);
             return highestLevelGroup;
         }
