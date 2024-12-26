@@ -91,7 +91,11 @@ public class Util {
     }
 
     public void pingServers() {
+        int lobbys = 0;
         for (BackendServer backendServer : new ArrayList<>(Data.backendInfoMap)) {
+            if(backendServer.getFlags().contains("lobby")) {
+                lobbys++;
+            }
             Optional<RegisteredServer> registeredServer = Nebula.server.getServer(backendServer.getServerName());
             registeredServer.ifPresent(regServer -> regServer.ping().whenComplete((result, exception) -> {
                 if (exception == null) {
@@ -108,6 +112,10 @@ public class Util {
                     }
                 }
             }));
+        }
+        if(lobbys == 0) {
+            Nebula.defaultsManager.createDefault();
+            log("No lobby server found, creating new one...");
         }
     }
 

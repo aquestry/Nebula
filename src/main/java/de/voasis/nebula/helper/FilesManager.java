@@ -133,6 +133,26 @@ public class FilesManager {
             Messages.QUEUE_PLAYER_COUNT_MISMATCH = messages.node("party", "queue-count-not-matching").getString("<pre>The player count in your party does not match the required queue size.").replace("<pre>", prefix);
             Messages.PARTY_NOT_ALLOWED = messages.node("party", "party-not-allowed").getString("<pre>You need to be leader to do that.").replace("<pre>", prefix);
             Messages.USAGE_PARTY = messages.node("party", "command-usage").getString("<pre>Usage: /party <accept|invite|leave> [player].").replace("<pre>", prefix);
+            // Group Messages
+            Messages.GROUP_USAGE = messages.node("group", "command-usage").getString("<pre>Usage: /group <assign|create|delete|list|permission|info>").replace("<pre>", prefix);
+            Messages.GROUP_ASSIGN_SUCCESS = messages.node("group", "assign-success").getString("<pre>Assigned player <player> to group <group>.").replace("<pre>", prefix);
+            Messages.GROUP_ASSIGN_PLAYER_NOT_FOUND = messages.node("group", "assign-player-not-found").getString("<pre>Player <player> not found.").replace("<pre>", prefix);
+            Messages.GROUP_ASSIGN_GROUP_NOT_FOUND = messages.node("group", "assign-group-not-found").getString("<pre>Group <group> not found.").replace("<pre>", prefix);
+            Messages.GROUP_CREATE_SUCCESS = messages.node("group", "create-success").getString("<pre>Group <group> created with prefix <prefix> and level <level>.").replace("<pre>", prefix);
+            Messages.GROUP_CREATE_ALREADY_EXISTS = messages.node("group", "create-already-exists").getString("<pre>Group <group> already exists.").replace("<pre>", prefix);
+            Messages.GROUP_CREATE_INVALID_LEVEL = messages.node("group", "create-invalid-level").getString("<pre>Invalid group level specified.").replace("<pre>", prefix);
+            Messages.GROUP_DELETE_SUCCESS = messages.node("group", "delete-success").getString("<pre>Group <group> deleted.").replace("<pre>", prefix);
+            Messages.GROUP_DELETE_DEFAULT = messages.node("group", "delete-default").getString("<pre>Cannot delete the default group.").replace("<pre>", prefix);
+            Messages.GROUP_DELETE_NOT_FOUND = messages.node("group", "delete-not-found").getString("<pre>Group <group> not found.").replace("<pre>", prefix);
+            Messages.GROUP_LIST_HEADER = messages.node("group", "list-header").getString("<pre>Available groups:").replace("<pre>", prefix);
+            Messages.GROUP_LIST_ITEM = messages.node("group", "list-item").getString("<pre>- <group>").replace("<pre>", prefix);
+            Messages.GROUP_LIST_EMPTY = messages.node("group", "list-empty").getString("<pre>No groups found.").replace("<pre>", prefix);
+            Messages.GROUP_INFO_NOT_FOUND = messages.node("group", "info-not-found").getString("<pre>Group <group> not found.").replace("<pre>", prefix);
+            Messages.GROUP_PERMISSION_ADD_SUCCESS = messages.node("group", "permission-add-success").getString("<pre>Permission <permission> added to group <group>.").replace("<pre>", prefix);
+            Messages.GROUP_PERMISSION_REMOVE_SUCCESS = messages.node("group", "permission-remove-success").getString("<pre>Permission <permission> removed from group <group>.").replace("<pre>", prefix);
+            Messages.GROUP_PERMISSION_LIST_HEADER = messages.node("group", "permission-list-header").getString("<pre>Permissions for group <group>:").replace("<pre>", prefix);
+            Messages.GROUP_PERMISSION_REMOVE_NOT_FOUND = messages.node("group", "permission-remove-not-found").getString("<pre>Permission <permission> not found in group <group>.").replace("<pre>", prefix);
+            Messages.GROUP_PERMISSION_ALREADY_EXISTS = messages.node("group", "permission-already-exists").getString("<pre>Permission <permission> already exists in group <group>.").replace("<pre>", prefix);
             // QueueProcessor Party-Specific Messages
             Messages.LEADER_CANNOT_JOIN_QUEUE = messages.node("queue", "leader-cannot-join").getString("<pre>You cannot join the queue because the player count in your party does not match.").replace("<pre>", prefix);
             Messages.NOT_PARTY_LEADER = messages.node("queue", "not-party-leader").getString("<pre>You cannot join a game mode because you are not the party leader. Use /p leave to leave the party.").replace("<pre>", prefix);

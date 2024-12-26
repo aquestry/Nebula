@@ -44,20 +44,18 @@ public class PermissionManager implements PermissionProvider {
         List<String> members = Nebula.permissionFile.getGroupMembers(groupName);
         List<String> permissions = group.getPermissions();
         ConfigurationNode groupNode = Nebula.permissionFile.getGroupNode(groupName);
-        StringBuilder log = new StringBuilder();
-        log.append("Group Information\n");
-        log.append("Name:      ").append(group.getName()).append("\n");
-        log.append("Prefix:    ").append(group.getPrefix()).append("\n");
-        log.append("Level:     ").append(group.getLevel()).append("\n");
-        log.append("Members:   ").append(members.size()).append("\n");
+        Nebula.util.log("Group Information\n");
+        Nebula.util.log("Name:      {}", groupName);
+        Nebula.util.log("Prefix:    {}", group.getPrefix());
+        Nebula.util.log("Level:     {}", group.getLevel());
+        Nebula.util.log("Members:   {}", members.size());
         for (String member : members) {
-            log.append(member).append(": ").append(getPlayerNameFromUUID(member)).append("\n");
+            Nebula.util.log(member + " : " + getPlayerNameFromUUID(member));
         }
-        log.append("Permissions:   ").append(permissions.size()).append("\n");
+        Nebula.util.log("Permissions:   ");
         for (String perm : permissions) {
-            log.append(perm).append("\n");
+            Nebula.util.log(perm);
         }
-        System.out.println(log);
     }
 
     public static String getPlayerNameFromUUID(String uuid) {
@@ -73,12 +71,12 @@ public class PermissionManager implements PermissionProvider {
                 JsonObject json = JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
                 return json.get("name").getAsString();
             } else if (connection.getResponseCode() == 204 || connection.getResponseCode() == 404) {
-                System.out.println("Player not found for UUID: " + uuid);
+                Nebula.util.log("Player not found for UUID: {}", uuid);
             } else {
-                System.out.println("Failed to fetch player name. HTTP Response: " + connection.getResponseCode());
+                Nebula.util.log("Failed to fetch player name. HTTP Response: {}", connection.getResponseCode());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Nebula.util.log(e.getMessage());
         }
         return "Null";
     }
@@ -96,7 +94,7 @@ public class PermissionManager implements PermissionProvider {
                 try {
                     permissions = groupNode.node("permissions").getList(String.class, new ArrayList<>());
                 } catch (Exception e) {
-                    System.out.println("Failed to load permissions for group \"" + groupName + "\": " + e.getMessage());
+                    Nebula.util.log("Failed to load permissions for group \"" + groupName + "\": " + e.getMessage());
                 }
                 Group group = new Group(groupName, prefix, level);
                 permissions.forEach(group::addPermission);
@@ -110,7 +108,7 @@ public class PermissionManager implements PermissionProvider {
                             playerGroups.put(uuid, group);
                         }
                     } catch (IllegalArgumentException e) {
-                        System.out.println("Invalid UUID in group " + groupName + ": " + memberUUID);
+                        Nebula.util.log("Invalid UUID in group " + groupName + ": " + memberUUID);
                     }
                 }
             }

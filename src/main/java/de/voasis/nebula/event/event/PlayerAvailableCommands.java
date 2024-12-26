@@ -7,7 +7,6 @@ import de.voasis.nebula.Nebula;
 public class PlayerAvailableCommands {
     public PlayerAvailableCommands(PlayerAvailableCommandsEvent event) {
         RootCommandNode<?> node = event.getRootNode();
-        node.removeChildByName("group");
         if(!Nebula.util.getBackendServer(event.getPlayer().getCurrentServer().get().getServerInfo().getName()).getFlags().contains("lobby")) {
             node.removeChildByName("queue");
         } else {

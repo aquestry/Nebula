@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class QueueProcessor {
-
     public void init() {
         for (GamemodeQueue queue : Data.gamemodeQueueMap) {
             int preloadCount = queue.getPreload();

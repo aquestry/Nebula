@@ -6,72 +6,69 @@ import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Data;
+import de.voasis.nebula.data.Messages;
 import de.voasis.nebula.map.Group;
 import java.util.List;
 import java.util.Optional;
 
 public class GroupCommand implements SimpleCommand {
-
     @Override
     public void execute(Invocation invocation) {
         CommandSource source = invocation.source();
-        if (!(source instanceof ConsoleCommandSource)) {
-            return;
-        }
         String[] args = invocation.arguments();
         if (args.length == 0) {
-            System.out.println("Usage: /group <assign|create|delete|list|info|permission>");
+            Nebula.util.sendMessage(source, Messages.GROUP_USAGE);
             return;
         }
         switch (args[0].toLowerCase()) {
             case "assign":
-                handleAssign(args);
+                handleAssign(args, source);
                 break;
             case "create":
-                handleCreate(args);
+                handleCreate(args, source);
                 break;
             case "delete":
-                handleDelete(args);
+                handleDelete(args, source);
                 break;
             case "list":
-                handleList();
-                break;
-            case "info":
-                handleInfo(args);
+                handleList(source);
                 break;
             case "permission":
-                handlePermission(args);
+                handlePermission(args, source);
+                break;
+            case "info":
+                handleInfo(args, source);
                 break;
             default:
-                System.out.println("Unknown subcommand. Usage: /group <assign|create|delete|list|info|permission>");
+                Nebula.util.sendMessage(source, Messages.GROUP_USAGE);
                 break;
         }
     }
 
-    private void handleAssign(String[] args) {
+    private void handleAssign(String[] args, CommandSource source) {
         if (args.length < 3) {
-            System.out.println("Usage: /group assign <player> <group>");
+            Nebula.util.sendMessage(source, Messages.GROUP_USAGE);
             return;
         }
         String playerName = args[1];
         String groupName = args[2];
         Optional<Player> player = Nebula.server.getPlayer(playerName);
         if (player.isEmpty()) {
-            System.out.println("Player not found: " + playerName);
+            Nebula.util.sendMessage(source, Messages.GROUP_ASSIGN_PLAYER_NOT_FOUND.replace("<player>", playerName));
             return;
         }
         Group group = Nebula.permissionManager.getGroupByName(groupName);
         if (group == null) {
-            System.out.println("Group not found: " + groupName);
+            Nebula.util.sendMessage(source, Messages.GROUP_ASSIGN_GROUP_NOT_FOUND.replace("<group>", groupName));
             return;
         }
         Nebula.permissionManager.assignGroup(player.get(), groupName);
-        System.out.println("Assigned player " + playerName + " to group " + groupName + ".");
+        Nebula.util.sendMessage(source, Messages.GROUP_ASSIGN_SUCCESS.replace("<player>", playerName).replace("<group>", groupName));
     }
 
-    private void handleCreate(String[] args) {
+    private void handleCreate(String[] args, CommandSource source) {
         if (args.length < 4) {
-            System.out.println("Usage: /group create <name> <prefix> <level>");
+            Nebula.util.sendMessage(source, Messages.GROUP_USAGE);
             return;
         }
         String groupName = args[1];
@@ -80,122 +77,93 @@ public class GroupCommand implements SimpleCommand {
         try {
             level = Integer.parseInt(args[3]);
         } catch (NumberFormatException e) {
-            System.out.println("Level must be a valid number.");
+            Nebula.util.sendMessage(source, Messages.GROUP_CREATE_INVALID_LEVEL);
             return;
         }
         if (Nebula.permissionManager.getGroupByName(groupName) != null) {
-            System.out.println("Group already exists: " + groupName);
+            Nebula.util.sendMessage(source, Messages.GROUP_CREATE_ALREADY_EXISTS.replace("<group>", groupName));
             return;
         }
         Nebula.permissionManager.createGroup(groupName, prefix, level);
-        System.out.println("Group created: " + groupName + " with prefix: " + prefix + " and level: " + level + ".");
+        Nebula.util.sendMessage(source, Messages.GROUP_CREATE_SUCCESS.replace("<group>", groupName).replace("<prefix>", prefix).replace("<level>", String.valueOf(level)));
     }
 
-    private void handleDelete(String[] args) {
+    private void handleDelete(String[] args, CommandSource source) {
         if (args.length < 2) {
-            System.out.println("Usage: /group delete <name>");
+            Nebula.util.sendMessage(source, Messages.GROUP_USAGE);
             return;
         }
         String groupName = args[1];
         if (groupName.equalsIgnoreCase(Data.defaultGroupName)) {
-            System.out.println("Cannot delete the default group: " + groupName);
+            Nebula.util.sendMessage(source, Messages.GROUP_DELETE_DEFAULT);
             return;
         }
         if (Nebula.permissionManager.getGroupByName(groupName) == null) {
-            System.out.println("Group not found: " + groupName);
+            Nebula.util.sendMessage(source, Messages.GROUP_DELETE_NOT_FOUND.replace("<group>", groupName));
             return;
         }
         Nebula.permissionManager.deleteGroup(groupName);
-        System.out.println("Group deleted: " + groupName + ".");
+        Nebula.util.sendMessage(source, Messages.GROUP_DELETE_SUCCESS.replace("<group>", groupName));
     }
 
-    private void handleList() {
+    private void handleList(CommandSource source) {
         List<String> groupNames = Nebula.permissionFile.getGroupNames();
         if (groupNames.isEmpty()) {
-            System.out.println("No groups found.");
+            Nebula.util.sendMessage(source, Messages.GROUP_LIST_EMPTY);
             return;
         }
-        System.out.println("Available Groups:");
+        Nebula.util.sendMessage(source, Messages.GROUP_LIST_HEADER);
         for (String groupName : groupNames) {
-            System.out.println("- " + groupName);
+            Nebula.util.sendMessage(source, Messages.GROUP_LIST_ITEM.replace("<group>", groupName));
         }
     }
 
-    private void handleInfo(String[] args) {
+    private void handleInfo(String[] args, CommandSource source) {
         if (args.length < 2) {
-            System.out.println("Usage: /group info <name>");
+            Nebula.util.sendMessage(source, Messages.GROUP_USAGE);
             return;
         }
         String groupName = args[1];
         Group group = Nebula.permissionManager.getGroupByName(groupName);
         if (group == null) {
-            System.out.println("Group not found: " + groupName);
+            Nebula.util.sendMessage(source, Messages.GROUP_INFO_NOT_FOUND.replace("<group>", groupName));
             return;
         }
         Nebula.permissionManager.logGroupInfo(group);
     }
 
-    private void handlePermission(String[] args) {
+    private void handlePermission(String[] args, CommandSource source) {
         if (args.length < 3) {
-            System.out.println("Usage: /group permission <add|remove|list> <group> [<permission>]");
+            Nebula.util.sendMessage(source, Messages.GROUP_USAGE);
             return;
         }
         String action = args[1].toLowerCase();
         String groupName = args[2];
         Group group = Nebula.permissionManager.getGroupByName(groupName);
         if (group == null) {
-            System.out.println("Group not found: " + groupName);
+            Nebula.util.sendMessage(source, Messages.GROUP_INFO_NOT_FOUND.replace("<group>", groupName));
             return;
         }
         switch (action) {
             case "add":
-                if (args.length < 4) {
-                    System.out.println("Usage: /group permission add <group> <permission>");
-                    return;
-                }
-                String addPermission = args[3];
-                if (!group.hasPermission(addPermission)) {
-                    group.addPermission(addPermission);
-                    Nebula.permissionFile.addPermissionToGroup(groupName, addPermission);
-                    Nebula.permissionFile.saveConfig();
-                    System.out.println("Permission \"" + addPermission + "\" added to group: " + groupName);
-                } else {
-                    System.out.println("Group already has permission: " + addPermission);
-                }
+                String permissionToAdd = args[3];
+                group.addPermission(permissionToAdd);
+                Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_ADD_SUCCESS.replace("<permission>", permissionToAdd));
                 break;
             case "remove":
-                if (args.length < 4) {
-                    System.out.println("Usage: /group permission remove <group> <permission>");
-                    return;
-                }
-                String removePermission = args[3];
-                if (group.hasPermission(removePermission)) {
-                    group.getPermissions().remove(removePermission);
-                    Nebula.permissionFile.removePermissionFromGroup(groupName, removePermission);
-                    Nebula.permissionFile.saveConfig();
-                    System.out.println("Permission \"" + removePermission + "\" removed from group: " + groupName);
-                } else {
-                    System.out.println("Group does not have permission: " + removePermission);
-                }
+                String permissionToRemove = args[3];
+                group.removePermission(permissionToRemove);
+                Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_REMOVE_SUCCESS.replace("<permission>", permissionToRemove));
                 break;
             case "list":
-                System.out.println("Permissions for group \"" + groupName + "\":");
-                if (group.getPermissions().isEmpty()) {
-                    System.out.println("  No permissions assigned.");
-                } else {
-                    for (String permission : group.getPermissions()) {
-                        System.out.println("  - " + permission);
-                    }
-                }
-                break;
-            default:
-                System.out.println("Unknown action. Use /group permission <add|remove|list> <group> [<permission>]");
+                Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_LIST_HEADER);
                 break;
         }
     }
 
     @Override
     public boolean hasPermission(Invocation invocation) {
-        return invocation.source() instanceof ConsoleCommandSource;
+        CommandSource sender = invocation.source();
+        return sender.hasPermission("velocity.admin") || sender instanceof ConsoleCommandSource;
     }
 }

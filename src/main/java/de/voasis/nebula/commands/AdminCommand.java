@@ -2,6 +2,7 @@ package de.voasis.nebula.commands;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
+import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import de.voasis.nebula.data.Data;
 import de.voasis.nebula.data.Messages;
 import de.voasis.nebula.map.BackendServer;
@@ -113,6 +114,7 @@ public class AdminCommand implements SimpleCommand {
 
     @Override
     public boolean hasPermission(Invocation invocation) {
-        return invocation.source().hasPermission("velocity.admin");
+        CommandSource sender = invocation.source();
+        return sender.hasPermission("velocity.admin") ||  sender instanceof ConsoleCommandSource;
     }
 }

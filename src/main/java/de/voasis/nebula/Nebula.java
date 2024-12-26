@@ -40,9 +40,9 @@ public class Nebula {
     public Nebula(ProxyServer proxy, @DataDirectory Path dataDirectory) {
         server = proxy;
         mm = MiniMessage.miniMessage();
+        util = new Util();
         permissionFile = new PermissionFile(dataDirectory);
         permissionManager  = new PermissionManager();
-        util = new Util();
         serverManager = new ServerManager();
         filesManager = new FilesManager(dataDirectory);
         defaultsManager = new DefaultsManager();

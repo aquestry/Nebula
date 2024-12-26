@@ -47,6 +47,26 @@ public class Messages {
     public static String QUEUE_PLAYER_COUNT_MISMATCH ;
     public static String PARTY_NOT_ALLOWED;
     public static String USAGE_PARTY;
+    // Group Messages
+    public static String GROUP_USAGE;
+    public static String GROUP_ASSIGN_SUCCESS;
+    public static String GROUP_ASSIGN_PLAYER_NOT_FOUND;
+    public static String GROUP_ASSIGN_GROUP_NOT_FOUND;
+    public static String GROUP_CREATE_SUCCESS;
+    public static String GROUP_CREATE_ALREADY_EXISTS;
+    public static String GROUP_CREATE_INVALID_LEVEL;
+    public static String GROUP_DELETE_SUCCESS;
+    public static String GROUP_DELETE_DEFAULT;
+    public static String GROUP_DELETE_NOT_FOUND;
+    public static String GROUP_LIST_HEADER;
+    public static String GROUP_LIST_ITEM;
+    public static String GROUP_LIST_EMPTY;
+    public static String GROUP_INFO_NOT_FOUND;
+    public static String GROUP_PERMISSION_ADD_SUCCESS;
+    public static String GROUP_PERMISSION_REMOVE_SUCCESS;
+    public static String GROUP_PERMISSION_LIST_HEADER;
+    public static String GROUP_PERMISSION_REMOVE_NOT_FOUND;
+    public static String GROUP_PERMISSION_ALREADY_EXISTS;
     // QueueProcessor-Specific Party Messages
     public static String LEADER_CANNOT_JOIN_QUEUE;
     public static String NOT_PARTY_LEADER;

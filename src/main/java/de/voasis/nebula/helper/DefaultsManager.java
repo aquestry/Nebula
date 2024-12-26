@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultsManager {
-
     public BackendServer getTarget() {
         BackendServer target = getServerWithLowestPlayerCount();
         if(target != null) {

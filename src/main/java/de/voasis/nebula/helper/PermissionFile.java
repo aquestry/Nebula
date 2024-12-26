@@ -1,5 +1,6 @@
 package de.voasis.nebula.helper;
 
+import de.voasis.nebula.Nebula;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
@@ -35,7 +36,7 @@ public class PermissionFile {
                     .build();
             rootNode = loader.load();
         } catch (IOException e) {
-            System.out.println("Failed to initialize configuration: " + e.getMessage());
+            Nebula.util.log("Failed to initialize configuration: " + e.getMessage());
         }
     }
 
@@ -55,10 +56,10 @@ public class PermissionFile {
                 permissions.add(permission);
                 permissionsNode.set(permissions);
                 saveConfig();
-                System.out.println("Added permission \"" + permission + "\" to group \"" + groupName + "\" in config.");
+                Nebula.util.log("Added permission \"" + permission + "\" to group \"" + groupName + "\" in config.");
             }
         } catch (IOException e) {
-            System.out.println("Failed to add permission to group: " + e.getMessage());
+            Nebula.util.log("Failed to add permission to group: " + e.getMessage());
         }
     }
 
@@ -70,10 +71,10 @@ public class PermissionFile {
                 permissions.remove(permission);
                 permissionsNode.set(permissions);
                 saveConfig();
-                System.out.println("Removed permission \"" + permission + "\" from group \"" + groupName + "\" in config.");
+                Nebula.util.log("Removed permission \"" + permission + "\" from group \"" + groupName + "\" in config.");
             }
         } catch (IOException e) {
-            System.out.println("Failed to remove permission from group: " + e.getMessage());
+            Nebula.util.log("Failed to remove permission from group: " + e.getMessage());
         }
     }
 
@@ -96,7 +97,7 @@ public class PermissionFile {
                 saveConfig();
             }
         } catch (IOException e) {
-            System.out.println("Failed to add player to group members: " + e.getMessage());
+            Nebula.util.log("Failed to add player to group members: " + e.getMessage());
         }
     }
 
@@ -119,7 +120,7 @@ public class PermissionFile {
         try {
             loader.save(rootNode);
         } catch (IOException e) {
-            System.out.println("Failed to save configuration: " + e.getMessage());
+            Nebula.util.log("Failed to save configuration: " + e.getMessage());
         }
     }
 

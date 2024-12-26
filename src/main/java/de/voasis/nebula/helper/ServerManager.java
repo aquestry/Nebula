@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServerManager {
-
     private void executeSSHCommand(HoldServer externalServer, String command, Runnable onSuccess, Runnable onError) {
         Session session = null;
         ChannelExec channelExec = null;
