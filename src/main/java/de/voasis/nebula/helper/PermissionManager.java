@@ -21,7 +21,7 @@ import java.util.*;
 public class PermissionManager implements PermissionProvider {
 
     private final List<Group> groups = new ArrayList<>();
-    private final Map<UUID, Group> playerGroups = new HashMap<>();
+    private HashMap<Player, Group> cachedGroups = new HashMap<>();
 
     public PermissionManager() {
         loadGroupsFromConfig();
@@ -29,8 +29,12 @@ public class PermissionManager implements PermissionProvider {
     }
 
     public boolean hasPermission(Player player, String permission) {
-        Group group = getGroup(player);
-        return group != null && group.hasPermission(permission);
+        for(Group group : groups) {
+            if(Nebula.permissionFile.getGroupMembers(group.getName()).contains(player.getUniqueId().toString())) {
+                return group.hasPermission(permission);
+            }
+        }
+        return false;
     }
 
     @Subscribe
@@ -85,7 +89,6 @@ public class PermissionManager implements PermissionProvider {
     private void loadGroupsFromConfig() {
         PermissionFile permissionFile = Nebula.permissionFile;
         groups.clear();
-        playerGroups.clear();
         for (String groupName : permissionFile.getGroupNames()) {
             ConfigurationNode groupNode = permissionFile.getGroupNode(groupName);
             if (groupNode != null) {
@@ -101,51 +104,48 @@ public class PermissionManager implements PermissionProvider {
                 permissions.forEach(group::addPermission);
                 groups.add(group);
                 logGroupInfo(Nebula.server.getConsoleCommandSource(), group);
-                List<String> members = permissionFile.getGroupMembers(groupName);
-                for (String memberUUID : members) {
-                    try {
-                        UUID uuid = UUID.fromString(memberUUID);
-                        if (!playerGroups.containsKey(uuid)) {
-                            playerGroups.put(uuid, group);
-                        }
-                    } catch (IllegalArgumentException e) {
-                        Nebula.util.log("Invalid UUID in group " + groupName + ": " + memberUUID);
-                    }
-                }
             }
         }
     }
 
-
     public Group getGroup(Player player) {
         UUID playerUUID = player.getUniqueId();
-        if (playerGroups.containsKey(playerUUID)) {
-            return playerGroups.get(playerUUID);
+        if(cachedGroups.containsKey(player)) {
+            return cachedGroups.get(player);
         }
-        Group highestLevelGroup = groups.stream()
-                .filter(group -> Nebula.permissionFile.getGroupMembers(group.getName()).contains(playerUUID.toString()))
-                .max(Comparator.comparingInt(Group::getLevel))
-                .orElse(null);
+        Group highestLevelGroup = null;
+        List<Group> sortedGroups = new ArrayList<>(groups);
+        sortedGroups.sort((g1, g2) -> Integer.compare(g2.getLevel(), g1.getLevel()));
+        for (Group group : sortedGroups) {
+            List<String> members = Nebula.permissionFile.getGroupMembers(group.getName());
+            if (members.contains(playerUUID.toString())) {
+                if (highestLevelGroup == null) {
+                    highestLevelGroup = group;
+                } else if (group.getLevel() > highestLevelGroup.getLevel()) {
+                    Nebula.util.log("Group {} has a higher level ({}) than current highest-level group {} ({})",
+                            group.getName(), group.getLevel(), highestLevelGroup.getName(), highestLevelGroup.getLevel());
+                    highestLevelGroup = group;
+                }
+            }
+        }
         if (highestLevelGroup != null) {
-            playerGroups.put(playerUUID, highestLevelGroup);
+            Nebula.util.log("Final highest-level group for player {}: {}", playerUUID, highestLevelGroup.getName());
+            cachedGroups.put(player, highestLevelGroup);
             return highestLevelGroup;
         }
-        String defaultGroupName = Data.defaultGroupName;
-        Group fallbackGroup = new Group("fallback", "<dark_gray>[<gray>Fallback<dark_gray>] <white>", 0);
-        Group defaultGroup = getGroupByName(defaultGroupName);
+        Group defaultGroup = getGroupByName(Data.defaultGroupName);
         if (defaultGroup != null) {
-            playerGroups.put(playerUUID, defaultGroup);
             Nebula.permissionFile.addMemberToGroup(defaultGroup, player);
+            Nebula.util.log("No specific group found. Assigning default group: {} to player {}", defaultGroup.getName(), playerUUID);
+            cachedGroups.put(player, defaultGroup);
             return defaultGroup;
         }
-        playerGroups.put(playerUUID, fallbackGroup);
-        return fallbackGroup;
+        Nebula.util.log("No default group found. Assigning fallback group to player: {}", playerUUID);
+        return new Group("fallback", "<dark_gray>[<gray>Fallback<dark_gray>] <white>", 0);
     }
 
     public void assignGroup(Player player, Group group) {
         if (group != null) {
-            playerGroups.remove(player.getUniqueId());
-            playerGroups.put(player.getUniqueId(), group);
             Nebula.permissionFile.removeMemberFromGroup(getGroup(player), player);
             Nebula.permissionFile.addMemberToGroup(group, player);
         }
