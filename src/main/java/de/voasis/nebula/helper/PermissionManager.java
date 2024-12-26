@@ -132,25 +132,22 @@ public class PermissionManager implements PermissionProvider {
         }
         String defaultGroupName = Data.defaultGroupName;
         Group fallbackGroup = new Group("fallback", "<dark_gray>[<gray>Fallback<dark_gray>] <white>", 0);
-        if (defaultGroupName == null) {
-            playerGroups.put(playerUUID, fallbackGroup);
-            return fallbackGroup;
-        }
         Group defaultGroup = getGroupByName(defaultGroupName);
         if (defaultGroup != null) {
             playerGroups.put(playerUUID, defaultGroup);
-            Nebula.permissionFile.addMemberToGroup(defaultGroupName, playerUUID.toString());
+            Nebula.permissionFile.addMemberToGroup(defaultGroup, player);
             return defaultGroup;
         }
         playerGroups.put(playerUUID, fallbackGroup);
         return fallbackGroup;
     }
 
-    public void assignGroup(Player player, String groupName) {
-        Group group = getGroupByName(groupName);
+    public void assignGroup(Player player, Group group) {
         if (group != null) {
+            playerGroups.remove(player.getUniqueId());
             playerGroups.put(player.getUniqueId(), group);
-            Nebula.permissionFile.addMemberToGroup(groupName, player.getUniqueId().toString());
+            Nebula.permissionFile.removeMemberFromGroup(getGroup(player), player);
+            Nebula.permissionFile.addMemberToGroup(group, player);
         }
     }
 

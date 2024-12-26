@@ -1,6 +1,8 @@
 package de.voasis.nebula.helper;
 
+import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
+import de.voasis.nebula.map.Group;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
@@ -48,30 +50,36 @@ public class PermissionFile {
         }
     }
 
-    public void addPermissionToGroup(String groupName, String permission) {
+    public void addPermissionToGroup(Group group, String permission) {
         try {
-            ConfigurationNode permissionsNode = rootNode.node("groups", groupName, "permissions");
-            List<String> permissions = permissionsNode.getList(String.class, new ArrayList<>());
+            ConfigurationNode permissionsNode = rootNode.node("groups", group.getName(), "permissions");
+            List<String> permissions = new ArrayList<>(permissionsNode.getList(String.class, new ArrayList<>()));
             if (!permissions.contains(permission)) {
-                permissions.add("\"" + permission + "\"");
+                permissions.add(permission);
                 permissionsNode.set(permissions);
+                group.addPermission(permission);
                 saveConfig();
-                Nebula.util.log("Added permission \"" + permission + "\" to group \"" + groupName + "\" in config.");
+                Nebula.util.log("Added permission \"" + permission + "\" to group \"" + group.getName() + "\" in config.");
+            } else {
+                Nebula.util.log("Permission \"" + permission + "\" already exists in group \"" + group.getName() + "\".");
             }
         } catch (IOException e) {
             Nebula.util.log("Failed to add permission to group: " + e.getMessage());
         }
     }
 
-    public void removePermissionFromGroup(String groupName, String permission) {
+    public void removePermissionFromGroup(Group group, String permission) {
         try {
-            ConfigurationNode permissionsNode = rootNode.node("groups", groupName, "permissions");
-            List<String> permissions = permissionsNode.getList(String.class, new ArrayList<>());
+            ConfigurationNode permissionsNode = rootNode.node("groups", group.getName(), "permissions");
+            List<String> permissions = new ArrayList<>(permissionsNode.getList(String.class, new ArrayList<>()));
             if (permissions.contains(permission)) {
-                permissions.remove("\"" + permission + "\"");
+                permissions.remove(permission);
                 permissionsNode.set(permissions);
+                group.removePermission(permission);
                 saveConfig();
-                Nebula.util.log("Removed permission \"" + permission + "\" from group \"" + groupName + "\" in config.");
+                Nebula.util.log("Removed permission \"" + permission + "\" from group \"" + group.getName() + "\" in config.");
+            } else {
+                Nebula.util.log("Permission \"" + permission + "\" not found in group \"" + group.getName() + "\".");
             }
         } catch (IOException e) {
             Nebula.util.log("Failed to remove permission from group: " + e.getMessage());
@@ -87,17 +95,39 @@ public class PermissionFile {
         }
     }
 
-    public void addMemberToGroup(String groupName, String playerUUID) {
+    public void addMemberToGroup(Group group, Player player) {
         try {
-            ConfigurationNode membersNode = rootNode.node("groups", groupName, "members");
-            List<String> members = membersNode.getList(String.class, new ArrayList<>());
+            ConfigurationNode membersNode = rootNode.node("groups", group.getName(), "members");
+            List<String> members = new ArrayList<>(membersNode.getList(String.class, new ArrayList<>()));
+            String playerUUID = player.getUniqueId().toString();
             if (!members.contains(playerUUID)) {
                 members.add(playerUUID);
                 membersNode.set(members);
                 saveConfig();
+                Nebula.util.log("Added player \"" + player.getUsername() + "\" (UUID: " + playerUUID + ") to group \"" + group.getName() + "\" in config.");
+            } else {
+                Nebula.util.log("Player \"" + player.getUsername() + "\" (UUID: " + playerUUID + ") is already in group \"" + group.getName() + "\".");
             }
         } catch (IOException e) {
             Nebula.util.log("Failed to add player to group members: " + e.getMessage());
+        }
+    }
+
+    public void removeMemberFromGroup(Group group, Player player) {
+        try {
+            ConfigurationNode membersNode = rootNode.node("groups", group.getName(), "members");
+            List<String> members = new ArrayList<>(membersNode.getList(String.class, new ArrayList<>()));
+            String playerUUID = player.getUniqueId().toString();
+            if (members.contains(playerUUID)) {
+                members.remove(playerUUID);
+                membersNode.set(members);
+                saveConfig();
+                Nebula.util.log("Removed player \"" + player.getUsername() + "\" (UUID: " + playerUUID + ") from group \"" + group.getName() + "\" in config.");
+            } else {
+                Nebula.util.log("Player \"" + player.getUsername() + "\" (UUID: " + playerUUID + ") is not a member of group \"" + group.getName() + "\".");
+            }
+        } catch (IOException e) {
+            Nebula.util.log("Failed to remove player from group members: " + e.getMessage());
         }
     }
 

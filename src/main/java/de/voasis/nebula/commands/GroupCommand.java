@@ -62,7 +62,7 @@ public class GroupCommand implements SimpleCommand {
             Nebula.util.sendMessage(source, Messages.GROUP_ASSIGN_GROUP_NOT_FOUND.replace("<group>", groupName));
             return;
         }
-        Nebula.permissionManager.assignGroup(player.get(), groupName);
+        Nebula.permissionManager.assignGroup(player.get(), group);
         Nebula.util.sendMessage(source, Messages.GROUP_ASSIGN_SUCCESS.replace("<player>", playerName).replace("<group>", groupName));
     }
 
@@ -147,12 +147,12 @@ public class GroupCommand implements SimpleCommand {
         switch (action) {
             case "add":
                 String permissionToAdd = args[3];
-                Nebula.permissionFile.addPermissionToGroup(groupName, permissionToAdd);
+                Nebula.permissionFile.addPermissionToGroup(group, permissionToAdd);
                 Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_ADD_SUCCESS.replace("<permission>", permissionToAdd).replace("<group>", groupName));
                 break;
             case "remove":
                 String permissionToRemove = args[3];
-                Nebula.permissionFile.removePermissionFromGroup(groupName, permissionToRemove);
+                Nebula.permissionFile.removePermissionFromGroup(group, permissionToRemove);
                 Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_REMOVE_SUCCESS.replace("<permission>", permissionToRemove).replace("<group>", groupName));
                 break;
             case "list":
