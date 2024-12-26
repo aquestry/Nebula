@@ -112,6 +112,12 @@ public class Util {
     }
 
     public void connectPlayer(Player player, BackendServer backendServer, boolean quit) {
+        if(backendServer == null) {
+            if(quit) {
+                player.disconnect(Component.empty());
+            }
+            return;
+        }
         String name = backendServer.getServerName();
         Optional<RegisteredServer> target = Nebula.server.getServer(name);
         sendMessage(player, Messages.SERVER_CONNECT.replace("<name>", name));
