@@ -84,6 +84,7 @@ public class Nebula {
         commandManager.register("group", new GroupCommand());
         commandManager.register("lobby", new LobbyCommand());
         commandManager.register("party", new PartyCommand());
+        commandManager.register("p", new PartyCommand());
         commandManager.register("queue", new QueueCommand());
     }
 }
