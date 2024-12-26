@@ -1,5 +1,7 @@
 package de.voasis.nebula.helper;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.permission.PermissionFunction;
 import com.velocitypowered.api.permission.PermissionProvider;
@@ -10,6 +12,9 @@ import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Data;
 import de.voasis.nebula.map.Group;
 import org.spongepowered.configurate.ConfigurationNode;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 
 public class PermissionManager implements PermissionProvider {
@@ -46,13 +51,36 @@ public class PermissionManager implements PermissionProvider {
         log.append("Level:     ").append(group.getLevel()).append("\n");
         log.append("Members:   ").append(members.size()).append("\n");
         for (String member : members) {
-            log.append(member).append("\n");
+            log.append(member).append(": ").append(getPlayerNameFromUUID(member)).append("\n");
         }
         log.append("Permissions:   ").append(permissions.size()).append("\n");
         for (String perm : permissions) {
             log.append(perm).append("\n");
         }
         System.out.println(log);
+    }
+
+    public static String getPlayerNameFromUUID(String uuid) {
+        try {
+            String uuidStr = uuid.replace("-", "");
+            String url = "https://sessionserver.mojang.com/session/minecraft/profile/" + uuidStr;
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("User-Agent", "Velocity Plugin");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            if (connection.getResponseCode() == 200) {
+                JsonObject json = JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
+                return json.get("name").getAsString();
+            } else if (connection.getResponseCode() == 204 || connection.getResponseCode() == 404) {
+                System.out.println("Player not found for UUID: " + uuid);
+            } else {
+                System.out.println("Failed to fetch player name. HTTP Response: " + connection.getResponseCode());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "Null";
     }
 
     private void loadGroupsFromConfig() {
