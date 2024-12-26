@@ -129,7 +129,7 @@ public class GroupCommand implements SimpleCommand {
             Nebula.util.sendMessage(source, Messages.GROUP_INFO_NOT_FOUND.replace("<group>", groupName));
             return;
         }
-        Nebula.permissionManager.logGroupInfo(group);
+        Nebula.permissionManager.logGroupInfo(source, group);
     }
 
     private void handlePermission(String[] args, CommandSource source) {

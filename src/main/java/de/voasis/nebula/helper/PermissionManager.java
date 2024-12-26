@@ -2,6 +2,7 @@ package de.voasis.nebula.helper;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.permission.PermissionFunction;
 import com.velocitypowered.api.permission.PermissionProvider;
@@ -39,22 +40,22 @@ public class PermissionManager implements PermissionProvider {
         );
     }
 
-    public void logGroupInfo(Group group) {
+    public void logGroupInfo(CommandSource source, Group group) {
         String groupName = group.getName();
         List<String> members = Nebula.permissionFile.getGroupMembers(groupName);
         List<String> permissions = group.getPermissions();
         ConfigurationNode groupNode = Nebula.permissionFile.getGroupNode(groupName);
-        Nebula.util.log("Group Information\n");
-        Nebula.util.log("Name:      {}", groupName);
-        Nebula.util.log("Prefix:    {}", group.getPrefix());
-        Nebula.util.log("Level:     {}", group.getLevel());
-        Nebula.util.log("Members:   {}", members.size());
+        Nebula.util.sendMessage(source, "Group Information");
+        Nebula.util.sendMessage(source, "Name:      " + groupName);
+        Nebula.util.sendMessage(source, "Prefix:    " + group.getPrefix());
+        Nebula.util.sendMessage(source, "Level:     " + group.getLevel());
+        Nebula.util.sendMessage(source, "Members:   " + members.size());
         for (String member : members) {
-            Nebula.util.log(member + " : " + getPlayerNameFromUUID(member));
+            Nebula.util.sendMessage(source, member + " : " + getPlayerNameFromUUID(member));
         }
-        Nebula.util.log("Permissions:   ");
+        Nebula.util.sendMessage(source, "Permissions:");
         for (String perm : permissions) {
-            Nebula.util.log(perm);
+            Nebula.util.sendMessage(source, perm);
         }
     }
 
@@ -99,7 +100,7 @@ public class PermissionManager implements PermissionProvider {
                 Group group = new Group(groupName, prefix, level);
                 permissions.forEach(group::addPermission);
                 groups.add(group);
-                logGroupInfo(group);
+                logGroupInfo(Nebula.server.getConsoleCommandSource(), group);
                 List<String> members = permissionFile.getGroupMembers(groupName);
                 for (String memberUUID : members) {
                     try {
