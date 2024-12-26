@@ -53,7 +53,7 @@ public class PermissionFile {
             ConfigurationNode permissionsNode = rootNode.node("groups", groupName, "permissions");
             List<String> permissions = permissionsNode.getList(String.class, new ArrayList<>());
             if (!permissions.contains(permission)) {
-                permissions.add(permission);
+                permissions.add("\"" + permission + "\"");
                 permissionsNode.set(permissions);
                 saveConfig();
                 Nebula.util.log("Added permission \"" + permission + "\" to group \"" + groupName + "\" in config.");
@@ -68,7 +68,7 @@ public class PermissionFile {
             ConfigurationNode permissionsNode = rootNode.node("groups", groupName, "permissions");
             List<String> permissions = permissionsNode.getList(String.class, new ArrayList<>());
             if (permissions.contains(permission)) {
-                permissions.remove(permission);
+                permissions.remove("\"" + permission + "\"");
                 permissionsNode.set(permissions);
                 saveConfig();
                 Nebula.util.log("Removed permission \"" + permission + "\" from group \"" + groupName + "\" in config.");
