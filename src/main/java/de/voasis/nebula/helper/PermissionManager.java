@@ -154,15 +154,30 @@ public class PermissionManager implements PermissionProvider {
 
     public void createGroup(String name, String prefix, int level) {
         if (getGroupByName(name) == null) {
-            groups.add(new Group(name, prefix, level));
-            Nebula.permissionFile.saveConfig();
+            Group newGroup = new Group(name, prefix, level);
+            groups.add(newGroup);
+            try {
+                ConfigurationNode groupNode = Nebula.permissionFile.getGroupNode(name);
+                groupNode.node("prefix").set(prefix);
+                groupNode.node("level").set(level);
+                groupNode.node("permissions").set(new ArrayList<String>());
+                Nebula.permissionFile.saveConfig();
+            } catch (Exception e) {
+                Nebula.util.log("Error saving group '" + name + "' to the configuration file: " + e.getMessage());
+            }
         }
     }
 
     public void deleteGroup(String name) {
         if (!name.equalsIgnoreCase(Data.defaultGroupName)) {
             groups.removeIf(group -> group.getName().equalsIgnoreCase(name));
-            Nebula.permissionFile.saveConfig();
+            try {
+                ConfigurationNode rootNode = Nebula.permissionFile.getRootNode();
+                rootNode.node("groups").removeChild(name);
+                Nebula.permissionFile.saveConfig();
+            } catch (Exception e) {
+                Nebula.util.log("Error deleting group '" + name + "' from the configuration file: " + e.getMessage());
+            }
         }
     }
 

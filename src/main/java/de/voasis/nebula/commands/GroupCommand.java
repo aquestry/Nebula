@@ -87,7 +87,7 @@ public class GroupCommand implements SimpleCommand {
             return;
         }
         Nebula.permissionManager.createGroup(groupName, prefix, level);
-        Nebula.util.sendMessage(source, Messages.GROUP_CREATE_SUCCESS.replace("<group>", groupName).replace("<prefix>", prefix).replace("<level>", String.valueOf(level)));
+        Nebula.util.sendMessage(source, Messages.GROUP_CREATE_SUCCESS.replace("<group>", groupName).replace("<prefix>", "'" + prefix + "'").replace("<level>", String.valueOf(level)));
     }
 
     private void handleDelete(String[] args, CommandSource source) {
@@ -193,7 +193,11 @@ public class GroupCommand implements SimpleCommand {
                             .orElse(List.of())
                             : List.of()
             );
-            default -> CompletableFuture.completedFuture(List.of());
+            default -> CompletableFuture.completedFuture(
+                    List.of("assign", "create", "delete", "list", "permission", "info").stream()
+                            .filter(command -> command.startsWith(args[0].toLowerCase()))
+                            .toList()
+            );
         };
     }
 
