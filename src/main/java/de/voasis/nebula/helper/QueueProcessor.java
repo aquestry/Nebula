@@ -100,7 +100,7 @@ public class QueueProcessor {
                             Party playerParty = Nebula.partyManager.getParty(player);
                             if(playerParty != null) {
                                 if(!playerParty.getLeader().equals(player)) {
-                                    Nebula.util.sendMessage(player, Messages.NOT_PARTY_LEADER);
+                                    Nebula.util.sendMessage(player, Messages.PARTY_NOT_ALLOWED);
                                     return;
                                 }
                                 if(queue.getNeededPlayers() != playerParty.getMembers().size()) {
