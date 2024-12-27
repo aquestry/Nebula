@@ -135,7 +135,7 @@ public class GroupCommand implements SimpleCommand {
     }
 
     private void handlePermission(String[] args, CommandSource source) {
-        if (args.length < 3) {
+        if (args.length < 3 || args.length < 4 && !args[1].equalsIgnoreCase("list")) {
             Nebula.util.sendMessage(source, Messages.GROUP_USAGE);
             return;
         }
@@ -149,13 +149,11 @@ public class GroupCommand implements SimpleCommand {
         switch (action) {
             case "add":
                 String permissionToAdd = args[3];
-                Nebula.permissionFile.addPermissionToGroup(group, permissionToAdd);
-                Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_ADD_SUCCESS.replace("<permission>", permissionToAdd).replace("<group>", groupName));
+                Nebula.permissionFile.addPermissionToGroup(group, permissionToAdd, source);
                 break;
             case "remove":
                 String permissionToRemove = args[3];
-                Nebula.permissionFile.removePermissionFromGroup(group, permissionToRemove);
-                Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_REMOVE_SUCCESS.replace("<permission>", permissionToRemove).replace("<group>", groupName));
+                Nebula.permissionFile.removePermissionFromGroup(group, permissionToRemove, source);
                 break;
             case "list":
                 Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_LIST_HEADER.replace("<group>", groupName));
@@ -219,7 +217,7 @@ public class GroupCommand implements SimpleCommand {
         }
         if (args.length == 4 && "permission".equalsIgnoreCase(args[0])) {
             if ("add".equalsIgnoreCase(args[1])) {
-                return CompletableFuture.completedFuture(List.of("<permission-to-add>"));
+                return CompletableFuture.completedFuture(List.of());
             } else if ("remove".equalsIgnoreCase(args[1])) {
                 Optional<Group> group = Optional.ofNullable(Nebula.permissionManager.getGroupByName(args[2]));
                 if (group.isPresent()) {
@@ -229,6 +227,8 @@ public class GroupCommand implements SimpleCommand {
                                     .toList()
                     );
                 }
+            } else if ("list".equalsIgnoreCase(args[1])) {
+                return CompletableFuture.completedFuture(Nebula.permissionFile.getGroupNames().stream().filter(s -> s.startsWith(args[3].toLowerCase())).toList());
             }
         }
         return CompletableFuture.completedFuture(List.of());

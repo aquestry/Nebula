@@ -1,7 +1,9 @@
 package de.voasis.nebula.helper;
 
+import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
+import de.voasis.nebula.data.Messages;
 import de.voasis.nebula.map.Group;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
@@ -50,25 +52,28 @@ public class PermissionFile {
         }
     }
 
-    public void addPermissionToGroup(Group group, String permission) {
+    public void addPermissionToGroup(Group group, String permission, CommandSource source) {
         try {
             ConfigurationNode permissionsNode = rootNode.node("groups", group.getName(), "permissions");
             List<String> permissions = new ArrayList<>(permissionsNode.getList(String.class, new ArrayList<>()));
             if (!permissions.contains(permission)) {
                 permissions.add(permission);
-                permissionsNode.set(permissions);
+                List<String> sanitizedPermissions = permissions.stream()
+                        .map(String::valueOf)
+                        .collect(Collectors.toList());
+                permissionsNode.setList(String.class, sanitizedPermissions);
                 group.addPermission(permission);
                 saveConfig();
-                Nebula.util.log("Added permission \"" + permission + "\" to group \"" + group.getName() + "\" in config.");
+                Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_ADD_SUCCESS.replace("<permission>", permission).replace("<group>", group.getName()));
             } else {
-                Nebula.util.log("Permission \"" + permission + "\" already exists in group \"" + group.getName() + "\".");
+                Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_ALREADY_EXISTS.replace("<permission>", permission).replace("<group>", group.getName()));
             }
         } catch (IOException e) {
             Nebula.util.log("Failed to add permission to group: " + e.getMessage());
         }
     }
 
-    public void removePermissionFromGroup(Group group, String permission) {
+    public void removePermissionFromGroup(Group group, String permission, CommandSource source) {
         try {
             ConfigurationNode permissionsNode = rootNode.node("groups", group.getName(), "permissions");
             List<String> permissions = new ArrayList<>(permissionsNode.getList(String.class, new ArrayList<>()));
@@ -77,9 +82,9 @@ public class PermissionFile {
                 permissionsNode.set(permissions);
                 group.removePermission(permission);
                 saveConfig();
-                Nebula.util.log("Removed permission \"" + permission + "\" from group \"" + group.getName() + "\" in config.");
+                Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_REMOVE_SUCCESS.replace("<permission>", permission).replace("<group>", group.getName()));
             } else {
-                Nebula.util.log("Permission \"" + permission + "\" not found in group \"" + group.getName() + "\".");
+                Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_REMOVE_NOT_FOUND.replace("<permission>", permission).replace("<group>", group.getName()));
             }
         } catch (IOException e) {
             Nebula.util.log("Failed to remove permission from group: " + e.getMessage());
@@ -95,7 +100,7 @@ public class PermissionFile {
         }
     }
 
-    public void addMemberToGroup(Group group, Player player) {
+    public void addMemberToGroup(Group group, Player player, CommandSource source) {
         try {
             ConfigurationNode membersNode = rootNode.node("groups", group.getName(), "members");
             List<String> members = new ArrayList<>(membersNode.getList(String.class, new ArrayList<>()));
@@ -113,7 +118,7 @@ public class PermissionFile {
         }
     }
 
-    public void removeMemberFromGroup(Group group, Player player) {
+    public void removeMemberFromGroup(Group group, Player player, CommandSource source) {
         try {
             ConfigurationNode membersNode = rootNode.node("groups", group.getName(), "members");
             List<String> members = new ArrayList<>(membersNode.getList(String.class, new ArrayList<>()));

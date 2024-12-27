@@ -135,7 +135,7 @@ public class PermissionManager implements PermissionProvider {
         }
         Group defaultGroup = getGroupByName(Data.defaultGroupName);
         if (defaultGroup != null) {
-            Nebula.permissionFile.addMemberToGroup(defaultGroup, player);
+            Nebula.permissionFile.addMemberToGroup(defaultGroup, player, null);
             Nebula.util.log("No specific group found. Assigning default group: {} to player {}", defaultGroup.getName(), playerUUID);
             cachedGroups.put(player, defaultGroup);
             return defaultGroup;
@@ -147,8 +147,8 @@ public class PermissionManager implements PermissionProvider {
     public void assignGroup(Player player, Group group) {
         if (group != null) {
             cachedGroups.remove(player);
-            Nebula.permissionFile.removeMemberFromGroup(getGroup(player), player);
-            Nebula.permissionFile.addMemberToGroup(group, player);
+            Nebula.permissionFile.removeMemberFromGroup(getGroup(player), player, null);
+            Nebula.permissionFile.addMemberToGroup(group, player, null);
         }
     }
 
