@@ -74,11 +74,13 @@ public class Util {
     private void stateComplete(RegisteredServer registeredServer) {
         for (BackendServer backendServer : Data.backendInfoMap) {
             if (registeredServer.getServerInfo().getName().equals(backendServer.getServerName())) {
-                if (!backendServer.isOnline()) {
-                    backendServer.setOnline(true);
-                    callPending(backendServer);
-                    CommandSource creator = backendServer.getCreator();
-                    sendMessage(creator, Messages.ONLINE.replace("<name>", backendServer.getServerName()));
+                synchronized (backendServer) {
+                    if (!backendServer.isOnline()) {
+                        backendServer.setOnline(true);
+                        callPending(backendServer);
+                        CommandSource creator = backendServer.getCreator();
+                        sendMessage(creator, Messages.ONLINE.replace("<name>", backendServer.getServerName()));
+                    }
                 }
             }
         }
@@ -87,11 +89,13 @@ public class Util {
     public void stateCompleteFailed(RegisteredServer registeredServer) {
         for (BackendServer backendServer : Data.backendInfoMap) {
             if (registeredServer.getServerInfo().getName().equals(backendServer.getServerName())) {
-                if (backendServer.isOnline()) {
-                    checkLobbys(true);
-                    backendServer.setOnline(false);
-                    CommandSource creator = backendServer.getCreator();
-                    sendMessage(creator, Messages.OFFLINE.replace("<name>", backendServer.getServerName()));
+                synchronized (backendServer) {
+                    if (backendServer.isOnline()) {
+                        checkLobbys(true);
+                        backendServer.setOnline(false);
+                        CommandSource creator = backendServer.getCreator();
+                        sendMessage(creator, Messages.OFFLINE.replace("<name>", backendServer.getServerName()));
+                    }
                 }
             }
         }
