@@ -52,6 +52,7 @@ public class Messages {
     public static String GROUP_ASSIGN_SUCCESS;
     public static String GROUP_ASSIGN_PLAYER_NOT_FOUND;
     public static String GROUP_ASSIGN_GROUP_NOT_FOUND;
+    public static String GROUP_ASSIGN_ALREADY;
     public static String GROUP_CREATE_SUCCESS;
     public static String GROUP_CREATE_ALREADY_EXISTS;
     public static String GROUP_CREATE_INVALID_LEVEL;

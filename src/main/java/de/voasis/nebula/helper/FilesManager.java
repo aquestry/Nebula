@@ -138,6 +138,7 @@ public class FilesManager {
             Messages.GROUP_ASSIGN_SUCCESS = messages.node("group", "assign-success").getString("<pre>Assigned player <player> to group <group>.").replace("<pre>", prefix);
             Messages.GROUP_ASSIGN_PLAYER_NOT_FOUND = messages.node("group", "assign-player-not-found").getString("<pre>Player <player> not found.").replace("<pre>", prefix);
             Messages.GROUP_ASSIGN_GROUP_NOT_FOUND = messages.node("group", "assign-group-not-found").getString("<pre>Group <group> not found.").replace("<pre>", prefix);
+            Messages.GROUP_ASSIGN_ALREADY = messages.node("group", "assign-group-already").getString("<pre>Player <player> is already in group <group>.").replace("<pre>", prefix);
             Messages.GROUP_CREATE_SUCCESS = messages.node("group", "create-success").getString("<pre>Group <group> created with prefix <prefix> and level <level>.").replace("<pre>", prefix);
             Messages.GROUP_CREATE_ALREADY_EXISTS = messages.node("group", "create-already-exists").getString("<pre>Group <group> already exists.").replace("<pre>", prefix);
             Messages.GROUP_CREATE_INVALID_LEVEL = messages.node("group", "create-invalid-level").getString("<pre>Invalid group level specified.").replace("<pre>", prefix);

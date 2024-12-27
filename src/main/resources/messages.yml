@@ -51,6 +51,7 @@ group:
   assign-success: "<pre>Assigned player <player> to group <group>."
   assign-player-not-found: "<pre>Player <player> not found."
   assign-group-not-found: "<pre>Group <group> not found."
+  assign-group-already: "<pre>Player <player> is already in group <group>."
   create-success: "<pre>Group <group> created with prefix <prefix> and level <level>."
   create-already-exists: "<pre>Group <group> already exists."
   create-invalid-level: "<pre>Invalid group level specified."

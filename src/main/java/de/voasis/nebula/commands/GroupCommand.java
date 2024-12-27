@@ -64,6 +64,10 @@ public class GroupCommand implements SimpleCommand {
             Nebula.util.sendMessage(source, Messages.GROUP_ASSIGN_GROUP_NOT_FOUND.replace("<group>", groupName));
             return;
         }
+        if(Nebula.permissionManager.getGroup(player.get()).equals(group)) {
+            Nebula.util.sendMessage(source, Messages.GROUP_ASSIGN_ALREADY.replace("<group>", groupName).replace("<player>", playerName));
+            return;
+        }
         Nebula.permissionManager.assignGroup(player.get(), group);
         Nebula.util.sendMessage(source, Messages.GROUP_ASSIGN_SUCCESS.replace("<player>", playerName).replace("<group>", groupName));
     }
