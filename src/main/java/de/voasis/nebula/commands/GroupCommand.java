@@ -48,7 +48,7 @@ public class GroupCommand implements SimpleCommand {
     }
 
     private void handleAssign(String[] args, CommandSource source) {
-        if (args.length < 3) {
+        if (args.length != 3) {
             Nebula.util.sendMessage(source, Messages.GROUP_USAGE);
             return;
         }
@@ -69,19 +69,19 @@ public class GroupCommand implements SimpleCommand {
     }
 
     private void handleCreate(String[] args, CommandSource source) {
-        if (args.length < 4) {
+        if (args.length < 3) {
             Nebula.util.sendMessage(source, Messages.GROUP_USAGE);
             return;
         }
         String groupName = args[1];
-        String prefix = args[2];
         int level;
         try {
-            level = Integer.parseInt(args[3]);
+            level = Integer.parseInt(args[2]);
         } catch (NumberFormatException e) {
             Nebula.util.sendMessage(source, Messages.GROUP_CREATE_INVALID_LEVEL);
             return;
         }
+        String prefix = String.join(" ", Stream.of(args).skip(3).toArray(String[]::new));
         if (Nebula.permissionManager.getGroupByName(groupName) != null) {
             Nebula.util.sendMessage(source, Messages.GROUP_CREATE_ALREADY_EXISTS.replace("<group>", groupName));
             return;
@@ -167,71 +167,34 @@ public class GroupCommand implements SimpleCommand {
     @Override
     public CompletableFuture<List<String>> suggestAsync(Invocation invocation) {
         String[] args = invocation.arguments();
-        if (args.length == 0) {
-            return CompletableFuture.completedFuture(List.of("assign", "create", "delete", "list", "permission", "info"));
-        }
-        if (args.length == 1) {
-            return CompletableFuture.completedFuture(Stream.of("assign", "create", "delete", "list", "permission", "info")
-                    .filter(command -> command.startsWith(args[0].toLowerCase()))
-                    .toList());
-        }
-        if (args.length == 2) {
-            switch (args[0].toLowerCase()) {
-                case "assign", "info", "delete":
-                    return CompletableFuture.completedFuture(
-                            Nebula.server.getAllPlayers().stream()
-                                    .map(Player::getUsername)
-                                    .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
-                                    .toList()
-                    );
-                case "permission":
-                    return CompletableFuture.completedFuture(Stream.of("add", "remove", "list")
-                            .filter(subCommand -> subCommand.startsWith(args[1].toLowerCase()))
-                            .toList());
-                case "create":
-                    return CompletableFuture.completedFuture(List.of("<groupName>", "<prefix>", "<level>"));
-                default:
-                    return CompletableFuture.completedFuture(List.of());
-            }
-        }
-        if (args.length == 3) {
-            switch (args[0].toLowerCase()) {
-                case "assign":
-                    return CompletableFuture.completedFuture(
-                            Nebula.permissionFile.getGroupNames().stream()
-                                    .filter(group -> group.toLowerCase().startsWith(args[2].toLowerCase()))
-                                    .toList()
-                    );
-                case "permission":
-                    if ("add".equalsIgnoreCase(args[1]) || "remove".equalsIgnoreCase(args[1])) {
-                        return CompletableFuture.completedFuture(
-                                Nebula.permissionFile.getGroupNames().stream()
-                                        .filter(group -> group.toLowerCase().startsWith(args[2].toLowerCase()))
-                                        .toList()
-                        );
-                    }
-                    return CompletableFuture.completedFuture(List.of());
-                default:
-                    return CompletableFuture.completedFuture(List.of());
-            }
-        }
-        if (args.length == 4 && "permission".equalsIgnoreCase(args[0])) {
-            if ("add".equalsIgnoreCase(args[1])) {
-                return CompletableFuture.completedFuture(List.of());
-            } else if ("remove".equalsIgnoreCase(args[1])) {
-                Optional<Group> group = Optional.ofNullable(Nebula.permissionManager.getGroupByName(args[2]));
-                if (group.isPresent()) {
-                    return CompletableFuture.completedFuture(
-                            group.get().getPermissions().stream()
-                                    .filter(permission -> permission.startsWith(args[3].toLowerCase()))
-                                    .toList()
-                    );
-                }
-            } else if ("list".equalsIgnoreCase(args[1])) {
-                return CompletableFuture.completedFuture(Nebula.permissionFile.getGroupNames().stream().filter(s -> s.startsWith(args[3].toLowerCase())).toList());
-            }
-        }
-        return CompletableFuture.completedFuture(List.of());
+        if (args.length == 0) return CompletableFuture.completedFuture(List.of("assign", "create", "delete", "list", "permission", "info"));
+        return switch (args[0].toLowerCase()) {
+            case "info", "delete" -> args.length == 2
+                    ? CompletableFuture.completedFuture(Nebula.permissionFile.getGroupNames().stream().filter(g -> g.startsWith(args[1])).toList())
+                    : CompletableFuture.completedFuture(List.of());
+            case "assign" -> CompletableFuture.completedFuture(
+                    args.length == 2
+                            ? Nebula.server.getAllPlayers().stream().map(Player::getUsername).filter(p -> p.startsWith(args[1])).toList()
+                            : args.length == 3
+                            ? Nebula.permissionFile.getGroupNames().stream().filter(g -> g.startsWith(args[2])).toList()
+                            : List.of()
+            );
+            case "create" -> CompletableFuture.completedFuture(
+                    args.length == 2 ? List.of("<groupName>") : args.length == 3 ? List.of("<level>") : List.of("<prefix...>")
+            );
+            case "permission" -> CompletableFuture.completedFuture(
+                    args.length == 2
+                            ? Stream.of("add", "remove", "list").filter(s -> s.startsWith(args[1])).toList()
+                            : args.length == 3
+                            ? Nebula.permissionFile.getGroupNames().stream().filter(g -> g.startsWith(args[2])).toList()
+                            : args.length == 4 && "remove".equalsIgnoreCase(args[1])
+                            ? Optional.ofNullable(Nebula.permissionManager.getGroupByName(args[2]))
+                            .map(g -> g.getPermissions().stream().filter(p -> p.startsWith(args[3])).toList())
+                            .orElse(List.of())
+                            : List.of()
+            );
+            default -> CompletableFuture.completedFuture(List.of());
+        };
     }
 
     @Override

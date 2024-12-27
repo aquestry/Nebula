@@ -67,7 +67,4 @@ public class Messages {
     public static String GROUP_PERMISSION_LIST_HEADER;
     public static String GROUP_PERMISSION_REMOVE_NOT_FOUND;
     public static String GROUP_PERMISSION_ALREADY_EXISTS;
-    // QueueProcessor-Specific Party Messages
-    public static String LEADER_CANNOT_JOIN_QUEUE;
-    public static String NOT_PARTY_LEADER;
 }
