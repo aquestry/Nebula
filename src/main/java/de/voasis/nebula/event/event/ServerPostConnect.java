@@ -11,7 +11,6 @@ public class ServerPostConnect {
         RegisteredServer server = player.getCurrentServer().get().getServer();
         Nebula.util.getBackendServer(server.getServerInfo().getName()).removePendingPlayerConnection(player);
         player.sendPlayerListHeader(Nebula.mm.deserialize("<blue><bold>Nebula Network</bold></blue>"));
-        Nebula.permissionManager.sendRanktoBackend(player);
-        Nebula.permissionManager.sendScoretoBackend(player);
+        Nebula.permissionManager.sendInfotoBackend(player);
     }
 }

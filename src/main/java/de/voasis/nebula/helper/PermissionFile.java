@@ -3,6 +3,7 @@ package de.voasis.nebula.helper;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
+import de.voasis.nebula.data.Data;
 import de.voasis.nebula.data.Messages;
 import de.voasis.nebula.map.Group;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -19,10 +20,13 @@ public class PermissionFile {
     private final Path configFilePath;
     private ConfigurationLoader<?> loader;
     private ConfigurationNode rootNode;
+    public final List<Group> groups = new ArrayList<>();
 
     public PermissionFile(Path dataDirectory) {
         this.configFilePath = dataDirectory.resolve("perms.conf");
         initializeConfig();
+        loadGroupsFromConfig();
+        Data.defaultGroupName = getDefaultGroupName();
     }
 
     private void initializeConfig() {
@@ -41,6 +45,26 @@ public class PermissionFile {
             rootNode = loader.load();
         } catch (IOException e) {
             Nebula.util.log("Failed to initialize configuration: " + e.getMessage());
+        }
+    }
+
+    public void loadGroupsFromConfig() {
+        for (String groupName : getGroupNames()) {
+            ConfigurationNode groupNode = getGroupNode(groupName);
+            if (groupNode != null) {
+                String prefix = groupNode.node("prefix").getString("");
+                int level = groupNode.node("level").getInt(0);
+                List<String> permissions = new ArrayList<>();
+                try {
+                    permissions = groupNode.node("permissions").getList(String.class, new ArrayList<>());
+                } catch (Exception e) {
+                    Nebula.util.log("Failed to load permissions for group \"" + groupName + "\": " + e.getMessage());
+                }
+                Group group = new Group(groupName, prefix, level);
+                permissions.forEach(group::addPermission);
+                groups.add(group);
+                Nebula.util.logGroupInfo(Nebula.server.getConsoleCommandSource(), group);
+            }
         }
     }
 
@@ -109,7 +133,6 @@ public class PermissionFile {
                 members.add(playerUUID);
                 membersNode.set(members);
                 saveConfig();
-                Nebula.util.log("Added player \"" + player.getUsername() + "\" (UUID: " + playerUUID + ") to group \"" + group.getName() + "\" in config.");
             } else {
                 Nebula.util.log("Player \"" + player.getUsername() + "\" (UUID: " + playerUUID + ") is already in group \"" + group.getName() + "\".");
             }
@@ -127,7 +150,6 @@ public class PermissionFile {
                 members.remove(playerUUID);
                 membersNode.set(members);
                 saveConfig();
-                Nebula.util.log("Removed player \"" + player.getUsername() + "\" (UUID: " + playerUUID + ") from group \"" + group.getName() + "\" in config.");
             } else {
                 Nebula.util.log("Player \"" + player.getUsername() + "\" (UUID: " + playerUUID + ") is not a member of group \"" + group.getName() + "\".");
             }

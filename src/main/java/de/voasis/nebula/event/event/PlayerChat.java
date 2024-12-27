@@ -8,7 +8,7 @@ import net.kyori.adventure.text.Component;
 public class PlayerChat {
     public PlayerChat(PlayerChatEvent event) {
         Player player = event.getPlayer();
-        Component message = Nebula.mm.deserialize( Nebula.permissionManager.getGroup(player).getPrefix() + player.getUsername() + ": <reset>" + event.getMessage());
+        Component message = Nebula.mm.deserialize( Nebula.permissionManager.getGroup(player, false).getPrefix() + player.getUsername() + ": <reset>" + event.getMessage());
         for(Player p : player.getCurrentServer().get().getServer().getPlayersConnected()) {
             p.sendMessage(message);
         }

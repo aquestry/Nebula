@@ -61,7 +61,7 @@ public class Nebula {
         server.getEventManager().register(this, new EventManager());
         server.getScheduler()
                 .buildTask(this, util::pingServers)
-                .repeat(800, TimeUnit.MILLISECONDS)
+                .repeat(700, TimeUnit.MILLISECONDS)
                 .schedule();
         server.getScheduler()
                 .buildTask(this, queueProcessor::process)
