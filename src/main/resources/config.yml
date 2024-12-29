@@ -1,10 +1,8 @@
 file-version: 1
 # UUID's of the Player that should have admins perms.
 admins:
-# Velocity Secret
-vsecret: <VELOCITY-SECRET>
 # Additional environment variables for backend Servers (use "none" for none)
-env-vars: FOO=bar,FOO2=bar2
+env-vars: PAPER_VELOCITY_SECRET=1234,FOO2=bar1
 # Should the templates be pulled at start? (will take its time)
 pull-start: true
 # Docherhub Template for the Default-Servers.
@@ -21,14 +19,19 @@ manager-servers:
   example:
     ip: localhost
     username: notrootpls
-    password: 1234
+    password: 1234 # type 'none', if you are not using a password
+    privateKeyFile: /path/to/private.key  # type 'none', if you are not using a key
+    port: 22  # default port 22
+
 # Gamemodes which players can join.
 gamemodes:
   Duels:
     templateName: anton691/simple-duels:latest
     neededPlayers: 2
     preload: 1
+    env-vars: FOO=bar,FOO2=bar2 # Additional environment variables for this gamemode only (use "none" for none)
   Parkour:
     templateName: anton691/simple-parkour:latest
     neededPlayers: 1
     preload: 1
+    env-vars: FOO=bar,FOO2=bar2 # Additional environment variables for this gamemode only (use "none" for none)

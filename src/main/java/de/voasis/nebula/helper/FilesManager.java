@@ -33,7 +33,6 @@ public class FilesManager {
             Data.defaultServerTemplate = config.node("lobby-template").getString();
             Data.defaultmax = config.node("lobby-max").getInt();
             Data.defaultmin = config.node("lobby-min").getInt();
-            Data.vsecret = config.node("vsecret").getString();
             Data.pullStart = config.node("pull-start").getBoolean();
             String envVars = config.node("env-vars").getString();
             Data.envVars = (envVars != null && !"none".equals(envVars))
@@ -48,13 +47,15 @@ public class FilesManager {
                     String ip = config.node("manager-servers", serverName, "ip").getString();
                     String username = config.node("manager-servers", serverName, "username").getString();
                     String password = config.node("manager-servers", serverName, "password").getString();
-                    if (ip == null || username == null || password == null) {
+                    String privateKeyFile = config.node("manager-servers", serverName, "privateKeyFile").getString();
+                    int port = config.node("manager-servers", serverName, "port").getInt(22);
+                    if (ip == null || username == null || password == null || privateKeyFile == null) {
                         Nebula.util.log("Incomplete configuration for server '{}'. Skipping this server.", serverName);
                         continue;
                     }
-                    HoldServer holdServer = new HoldServer(serverName.toString(), ip, password, 0, username);
+                    HoldServer holdServer = new HoldServer(serverName.toString(), ip, username, password, privateKeyFile, port, 0);
                     Data.holdServerMap.add(holdServer);
-                    Nebula.util.updateFreePort(holdServer);
+                    Nebula.ssh.updateFreePort(holdServer);
                     Nebula.util.log("Added hold server to pool: {}", serverName);
                 }
             }
@@ -68,8 +69,14 @@ public class FilesManager {
                     String template = config.node("gamemodes", queueName, "templateName").getString();
                     int neededPlayers = config.node("gamemodes", queueName, "neededPlayers").getInt();
                     int preload = config.node("gamemodes", queueName, "preload").getInt();
+                    String localEnvVars = config.node("gamemodes", queueName, "env-vars").getString();
+                    localEnvVars = (localEnvVars != null && !"none".equals(envVars))
+                            ? Arrays.stream(envVars.split(","))
+                            .map(s -> " -e " + s)
+                            .collect(Collectors.joining())
+                            : "";
                     Data.alltemplates.add(template);
-                    Data.gamemodeQueueMap.add(new GamemodeQueue(queueName.toString(), template, neededPlayers, preload));
+                    Data.gamemodeQueueMap.add(new GamemodeQueue(queueName.toString(), template, neededPlayers, preload, localEnvVars));
                     Nebula.util.log("Added gamemode to pool: {}, {}, {}.", queueName, template, neededPlayers);
                 }
             }

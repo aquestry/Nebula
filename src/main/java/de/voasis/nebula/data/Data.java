@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Data {
-    public static String vsecret;
     public static String envVars;
     public static boolean pullStart;
     public static String defaultServerTemplate;

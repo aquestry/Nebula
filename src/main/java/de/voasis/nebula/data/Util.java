@@ -2,15 +2,11 @@ package de.voasis.nebula.data;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.map.BackendServer;
 import de.voasis.nebula.map.Group;
-import de.voasis.nebula.map.HoldServer;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.map.Party;
 import net.kyori.adventure.text.Component;
@@ -42,33 +38,6 @@ public class Util {
         } while (generatedStrings.contains(result));
         generatedStrings.add(result);
         return result;
-    }
-
-    public void updateFreePort(HoldServer externalServer) {
-        int freePort = -1;
-        try {
-            JSch jsch = new JSch();
-            Session session = jsch.getSession(externalServer.getUsername(), externalServer.getIp(), 22);
-            session.setPassword(externalServer.getPassword());
-            Properties config = new Properties();
-            config.put("StrictHostKeyChecking", "no");
-            session.setConfig(config);
-            session.connect();
-            String command = "ruby -e 'require \"socket\"; puts Addrinfo.tcp(\"\", 0).bind {|s| s.local_address.ip_port }'";
-            ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
-            channelExec.setCommand(command);
-            channelExec.connect();
-            byte[] tmp = new byte[1024];
-            int i = channelExec.getInputStream().read(tmp, 0, 1024);
-            if (i != -1) {
-                freePort = Integer.parseInt(new String(tmp, 0, i).trim());
-            }
-            channelExec.disconnect();
-            session.disconnect();
-            externalServer.setFreePort(Math.max(freePort, 0));
-        } catch (Exception e) {
-            Nebula.util.log("Failed to fetch free port via SSH on server: {}", externalServer.getServerName());
-        }
     }
 
     private void stateComplete(RegisteredServer registeredServer) {

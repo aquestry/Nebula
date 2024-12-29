@@ -35,10 +35,12 @@ public class Nebula {
     public static AutoDeleter autoDeleter;
     public static PartyManager partyManager;
     public static Util util;
+    public static SSH ssh;
 
     @Inject
     public Nebula(ProxyServer proxy, @DataDirectory Path dataDirectory) {
         server = proxy;
+        ssh = new SSH();
         util = new Util();
         permissionFile = new PermissionFile(dataDirectory);
         permissionManager  = new PermissionManager();
