@@ -1,6 +1,4 @@
 file-version: 1
-# UUID's of the Player that should have admins perms.
-admins:
 # Additional environment variables for backend Servers (use "none" for none)
 env-vars: PAPER_VELOCITY_SECRET=1234,FOO2=bar1
 # Should the templates be pulled at start? (will take its time)
@@ -22,7 +20,6 @@ manager-servers:
     password: 1234 # type 'none', if you are not using a password
     privateKeyFile: /path/to/private.key  # type 'none', if you are not using a key
     port: 22  # default port 22
-
 # Gamemodes which players can join.
 gamemodes:
   Duels:
