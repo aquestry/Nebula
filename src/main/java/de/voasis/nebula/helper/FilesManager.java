@@ -55,8 +55,9 @@ public class FilesManager {
                     }
                     HoldServer holdServer = new HoldServer(serverName.toString(), ip, username, password, privateKeyFile, port, 0);
                     Data.holdServerMap.add(holdServer);
-                    Nebula.ssh.updateFreePort(holdServer);
+                    Nebula.ssh.init(holdServer);
                     Nebula.util.log("Added hold server to pool: {}", serverName);
+                    Nebula.ssh.updateFreePort(holdServer);
                 }
             }
             if (Data.holdServerMap.isEmpty()) {
