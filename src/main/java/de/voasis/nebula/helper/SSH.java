@@ -1,66 +1,78 @@
 package de.voasis.nebula.helper;
 
+import com.jcraft.jsch.*;
 import de.voasis.nebula.map.HoldServer;
-import org.apache.sshd.client.SshClient;
-import org.apache.sshd.client.channel.ChannelExec;
-import org.apache.sshd.client.channel.ClientChannelEvent;
-import org.apache.sshd.client.future.ConnectFuture;
-import org.apache.sshd.client.session.ClientSession;
-import org.apache.sshd.common.keyprovider.FileKeyPairProvider;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.time.Duration;
-import java.util.EnumSet;
+import java.util.Properties;
 
 public class SSH {
-    private ClientSession createSSHClient(HoldServer server) throws IOException {
-        SshClient client = SshClient.setUpDefaultClient();
-        client.setServerKeyVerifier((clientSession, remoteAddress, serverKey) -> true);
-        client.start();
-        ConnectFuture connectFuture = client.connect(server.getUsername(), server.getIp(), server.getPort());
-        connectFuture.await(Duration.ofSeconds(5));
-        ClientSession session = connectFuture.getSession();
-        if (server.getPrivateKeyFile() != null && !server.getPrivateKeyFile().equals("none")) {
-            FileKeyPairProvider keyPairProvider = new FileKeyPairProvider(Path.of(server.getPrivateKeyFile()));
-            session.addPublicKeyIdentity(keyPairProvider.loadKeys(session).iterator().next());
-            session.auth().verify(Duration.ofSeconds(5));
-        } else if (server.getPassword() != null && !server.getPassword().equals("none")) {
-            session.addPasswordIdentity(server.getPassword());
-            session.auth().verify(Duration.ofSeconds(5));
-        } else {
-            throw new IOException("No valid authentication method provided.");
-        }
-        return session;
-    }
     public void updateFreePort(HoldServer externalServer) {
-        int freePort = -1;
-        try (ClientSession session = createSSHClient(externalServer); ChannelExec channel = session.createExecChannel("ruby -e 'require \"socket\"; puts Addrinfo.tcp(\"\", 0).bind {|s| s.local_address.ip_port }'")) {
+        Session session = null;
+        ChannelExec channel = null;
+        try {
+            JSch jsch = new JSch();
+            if (externalServer.getPrivateKeyFile() != null && !externalServer.getPrivateKeyFile().equals("none"))
+                jsch.addIdentity(externalServer.getPrivateKeyFile());
+            session = jsch.getSession(externalServer.getUsername(), externalServer.getIp(), externalServer.getPort());
+            if (externalServer.getPassword() != null && !externalServer.getPassword().equals("none"))
+                session.setPassword(externalServer.getPassword());
+            Properties config = new Properties();
+            config.put("StrictHostKeyChecking", "no");
+            session.setConfig(config);
+            session.connect(10000);
+            channel = (ChannelExec) session.openChannel("exec");
+            channel.setCommand("ruby -e 'require \"socket\"; puts Addrinfo.tcp(\"\", 0).bind {|s| s.local_address.ip_port }'");
             ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
-            channel.setOut(responseStream);
-            channel.open().verify(Duration.ofSeconds(5));
-            channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), Duration.ofSeconds(5).toMillis());
+            channel.setOutputStream(responseStream);
+            channel.connect(10000);
+            while (!channel.isClosed()) {
+                Thread.sleep(100);
+            }
             String output = responseStream.toString().trim();
             if (!output.isEmpty()) {
-                freePort = Integer.parseInt(output);
+                externalServer.setFreePort(Integer.parseInt(output));
             }
-            externalServer.setFreePort(Math.max(freePort, 0));
-        } catch (IOException ignored) {}
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+        } finally {
+            if (channel != null) channel.disconnect();
+            if (session != null) session.disconnect();
+        }
     }
+
     public void executeSSHCommand(HoldServer externalServer, String command, Runnable onSuccess, Runnable onError) {
-        try (ClientSession session = createSSHClient(externalServer); ChannelExec channel = session.createExecChannel(command)) {
+        Session session = null;
+        ChannelExec channel = null;
+        try {
+            JSch jsch = new JSch();
+            if (externalServer.getPrivateKeyFile() != null && !externalServer.getPrivateKeyFile().equals("none"))
+                jsch.addIdentity(externalServer.getPrivateKeyFile());
+            session = jsch.getSession(externalServer.getUsername(), externalServer.getIp(), externalServer.getPort());
+            if (externalServer.getPassword() != null && !externalServer.getPassword().equals("none"))
+                session.setPassword(externalServer.getPassword());
+            Properties config = new Properties();
+            config.put("StrictHostKeyChecking", "no");
+            session.setConfig(config);
+            session.connect(10000);
+            channel = (ChannelExec) session.openChannel("exec");
+            channel.setCommand(command);
             ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
-            channel.setOut(responseStream);
-            channel.open().verify(Duration.ofSeconds(5));
-            channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), Duration.ofSeconds(5).toMillis());
-            Integer exitStatus = channel.getExitStatus();
-            if (exitStatus != null && exitStatus == 0) {
+            channel.setOutputStream(responseStream);
+            channel.connect(10000);
+            while (!channel.isClosed()) {
+                Thread.sleep(100);
+            }
+            String output = responseStream.toString().trim();
+            if (!output.isEmpty()) {
                 onSuccess.run();
             } else {
                 onError.run();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             onError.run();
+        } finally {
+            if (channel != null) channel.disconnect();
+            if (session != null) session.disconnect();
         }
     }
 }
