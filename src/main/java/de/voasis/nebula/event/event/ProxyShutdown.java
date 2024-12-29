@@ -8,11 +8,11 @@ import java.util.ArrayList;
 
 public class ProxyShutdown {
     public ProxyShutdown(ProxyShutdownEvent event) {
-        Nebula.ssh.closeAll();
         for(BackendServer backendServer : new ArrayList<>(Data.backendInfoMap)) {
             if(backendServer != null) {
                 Nebula.serverManager.delete(backendServer, null);
             }
         }
+        Nebula.ssh.closeAll();
     }
 }
