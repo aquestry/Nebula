@@ -32,7 +32,7 @@ public class SSH {
             session.connect(10000);
             sessionPool.put(node, session);
             Data.nodeMap.add(node);
-            System.out.println("SSH session initialized successfully for server: " + node.getIp());
+            System.out.println("Session initialized successfully for server: " + node.getIp());
             updateFreePort(node);
         } catch (JSchException e) {
             System.err.println("Failed to initialize SSH session for server " + node.getIp() + ": " + e.getMessage());

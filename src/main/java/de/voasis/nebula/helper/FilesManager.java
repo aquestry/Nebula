@@ -55,7 +55,6 @@ public class FilesManager {
                     }
                     Node node = new Node(serverName.toString(), ip, username, password, privateKeyFile, port, 0);
                     Nebula.ssh.init(node);
-                    Nebula.util.log("Loaded hold server: {}", serverName);
                     Nebula.ssh.updateFreePort(node);
                 }
             }
