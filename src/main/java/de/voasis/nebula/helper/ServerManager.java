@@ -44,7 +44,8 @@ public class ServerManager {
                     }
                 }
             }
-            String command = String.format("docker run -d %s -p %d:25565 --name %s %s", envVars, tempPort, FinalNewName, templateName);
+            String command = String.format("docker run --security-opt seccomp=unconfined -d %s -p %d:25565 --name %s %s", envVars, tempPort, FinalNewName, templateName);
+            Nebula.util.log(command);
             Nebula.util.sendMessage(source, Messages.CREATE_CONTAINER.replace("<name>", FinalNewName));
             BackendServer backendServer = new BackendServer(FinalNewName, externalServer, tempPort, false, source, templateName, starterFlags);
             HoldServer finalExternalServer = externalServer;
