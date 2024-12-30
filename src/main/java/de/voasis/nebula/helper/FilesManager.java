@@ -60,8 +60,8 @@ public class FilesManager {
                     Nebula.ssh.updateFreePort(node);
                 }
             }
-            if (Data.nodeMap.isEmpty()) {
-                Nebula.util.log("NO HOLD SERVERS FOUND!!! SHUTTING DOWN!!!");
+            if (Data.nodeMap.isEmpty() || !Data.nodeMap.stream().anyMatch(Node::isActive)) {
+                Nebula.util.log("No availble nodes, shutting down.");
                 Nebula.server.shutdown();
             }
             Map<Object, ? extends ConfigurationNode> gamemodes = config.node("gamemodes").childrenMap();
