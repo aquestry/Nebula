@@ -1,7 +1,7 @@
 package de.voasis.nebula.helper;
 
 import de.voasis.nebula.data.Data;
-import de.voasis.nebula.map.BackendServer;
+import de.voasis.nebula.map.Container;
 import de.voasis.nebula.Nebula;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,46 +10,46 @@ import java.util.List;
 
 public class AutoDeleter {
 
-    private final Map<BackendServer, Long> deletionTimers = new HashMap<>();
+    private final Map<Container, Long> deletionTimers = new HashMap<>();
     private static final long DELETION_DELAY = 2000;
 
     public void process() {
         long currentTime = System.currentTimeMillis();
-        List<BackendServer> serversToDelete = new ArrayList<>();
+        List<Container> serversToDelete = new ArrayList<>();
         boolean lobbyServerDeleted = false;
-        for (BackendServer backendServer : Data.backendInfoMap) {
-            if (backendServer.getFlags().contains("custom") || backendServer.getFlags().contains("retry")) {
+        for (Container container : Data.backendInfoMap) {
+            if (container.getFlags().contains("custom") || container.getFlags().contains("retry")) {
                 continue;
             }
-            boolean conditionsMet = Nebula.util.getPlayerCount(backendServer) == 0 &&
-                    backendServer.getPendingPlayerConnections().isEmpty() && !backendServer.getFlags().contains("preload");
-            if (backendServer.getFlags().contains("lobby")) {
-                conditionsMet = conditionsMet && !lobbyServerDeleted && canDeleteLobbyServer(backendServer);
+            boolean conditionsMet = Nebula.util.getPlayerCount(container) == 0 &&
+                    container.getPendingPlayerConnections().isEmpty() && !container.getFlags().contains("preload");
+            if (container.getFlags().contains("lobby")) {
+                conditionsMet = conditionsMet && !lobbyServerDeleted && canDeleteLobbyServer(container);
             }
             if (conditionsMet) {
-                if (!deletionTimers.containsKey(backendServer)) {
-                    deletionTimers.put(backendServer, currentTime);
+                if (!deletionTimers.containsKey(container)) {
+                    deletionTimers.put(container, currentTime);
                 } else {
-                    long timerStarted = deletionTimers.get(backendServer);
+                    long timerStarted = deletionTimers.get(container);
                     if (currentTime - timerStarted >= DELETION_DELAY) {
-                        serversToDelete.add(backendServer);
-                        deletionTimers.remove(backendServer);
-                        if (backendServer.getFlags().contains("lobby")) {
+                        serversToDelete.add(container);
+                        deletionTimers.remove(container);
+                        if (container.getFlags().contains("lobby")) {
                             lobbyServerDeleted = true;
                         }
                     }
                 }
             } else {
-                deletionTimers.remove(backendServer);
+                deletionTimers.remove(container);
             }
         }
-        for (BackendServer serverToDelete : serversToDelete) {
+        for (Container serverToDelete : serversToDelete) {
             Nebula.serverManager.delete(serverToDelete, null);
         }
     }
 
-    private boolean canDeleteLobbyServer(BackendServer serverToExclude) {
-        for (BackendServer otherServer : Data.backendInfoMap) {
+    private boolean canDeleteLobbyServer(Container serverToExclude) {
+        for (Container otherServer : Data.backendInfoMap) {
             if (!otherServer.equals(serverToExclude) && otherServer.getFlags().contains("lobby") && otherServer.isOnline() && Nebula.util.getPlayerCount(otherServer) < Data.defaultmin) {
                 return true;
             }

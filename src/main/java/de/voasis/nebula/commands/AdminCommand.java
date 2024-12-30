@@ -5,7 +5,7 @@ import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import de.voasis.nebula.data.Data;
 import de.voasis.nebula.data.Messages;
-import de.voasis.nebula.map.BackendServer;
+import de.voasis.nebula.map.Container;
 import de.voasis.nebula.Nebula;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -44,29 +44,29 @@ public class AdminCommand implements SimpleCommand {
     }
 
     private void handleKillCommand(CommandSource source, String[] args) {
-        BackendServer backendServer = Nebula.util.getBackendServer(args[1]);
-        if(backendServer == null) {
+        Container container = Nebula.util.getBackendServer(args[1]);
+        if(container == null) {
             Nebula.util.sendMessage(source, Messages.SERVER_NOT_FOUND.replace("<name>", args[1]));
         } else {
-            Nebula.serverManager.kill(backendServer, source);
+            Nebula.serverManager.kill(container, source);
         }
     }
 
     private void handleStartCommand(CommandSource source, String[] args) {
-        BackendServer backendServer = Nebula.util.getBackendServer(args[1]);
-        if(backendServer == null) {
+        Container container = Nebula.util.getBackendServer(args[1]);
+        if(container == null) {
             Nebula.util.sendMessage(source, Messages.SERVER_NOT_FOUND.replace("<name>", args[1]));
         } else {
-            Nebula.serverManager.start(backendServer, source);
+            Nebula.serverManager.start(container, source);
         }
     }
 
     private void handleDeleteCommand(CommandSource source, String[] args) {
-        BackendServer backendServer = Nebula.util.getBackendServer(args[1]);
-        if(backendServer == null) {
+        Container container = Nebula.util.getBackendServer(args[1]);
+        if(container == null) {
             Nebula.util.sendMessage(source, Messages.SERVER_NOT_FOUND.replace("<name>", args[1]));
         } else {
-            Nebula.serverManager.delete(backendServer, source);
+            Nebula.serverManager.delete(container, source);
         }
     }
 
@@ -93,18 +93,18 @@ public class AdminCommand implements SimpleCommand {
             } else if("start".equalsIgnoreCase(args[0])) {
                 return CompletableFuture.completedFuture(Data.backendInfoMap.stream()
                         .filter(backendServer -> !backendServer.isOnline())
-                        .map(BackendServer::getServerName)
+                        .map(Container::getServerName)
                         .filter(serverName -> serverName.startsWith(args[1]))
                         .toList());
             } else if("kill".equalsIgnoreCase(args[0])) {
                 return CompletableFuture.completedFuture(Data.backendInfoMap.stream()
-                        .filter(BackendServer::isOnline)
-                        .map(BackendServer::getServerName)
+                        .filter(Container::isOnline)
+                        .map(Container::getServerName)
                         .filter(serverName -> serverName.startsWith(args[1]))
                         .toList());
             } else {
                 return CompletableFuture.completedFuture(Data.backendInfoMap.stream()
-                        .map(BackendServer::getServerName)
+                        .map(Container::getServerName)
                         .filter(serverName -> serverName.startsWith(args[1]))
                         .toList());
             }

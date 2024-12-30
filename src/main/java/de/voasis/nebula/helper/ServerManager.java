@@ -5,74 +5,74 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Messages;
-import de.voasis.nebula.map.BackendServer;
+import de.voasis.nebula.map.Container;
 import de.voasis.nebula.data.Data;
-import de.voasis.nebula.map.GamemodeQueue;
-import de.voasis.nebula.map.HoldServer;
+import de.voasis.nebula.map.Queue;
+import de.voasis.nebula.map.Node;
 import net.kyori.adventure.text.Component;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ServerManager {
-    public BackendServer createFromTemplate(String templateName, String newName, CommandSource source, String... starterFlags) {
+    public Container createFromTemplate(String templateName, String newName, CommandSource source, String... starterFlags) {
         try {
-            HoldServer externalServer = Data.holdServerMap.getFirst();
-            for(HoldServer holdServer : Data.holdServerMap) {
-                if(holdServer.getBackendServers().size() < externalServer.getBackendServers().size()) {
-                    externalServer = holdServer;
+            Node node = Data.nodeMap.getFirst();
+            for(Node n : Data.nodeMap) {
+                if(n.getBackendServers().size() < node.getBackendServers().size()) {
+                    node = n;
                 }
             }
-            while(externalServer.getFreePort() == 0) {
-                Nebula.ssh.updateFreePort(externalServer);
+            while(node.getFreePort() == 0) {
+                Nebula.ssh.updateFreePort(node);
                 Thread.sleep(100);
             }
-            int tempPort = externalServer.getFreePort();
-            String FinalNewName = newName + "-" + externalServer.getServerName();
-            for (BackendServer backendServer : Data.backendInfoMap) {
-                if (backendServer.getServerName().equals(FinalNewName)) {
+            int tempPort = node.getFreePort();
+            String FinalNewName = newName + "-" + node.getServerName();
+            for (Container container : Data.backendInfoMap) {
+                if (container.getServerName().equals(FinalNewName)) {
                     Nebula.util.sendMessage(source, Messages.ALREADY_EXISTS.replace("<name>", FinalNewName));
                     return null;
                 }
             }
             StringBuilder envVars = new StringBuilder(Data.envVars);
             for(String flags : starterFlags) {
-                for(GamemodeQueue gamemodeQueue : Data.gamemodeQueueMap) {
-                    if(gamemodeQueue.getName().equals(flags.replace("gamemode:", ""))) {
-                        envVars.append(gamemodeQueue.getLocalEnvVars());
+                for(Queue queue : Data.queueMap) {
+                    if(queue.getName().equals(flags.replace("gamemode:", ""))) {
+                        envVars.append(queue.getLocalEnvVars());
                         break;
                     }
                 }
             }
             String command = String.format("docker run -d %s -p %d:25565 --name %s %s", envVars, tempPort, FinalNewName, templateName);
             Nebula.util.sendMessage(source, Messages.CREATE_CONTAINER.replace("<name>", FinalNewName));
-            BackendServer backendServer = new BackendServer(FinalNewName, externalServer, tempPort, false, source, templateName, starterFlags);
-            HoldServer finalExternalServer = externalServer;
-            Nebula.ssh.executeSSHCommand(externalServer, command,
+            Container container = new Container(FinalNewName, node, tempPort, false, source, templateName, starterFlags);
+            Node finalnode = node;
+            Nebula.ssh.executeSSHCommand(node, command,
                     () -> {
-                        ServerInfo newInfo = new ServerInfo(FinalNewName, new InetSocketAddress(finalExternalServer.getIp(), tempPort));
+                        ServerInfo newInfo = new ServerInfo(FinalNewName, new InetSocketAddress(finalnode.getIp(), tempPort));
                         Nebula.server.registerServer(newInfo);
-                        Data.backendInfoMap.add(backendServer);
-                        Nebula.ssh.updateFreePort(finalExternalServer);
+                        Data.backendInfoMap.add(container);
+                        Nebula.ssh.updateFreePort(finalnode);
                         Nebula.util.sendMessage(source, Messages.DONE);
-                        backendServer.removeFlag("retry");
+                        container.removeFlag("retry");
                     },
                     () -> {
                         Nebula.util.sendMessage(source, Messages.ERROR_CREATE.replace("<name>", FinalNewName));
-                        if (backendServer.getFlags().contains("retry")) {
+                        if (container.getFlags().contains("retry")) {
                             List<String> flags = new ArrayList<>(List.of(starterFlags));
                             flags.remove("retry");
                             createFromTemplate(templateName, newName, source, flags.toArray(new String[0]));
                         }
                     }
             );
-            return backendServer;
+            return container;
         } catch (Exception e) {
             return null;
         }
     }
 
-    public void kill(BackendServer serverToKill, CommandSource source) {
+    public void kill(Container serverToKill, CommandSource source) {
         String name = serverToKill.getServerName();
         if(!serverToKill.isOnline()) {
             Nebula.util.sendMessage(source, Messages.SERVER_STOPPED.replace("<name>", name));
@@ -86,10 +86,10 @@ public class ServerManager {
         );
     }
 
-    private void kickAll(BackendServer backendServer) {
-        Nebula.server.getServer(backendServer.getServerName()).ifPresent(serverInfo -> {
+    private void kickAll(Container container) {
+        Nebula.server.getServer(container.getServerName()).ifPresent(serverInfo -> {
             for (Player p : serverInfo.getPlayersConnected()) {
-                if(backendServer.getFlags().contains("lobby")) {
+                if(container.getFlags().contains("lobby")) {
                     p.disconnect(Component.empty());
                 } else {
                     Nebula.util.connectPlayer(p, Nebula.defaultsManager.getTarget(), true);
@@ -98,7 +98,7 @@ public class ServerManager {
         });
     }
 
-    public void start(BackendServer serverToStart, CommandSource source) {
+    public void start(Container serverToStart, CommandSource source) {
         String name = serverToStart.getServerName();
         if(serverToStart.isOnline()) {
             Nebula.util.sendMessage(source, Messages.SERVER_RUNNING.replace("<name>", name));
@@ -111,23 +111,23 @@ public class ServerManager {
         );
     }
 
-    public void pull(HoldServer externalServer, String template, CommandSource source) {
-        String externName = externalServer.getServerName();
-        Nebula.util.sendMessage(source, Messages.PULL_TEMPLATE.replace("<name>", externName).replace("<template>", template));
-        Nebula.ssh.executeSSHCommand(externalServer, "docker pull " + template,
-                () -> Nebula.util.sendMessage(source, Messages.DONE_PULL.replace("<name>", externName).replace("<template>", template)),
-                () -> Nebula.util.sendMessage(source, Messages.ERROR_PULL.replace("<name>", externName).replace("<template>", template))
+    public void pull(Node node, String template, CommandSource source) {
+        String nodeName = node.getServerName();
+        Nebula.util.sendMessage(source, Messages.PULL_TEMPLATE.replace("<name>", nodeName).replace("<template>", template));
+        Nebula.ssh.executeSSHCommand(node, "docker pull " + template,
+                () -> Nebula.util.sendMessage(source, Messages.DONE_PULL.replace("<name>", nodeName).replace("<template>", template)),
+                () -> Nebula.util.sendMessage(source, Messages.ERROR_PULL.replace("<name>", nodeName).replace("<template>", template))
         );
     }
 
-    public void delete(BackendServer serverToDelete, CommandSource source) {
+    public void delete(Container serverToDelete, CommandSource source) {
         kickAll(serverToDelete);
         String name = serverToDelete.getServerName();
-        HoldServer externalServer = serverToDelete.getHoldServer();
+        Node node = serverToDelete.getHoldServer();
         Nebula.util.sendMessage(source, Messages.DELETE_CONTAINER.replace("<name>", name));
-        Nebula.ssh.executeSSHCommand(externalServer, "docker rm -f " + name,
+        Nebula.ssh.executeSSHCommand(node, "docker rm -f " + name,
                 () -> {
-                    Nebula.server.unregisterServer(new ServerInfo(name, new InetSocketAddress(externalServer.getIp(), serverToDelete.getPort())));
+                    Nebula.server.unregisterServer(new ServerInfo(name, new InetSocketAddress(node.getIp(), serverToDelete.getPort())));
                     Data.backendInfoMap.remove(serverToDelete);
                     Nebula.util.sendMessage(source, Messages.DONE);
                 },

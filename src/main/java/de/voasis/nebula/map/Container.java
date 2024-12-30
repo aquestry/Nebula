@@ -5,9 +5,9 @@ import com.velocitypowered.api.proxy.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BackendServer {
+public class Container {
 
-    private final HoldServer holdServer;
+    private final Node node;
     private final int port;
     private final String serverName;
     private final CommandSource creator;
@@ -16,9 +16,9 @@ public class BackendServer {
     private final List<Player> pendingPlayerConnections = new ArrayList<>();
     public List<String> flags = new ArrayList<>();
 
-    public BackendServer(String serverName, HoldServer holdServer, int port, boolean online, CommandSource creator, String template, String... starterFlags) {
+    public Container(String serverName, Node node, int port, boolean online, CommandSource creator, String template, String... starterFlags) {
         this.serverName = serverName;
-        this.holdServer = holdServer;
+        this.node = node;
         this.port = port;
         this.online = online;
         this.creator = creator;
@@ -29,7 +29,7 @@ public class BackendServer {
     public String getServerName() { return serverName; }
     public String getTemplate() { return template; }
     public int getPort() { return port; }
-    public HoldServer getHoldServer() { return holdServer; }
+    public Node getHoldServer() { return node; }
     public boolean isOnline() { return online; }
     public CommandSource getCreator() { return creator; }
     public void addPendingPlayerConnection(Player player) { if (!pendingPlayerConnections.contains(player)) { pendingPlayerConnections.add(player);} }

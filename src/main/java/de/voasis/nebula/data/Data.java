@@ -1,8 +1,8 @@
 package de.voasis.nebula.data;
 
-import de.voasis.nebula.map.BackendServer;
-import de.voasis.nebula.map.GamemodeQueue;
-import de.voasis.nebula.map.HoldServer;
+import de.voasis.nebula.map.Container;
+import de.voasis.nebula.map.Queue;
+import de.voasis.nebula.map.Node;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,9 +15,9 @@ public class Data {
     public static int defaultmax;
     public static int defaultmin;
     public static String defaultGroupName;
-    public static List<HoldServer> holdServerMap = new ArrayList<>();
-    public static List<BackendServer> backendInfoMap = new ArrayList<>();
-    public static List<GamemodeQueue> gamemodeQueueMap = new ArrayList<>();
+    public static List<Node> nodeMap = new ArrayList<>();
+    public static List<Container> backendInfoMap = new ArrayList<>();
+    public static List<Queue> queueMap = new ArrayList<>();
     public static final Map<String, Long> cooldownsPluginMessage = new ConcurrentHashMap<>();
     public static List<String> alltemplates = new ArrayList<>();
     public static String Icon = """

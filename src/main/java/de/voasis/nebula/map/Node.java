@@ -3,7 +3,7 @@ package de.voasis.nebula.map;
 import de.voasis.nebula.data.Data;
 import java.util.List;
 
-public class HoldServer {
+public class Node {
 
     private final String serverName;
     private final String password;
@@ -11,9 +11,10 @@ public class HoldServer {
     private final String username;
     private final String ip;
     private final int port;
+    private boolean active;
     private int freePort;
 
-    public HoldServer(String serverName, String ip, String username, String password, String privateKeyFile, int port, int freePort) {
+    public Node(String serverName, String ip, String username, String password, String privateKeyFile, int port, int freePort) {
         this.serverName = serverName;
         this.password = (password != null) ? password : "none";
         this.privateKeyFile = (privateKeyFile != null) ? privateKeyFile : "none";
@@ -23,6 +24,9 @@ public class HoldServer {
         this.freePort = freePort;
     }
 
+    public void setFreePort(int freePort) { this.freePort = freePort; }
+    public void setActive(boolean active) { this.active = active; }
+    public boolean isActive() { return active; }
     public String getServerName() { return serverName; }
     public String getPassword() { return password; }
     public String getPrivateKeyFile() { return privateKeyFile; }
@@ -30,9 +34,8 @@ public class HoldServer {
     public String getIp() { return ip; }
     public int getPort() { return port; }
     public int getFreePort() { return freePort; }
-    public void setFreePort(int freePort) { this.freePort = freePort; }
 
-    public List<BackendServer> getBackendServers() {
+    public List<Container> getBackendServers() {
         return Data.backendInfoMap.stream()
                 .filter(backendServer -> backendServer.getHoldServer().equals(this))
                 .toList();

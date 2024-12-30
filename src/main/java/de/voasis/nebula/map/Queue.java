@@ -4,7 +4,7 @@ import com.velocitypowered.api.proxy.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GamemodeQueue {
+public class Queue {
 
     private final String name;
     private final String template;
@@ -13,7 +13,7 @@ public class GamemodeQueue {
     private String localEnvVars;
     private List<Player> inQueue = new ArrayList<>();
 
-    public GamemodeQueue(String name, String template, int neededPlayers, int preload, String localEnvVars) {
+    public Queue(String name, String template, int neededPlayers, int preload, String localEnvVars) {
         this.name = name;
         this.template = template;
         this.neededPlayers = neededPlayers;

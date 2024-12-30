@@ -3,7 +3,7 @@ package de.voasis.nebula.event.event;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.data.Data;
-import de.voasis.nebula.map.BackendServer;
+import de.voasis.nebula.map.Container;
 import de.voasis.nebula.Nebula;
 
 public class Disconnect {
@@ -14,8 +14,8 @@ public class Disconnect {
         } else {
             Nebula.queueProcessor.leaveQueue(player, false);
         }
-        for(BackendServer backendServer : Data.backendInfoMap) {
-            backendServer.removePendingPlayerConnection(player);
+        for(Container container : Data.backendInfoMap) {
+            container.removePendingPlayerConnection(player);
         }
     }
 }

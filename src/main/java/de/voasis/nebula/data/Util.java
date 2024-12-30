@@ -5,7 +5,7 @@ import com.google.gson.JsonParser;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import de.voasis.nebula.map.BackendServer;
+import de.voasis.nebula.map.Container;
 import de.voasis.nebula.map.Group;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.map.Party;
@@ -41,14 +41,14 @@ public class Util {
     }
 
     private void stateComplete(RegisteredServer registeredServer) {
-        for (BackendServer backendServer : Data.backendInfoMap) {
-            if (registeredServer.getServerInfo().getName().equals(backendServer.getServerName())) {
-                synchronized (backendServer) {
-                    if (!backendServer.isOnline()) {
-                        backendServer.setOnline(true);
-                        callPending(backendServer);
-                        CommandSource creator = backendServer.getCreator();
-                        sendMessage(creator, Messages.ONLINE.replace("<name>", backendServer.getServerName()));
+        for (Container container : Data.backendInfoMap) {
+            if (registeredServer.getServerInfo().getName().equals(container.getServerName())) {
+                synchronized (container) {
+                    if (!container.isOnline()) {
+                        container.setOnline(true);
+                        callPending(container);
+                        CommandSource creator = container.getCreator();
+                        sendMessage(creator, Messages.ONLINE.replace("<name>", container.getServerName()));
                     }
                 }
             }
@@ -56,14 +56,14 @@ public class Util {
     }
 
     public void stateCompleteFailed(RegisteredServer registeredServer) {
-        for (BackendServer backendServer : Data.backendInfoMap) {
-            if (registeredServer.getServerInfo().getName().equals(backendServer.getServerName())) {
-                synchronized (backendServer) {
-                    if (backendServer.isOnline()) {
+        for (Container container : Data.backendInfoMap) {
+            if (registeredServer.getServerInfo().getName().equals(container.getServerName())) {
+                synchronized (container) {
+                    if (container.isOnline()) {
                         checkLobbys(true);
-                        backendServer.setOnline(false);
-                        CommandSource creator = backendServer.getCreator();
-                        sendMessage(creator, Messages.OFFLINE.replace("<name>", backendServer.getServerName()));
+                        container.setOnline(false);
+                        CommandSource creator = container.getCreator();
+                        sendMessage(creator, Messages.OFFLINE.replace("<name>", container.getServerName()));
                     }
                 }
             }
@@ -72,8 +72,8 @@ public class Util {
 
     public void pingServers() {
         checkLobbys(false);
-        for (BackendServer backendServer : new ArrayList<>(Data.backendInfoMap)) {
-            Optional<RegisteredServer> registeredServer = Nebula.server.getServer(backendServer.getServerName());
+        for (Container container : new ArrayList<>(Data.backendInfoMap)) {
+            Optional<RegisteredServer> registeredServer = Nebula.server.getServer(container.getServerName());
             registeredServer.ifPresent(regServer -> regServer.ping().whenComplete((result, exception) -> {
                 if (exception == null) {
                     try {
@@ -94,9 +94,9 @@ public class Util {
 
     public void checkLobbys(boolean online) {
         int lobbys = 0;
-        for(BackendServer backendServer : Data.backendInfoMap) {
-            if(backendServer.getFlags().contains("lobby")) {
-                if(online && backendServer.isOnline()) {
+        for(Container container : Data.backendInfoMap) {
+            if(container.getFlags().contains("lobby")) {
+                if(online && container.isOnline()) {
                     lobbys++;
                 } else if(!online){
                     lobbys++;
@@ -109,14 +109,14 @@ public class Util {
         }
     }
 
-    public void connectPlayer(Player player, BackendServer backendServer, boolean quit) {
-        if(backendServer == null) {
+    public void connectPlayer(Player player, Container container, boolean quit) {
+        if(container == null) {
             if(quit) {
                 player.disconnect(Component.empty());
             }
             return;
         }
-        String name = backendServer.getServerName();
+        String name = container.getServerName();
         Optional<RegisteredServer> target = Nebula.server.getServer(name);
         sendMessage(player, Messages.SERVER_CONNECT.replace("<name>", name));
         if(target.isPresent()) {
@@ -128,8 +128,8 @@ public class Util {
         }
     }
 
-    public BackendServer getBackendServer(String name) {
-        for (BackendServer server : Data.backendInfoMap) {
+    public Container getBackendServer(String name) {
+        for (Container server : Data.backendInfoMap) {
             if (server.getServerName().equals(name)) {
                 return server;
             }
@@ -137,10 +137,10 @@ public class Util {
         return null;
     }
 
-    public void callPending(BackendServer backendServer) {
-        for(Player p : backendServer.getPendingPlayerConnections()) {
-            if (p.getCurrentServer().isEmpty() || !p.getCurrentServer().get().getServerInfo().getName().equals(backendServer.getServerName())) {
-                connectPlayer(p, backendServer, false);
+    public void callPending(Container container) {
+        for(Player p : container.getPendingPlayerConnections()) {
+            if (p.getCurrentServer().isEmpty() || !p.getCurrentServer().get().getServerInfo().getName().equals(container.getServerName())) {
+                connectPlayer(p, container, false);
             }
         }
     }
@@ -179,7 +179,7 @@ public class Util {
         if(backendServer instanceof RegisteredServer registeredServer && backendServer != null) {
             return registeredServer.getPlayersConnected().size();
         }
-        if(backendServer instanceof BackendServer backend && backendServer != null) {
+        if(backendServer instanceof Container backend && backendServer != null) {
             return Nebula.server.getServer(backend.getServerName()).get().getPlayersConnected().size();
         }
         return 0;

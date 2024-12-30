@@ -12,8 +12,8 @@ lobby-max: 5
 # The current server will continue accepting players until it reaches the player limit (5),
 # at which point new players will start connecting to the newly created lobby server.
 lobby-min: 3
-# Hold-Servers, at least one.
-manager-servers:
+# Nodes, at least one.
+nodes:
   example:
     ip: localhost
     username: notrootpls

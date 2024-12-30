@@ -2,8 +2,8 @@ package de.voasis.nebula.helper;
 
 import de.voasis.nebula.data.Data;
 import de.voasis.nebula.data.Messages;
-import de.voasis.nebula.map.GamemodeQueue;
-import de.voasis.nebula.map.HoldServer;
+import de.voasis.nebula.map.Queue;
+import de.voasis.nebula.map.Node;
 import de.voasis.nebula.Nebula;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
@@ -40,27 +40,27 @@ public class FilesManager {
                     .map(s -> " -e " + s)
                     .collect(Collectors.joining())
                     : "";
-            Data.holdServerMap.clear();
-            Map<Object, ? extends ConfigurationNode> managerServers = config.node("manager-servers").childrenMap();
+            Data.nodeMap.clear();
+            Map<Object, ? extends ConfigurationNode> managerServers = config.node("nodes").childrenMap();
             if (managerServers != null) {
                 for (Object serverName : managerServers.keySet()) {
-                    String ip = config.node("manager-servers", serverName, "ip").getString();
-                    String username = config.node("manager-servers", serverName, "username").getString();
-                    String password = config.node("manager-servers", serverName, "password").getString();
-                    String privateKeyFile = config.node("manager-servers", serverName, "privateKeyFile").getString();
-                    int port = config.node("manager-servers", serverName, "port").getInt(22);
+                    String ip = config.node("nodes", serverName, "ip").getString();
+                    String username = config.node("nodes", serverName, "username").getString();
+                    String password = config.node("nodes", serverName, "password").getString();
+                    String privateKeyFile = config.node("nodes", serverName, "privateKeyFile").getString();
+                    int port = config.node("nodes", serverName, "port").getInt(22);
                     if (ip == null || username == null || password == null || privateKeyFile == null) {
                         Nebula.util.log("Incomplete configuration for server '{}'. Skipping this server.", serverName);
                         continue;
                     }
-                    HoldServer holdServer = new HoldServer(serverName.toString(), ip, username, password, privateKeyFile, port, 0);
-                    Data.holdServerMap.add(holdServer);
-                    Nebula.ssh.init(holdServer);
+                    Node node = new Node(serverName.toString(), ip, username, password, privateKeyFile, port, 0);
+                    Data.nodeMap.add(node);
+                    Nebula.ssh.init(node);
                     Nebula.util.log("Loaded hold server: {}", serverName);
-                    Nebula.ssh.updateFreePort(holdServer);
+                    Nebula.ssh.updateFreePort(node);
                 }
             }
-            if (Data.holdServerMap.isEmpty()) {
+            if (Data.nodeMap.isEmpty()) {
                 Nebula.util.log("NO HOLD SERVERS FOUND!!! SHUTTING DOWN!!!");
                 Nebula.server.shutdown();
             }
@@ -77,13 +77,13 @@ public class FilesManager {
                             .collect(Collectors.joining())
                             : "";
                     Data.alltemplates.add(template);
-                    Data.gamemodeQueueMap.add(new GamemodeQueue(queueName.toString(), template, neededPlayers, preload, localEnvVars));
+                    Data.queueMap.add(new Queue(queueName.toString(), template, neededPlayers, preload, localEnvVars));
                     Nebula.util.log("Added gamemode to pool: {}, {}, {}.", queueName, template, neededPlayers);
                 }
             }
             Data.alltemplates.add(Data.defaultServerTemplate);
             if(Data.pullStart) {
-                Data.holdServerMap.parallelStream().forEach(holdServer ->
+                Data.nodeMap.parallelStream().forEach(holdServer ->
                         Data.alltemplates.parallelStream().forEach(template ->
                                 Nebula.serverManager.pull(holdServer, template, Nebula.server.getConsoleCommandSource())));
             }
