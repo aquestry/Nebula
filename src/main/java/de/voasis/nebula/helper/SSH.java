@@ -1,6 +1,7 @@
 package de.voasis.nebula.helper;
 
 import com.jcraft.jsch.*;
+import de.voasis.nebula.data.Data;
 import de.voasis.nebula.map.Node;
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
@@ -30,12 +31,11 @@ public class SSH {
             session.setConfig(config);
             session.connect(10000);
             sessionPool.put(node, session);
+            Data.nodeMap.add(node);
             System.out.println("SSH session initialized successfully for server: " + node.getIp());
-            node.setActive(true);
             updateFreePort(node);
         } catch (JSchException e) {
             System.err.println("Failed to initialize SSH session for server " + node.getIp() + ": " + e.getMessage());
-            node.setActive(false);
         }
     }
 

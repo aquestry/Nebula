@@ -54,13 +54,12 @@ public class FilesManager {
                         continue;
                     }
                     Node node = new Node(serverName.toString(), ip, username, password, privateKeyFile, port, 0);
-                    Data.nodeMap.add(node);
                     Nebula.ssh.init(node);
                     Nebula.util.log("Loaded hold server: {}", serverName);
                     Nebula.ssh.updateFreePort(node);
                 }
             }
-            if (Data.nodeMap.isEmpty() || !Data.nodeMap.stream().anyMatch(Node::isActive)) {
+            if (Data.nodeMap.isEmpty()) {
                 Nebula.util.log("No availble nodes, shutting down.");
                 Nebula.server.shutdown();
             }

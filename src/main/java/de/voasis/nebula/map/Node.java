@@ -11,7 +11,6 @@ public class Node {
     private final String username;
     private final String ip;
     private final int port;
-    private boolean active;
     private int freePort;
 
     public Node(String serverName, String ip, String username, String password, String privateKeyFile, int port, int freePort) {
@@ -25,8 +24,6 @@ public class Node {
     }
 
     public void setFreePort(int freePort) { this.freePort = freePort; }
-    public void setActive(boolean active) { this.active = active; }
-    public boolean isActive() { return active; }
     public String getServerName() { return serverName; }
     public String getPassword() { return password; }
     public String getPrivateKeyFile() { return privateKeyFile; }
