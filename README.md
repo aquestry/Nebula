@@ -31,7 +31,7 @@ Nebula also supports in-game commands for admins to manage server instances dire
 You dont have to use them, Nebula does handle the queue and lobby scalign on its own.
 But here they are:
 
-### **Admin Commands:** 
+### **Admin Commands:** **Permission: 'velocity.admin'**
 
 - **/admin template [template_name] [new_server_name]**  
   - **Description**: Creates a new server instance using the specified template.
@@ -61,35 +61,64 @@ But here they are:
     /admin start test
     ```
     
-### **Group Commands:** 
+### **Group Commands:** **Permission: 'velocity.admin'**
 
-- **/group template [template_name] [new_server_name]**  
-  - **Description**: Creates a new server instance using the specified template.
+- **/group assign [player_name] [group_name]**  
+  - **Description**: Assigns a specified group to a player. This changes the player's group affiliation to the provided group name.
   - **Example**:  
     ```
-    /admin template anton691/simple-lobby:latest test
-    ```
-
-- **/admin kill [server_name]**  
-  - **Description**: Kills a running server instance.
-  - **Example**:  
-    ```
-    /admin kill test
+    /group assign Alice Moderator
     ```
 
-- **/admin delete [server_name]**  
-  - **Description**: Deletes a server instance. (Will Kill it before.)
+- **/group create [group_name] [level] [prefix...]**  
+  - **Description**: Creates a new group with the given name, level, and prefix. The `level` determines the hierarchy or priority of the group, and the `prefix` is used as a tag for the group.
   - **Example**:  
     ```
-    /admin delete test
+    /group create VIP 2 "VIP Player"
     ```
-    
-- **/admin start [server_name]**  
-  - **Description**: Starts a server instance.
+
+- **/group delete [group_name]**  
+  - **Description**: Deletes an existing group. **Note**: The default group cannot be deleted.
   - **Example**:  
     ```
-    /admin start test
-    ``` 
+    /group delete VIP
+    ```
+
+- **/group list**  
+  - **Description**: Lists all existing groups.
+  - **Example**:  
+    ```
+    /group list
+    ```
+
+- **/group permission add [group_name] [permission]**  
+  - **Description**: Adds a specific permission to a group.
+  - **Example**:  
+    ```
+    /group permission add VIP access_premium_features
+    ```
+
+- **/group permission remove [group_name] [permission]**  
+  - **Description**: Removes a specific permission from a group.
+  - **Example**:  
+    ```
+    /group permission remove VIP access_premium_features
+    ```
+
+- **/group permission list [group_name]**  
+  - **Description**: Lists all permissions assigned to a specified group.
+  - **Example**:  
+    ```
+    /group permission list VIP
+    ```
+
+- **/group info [group_name]**  
+  - **Description**: Displays detailed information about a specific group, including its permissions and other relevant details.
+  - **Example**:  
+    ```
+    /group info VIP
+    ```
+
 ### **Queue Commands:**
 
 - **/queue join [queue name]**  
