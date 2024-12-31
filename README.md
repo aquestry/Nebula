@@ -5,9 +5,10 @@
 **Nebula** is a server management tool built with Java and integrated with Velocity, designed to handle the dynamic creation, management, and control of Minecraft server instances. It uses Docker on Hold-Servers to manage Backend-Servers.
 
 ## Key Features:
-- **Simple Permissions**: Simply define admins via there UUID in the config.
+- **Simple Permissions**: Simply define groups in the config.
 - **Port Management**: Automatically retrieve free ports to assign to new server instances.
-- **Velocity Integration**: Integrates with Velocity, allowing dynamic server registration and player management within the Velocity proxy 
+- **Node Management**: Automatically creates and deletes containers when needed.
+- **Velocity Integration**: Integrates with Velocity, allowing dynamic server registration and player management within the Velocity proxy.
 
 ## Requirements:
 - **Java 21**: Required for running the Proxy instance.
@@ -23,8 +24,8 @@
 6. Stop and configure and then start again.
    
 ## Important Info:
-On start, Velocity will try to create a server on the first backend server via the Lobby-Template in the config and name it "Lobby-0".
-Later on, it will create more lobby servers according to the player count.
+On start, Velocity will try to create a server on the first backend server via the Lobby-Template in the config.
+Later on, it will create more lobby servers according to the player count limits defined in the config.
 ## In-Game Commands
 Nebula also supports in-game commands for admins to manage server instances directly within Minecraft.
 You dont have to use them, Nebula does handle the queue and lobby scalign on its own.
@@ -38,7 +39,6 @@ But here they are:
     ```
     /admin template anton691/simple-lobby:latest test
     ```
-    This will create a new server called `test` based on the `anton691/simple-lobby:latest` template on Dockerhub.
 
 - **/admin kill [server_name]**  
   - **Description**: Kills a running server instance.
@@ -53,13 +53,43 @@ But here they are:
     ```
     /admin delete test
     ```
+    
 - **/admin start [server_name]**  
   - **Description**: Starts a server instance.
   - **Example**:  
     ```
     /admin start test
     ```
+    
+### **Group Commands:** 
 
+- **/group template [template_name] [new_server_name]**  
+  - **Description**: Creates a new server instance using the specified template.
+  - **Example**:  
+    ```
+    /admin template anton691/simple-lobby:latest test
+    ```
+
+- **/admin kill [server_name]**  
+  - **Description**: Kills a running server instance.
+  - **Example**:  
+    ```
+    /admin kill test
+    ```
+
+- **/admin delete [server_name]**  
+  - **Description**: Deletes a server instance. (Will Kill it before.)
+  - **Example**:  
+    ```
+    /admin delete test
+    ```
+    
+- **/admin start [server_name]**  
+  - **Description**: Starts a server instance.
+  - **Example**:  
+    ```
+    /admin start test
+    ``` 
 ### **Queue Commands:**
 
 - **/queue join [queue name]**  
@@ -76,6 +106,28 @@ But here they are:
     /queue leave
     ```
     
+### **Party Commands:**
+
+- **/party invite [player]**  
+  - **Description**: Invite a player.
+  - **Example**:  
+    ```
+    /party invite BastiGHG
+    ```
+    
+- **/party accept [invite]**  
+  - **Description**: Accept a invite from a player, if no invite is given it will try to use the latest invite.
+  - **Example**:  
+    ```
+    /party accept Aquestry
+    ```
+
+- **/party leave**  
+  - **Description**: Leave the current party..
+  - **Example**:  
+    ```
+    /party leave
+    ```
+        
 ## Future Enhancements:
-- Better perms system
-- Bigger
+- Multi-Proxy-System
