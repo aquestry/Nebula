@@ -71,6 +71,7 @@ public class Util {
     }
 
     public void pingServers() {
+        if(Data.quitting) return;
         checkLobbys(false);
         for (Container container : new ArrayList<>(Data.backendInfoMap)) {
             Optional<RegisteredServer> registeredServer = Nebula.server.getServer(container.getServerName());

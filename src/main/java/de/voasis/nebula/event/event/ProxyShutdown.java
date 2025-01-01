@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 public class ProxyShutdown {
     public ProxyShutdown(ProxyShutdownEvent event) {
+        Data.quitting = true;
         for(Container container : new ArrayList<>(Data.backendInfoMap)) {
             if(container != null) {
                 Nebula.serverManager.delete(container, null);

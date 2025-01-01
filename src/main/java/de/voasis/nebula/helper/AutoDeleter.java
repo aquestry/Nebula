@@ -14,6 +14,7 @@ public class AutoDeleter {
     private static final long DELETION_DELAY = 2000;
 
     public void process() {
+        if(Data.quitting) return;
         long currentTime = System.currentTimeMillis();
         List<Container> serversToDelete = new ArrayList<>();
         boolean lobbyServerDeleted = false;
