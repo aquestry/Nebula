@@ -27,7 +27,6 @@ public class Container {
     }
 
     public String getServerName() { return serverName; }
-    public String getTemplate() { return template; }
     public int getPort() { return port; }
     public Node getHoldServer() { return node; }
     public boolean isOnline() { return online; }

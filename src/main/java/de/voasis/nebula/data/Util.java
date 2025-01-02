@@ -11,7 +11,6 @@ import de.voasis.nebula.Nebula;
 import de.voasis.nebula.map.Party;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.InputStreamReader;
@@ -93,6 +92,15 @@ public class Util {
                     }
                 }
             }));
+        }
+    }
+
+    public long getPriority(String ip) {
+        try {
+            return Long.parseLong(ip.replace(".", ""));
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid IP format: " + ip);
+            return 0;
         }
     }
 

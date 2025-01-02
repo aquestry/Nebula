@@ -9,8 +9,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class MultiProxyClient {
-    public MultiProxyClient() {
+public class MultiProxySender {
+    public MultiProxySender() {
         for(Proxy p : Data.proxyMap) {
             try {
                 p.setSocket(new Socket(p.getIP(), p.getPort()));

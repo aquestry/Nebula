@@ -37,7 +37,7 @@ public class Nebula {
     public static Util util;
     public static SSH ssh;
     public static MultiProxyServer multiProxyServer;
-    public static MultiProxyClient multiProxyClient;
+    public static MultiProxySender multiProxySender;
 
     @Inject
     public Nebula(ProxyServer proxy, @DataDirectory Path dataDirectory) {
@@ -58,8 +58,8 @@ public class Nebula {
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         if(Data.multiProxyMode) {
+            multiProxySender = new MultiProxySender();
             multiProxyServer = new MultiProxyServer();
-            multiProxyClient = new MultiProxyClient();
         }
         registerCommands();
         util.log(Data.Icon);

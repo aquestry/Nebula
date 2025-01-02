@@ -188,7 +188,7 @@ public class FilesManager {
                 String ip = multiproxy.node("proxies", proxy, "ip").getString();
                 int port = multiproxy.node("proxies", proxy, "port").getInt();
                 Data.proxyMap.add(new Proxy(proxy.toString(), ip, port));
-                Nebula.util.log("Loaded proxy " + proxy + " with ip " + ip + " and port " + port + " from config");
+                Nebula.util.log("Loaded proxy " + proxy + " with ip " + ip + " and port " + port + " from config.");
             }
         }
     }
