@@ -2,6 +2,7 @@ package de.voasis.nebula.helper;
 
 import de.voasis.nebula.data.Data;
 import de.voasis.nebula.data.Messages;
+import de.voasis.nebula.map.Proxy;
 import de.voasis.nebula.map.Queue;
 import de.voasis.nebula.map.Node;
 import de.voasis.nebula.Nebula;
@@ -21,6 +22,7 @@ public class FilesManager {
 
     private ConfigurationNode config;
     private ConfigurationNode messages;
+    private ConfigurationNode multiproxy;
 
     public FilesManager(Path dataDirectory) {
         loadFiles(dataDirectory);
@@ -30,6 +32,10 @@ public class FilesManager {
     public void load() {
         try {
             loadMessageStrings();
+            Data.multiProxyMode = multiproxy.node("enabled").getBoolean();
+            if(Data.multiProxyMode) {
+                loadProxies();
+            }
             Data.defaultServerTemplate = config.node("lobby-template").getString();
             Data.defaultmax = config.node("lobby-max").getInt();
             Data.defaultmin = config.node("lobby-min").getInt();
@@ -40,45 +46,8 @@ public class FilesManager {
                     .map(s -> " -e " + s)
                     .collect(Collectors.joining())
                     : "";
-            Data.nodeMap.clear();
-            Map<Object, ? extends ConfigurationNode> managerServers = config.node("nodes").childrenMap();
-            if (managerServers != null) {
-                for (Object serverName : managerServers.keySet()) {
-                    String ip = config.node("nodes", serverName, "ip").getString();
-                    String username = config.node("nodes", serverName, "username").getString();
-                    String password = config.node("nodes", serverName, "password").getString();
-                    String privateKeyFile = config.node("nodes", serverName, "privateKeyFile").getString();
-                    int port = config.node("nodes", serverName, "port").getInt(22);
-                    if (ip == null || username == null || password == null || privateKeyFile == null) {
-                        Nebula.util.log("Incomplete configuration for server '{}'. Skipping this server.", serverName);
-                        continue;
-                    }
-                    Node node = new Node(serverName.toString(), ip, username, password, privateKeyFile, port, 0);
-                    Nebula.ssh.init(node);
-                    Nebula.ssh.updateFreePort(node);
-                }
-            }
-            if (Data.nodeMap.isEmpty()) {
-                Nebula.util.log("No availble nodes, shutting down.");
-                Nebula.server.shutdown();
-            }
-            Map<Object, ? extends ConfigurationNode> gamemodes = config.node("gamemodes").childrenMap();
-            if (gamemodes != null) {
-                for (Object queueName : gamemodes.keySet()) {
-                    String template = config.node("gamemodes", queueName, "templateName").getString();
-                    int neededPlayers = config.node("gamemodes", queueName, "neededPlayers").getInt();
-                    int preload = config.node("gamemodes", queueName, "preload").getInt();
-                    String localEnvVars = config.node("gamemodes", queueName, "env-vars").getString();
-                    localEnvVars = (localEnvVars != null && !"none".equals(envVars))
-                            ? Arrays.stream(envVars.split(","))
-                            .map(s -> " -e " + s)
-                            .collect(Collectors.joining())
-                            : "";
-                    Data.alltemplates.add(template);
-                    Data.queueMap.add(new Queue(queueName.toString(), template, neededPlayers, preload, localEnvVars));
-                    Nebula.util.log("Added gamemode to pool: {}, {}, {}.", queueName, template, neededPlayers);
-                }
-            }
+            loadNodes();
+            loadGamemodes(envVars);
             Data.alltemplates.add(Data.defaultServerTemplate);
             if(Data.pullStart) {
                 Data.nodeMap.parallelStream().forEach(holdServer ->
@@ -166,6 +135,64 @@ public class FilesManager {
         }
     }
 
+    private void loadNodes() {
+        Map<Object, ? extends ConfigurationNode> managerServers = config.node("nodes").childrenMap();
+        if (managerServers != null) {
+            for (Object serverName : managerServers.keySet()) {
+                String ip = config.node("nodes", serverName, "ip").getString();
+                String username = config.node("nodes", serverName, "username").getString();
+                String password = config.node("nodes", serverName, "password").getString();
+                String privateKeyFile = config.node("nodes", serverName, "privateKeyFile").getString();
+                int port = config.node("nodes", serverName, "port").getInt(22);
+                if (ip == null || username == null || password == null || privateKeyFile == null) {
+                    Nebula.util.log("Incomplete configuration for server '{}'. Skipping this server.", serverName);
+                    continue;
+                }
+                Node node = new Node(serverName.toString(), ip, username, password, privateKeyFile, port, 0);
+                Nebula.ssh.init(node);
+                Nebula.ssh.updateFreePort(node);
+            }
+        }
+        if (Data.nodeMap.isEmpty()) {
+            Nebula.util.log("No availble nodes, shutting down.");
+            Nebula.server.shutdown();
+        }
+    }
+
+    private void loadGamemodes(String envVars) {
+        Map<Object, ? extends ConfigurationNode> gamemodes = config.node("gamemodes").childrenMap();
+        if (gamemodes != null) {
+            for (Object queueName : gamemodes.keySet()) {
+                String template = config.node("gamemodes", queueName, "templateName").getString();
+                int neededPlayers = config.node("gamemodes", queueName, "neededPlayers").getInt();
+                int preload = config.node("gamemodes", queueName, "preload").getInt();
+                String localEnvVars = config.node("gamemodes", queueName, "env-vars").getString();
+                localEnvVars = (localEnvVars != null && !"none".equals(envVars))
+                        ? Arrays.stream(envVars.split(","))
+                        .map(s -> " -e " + s)
+                        .collect(Collectors.joining())
+                        : "";
+                Data.alltemplates.add(template);
+                Data.queueMap.add(new Queue(queueName.toString(), template, neededPlayers, preload, localEnvVars));
+                Nebula.util.log("Added gamemode to pool: {}, {}, {}.", queueName, template, neededPlayers);
+            }
+        }
+    }
+
+    private void loadProxies() {
+        Data.HMACSecret = multiproxy.node("hmac-secret").getString();
+        Data.multiProxyPort = multiproxy.node("port").getInt();
+        Map<Object, ? extends ConfigurationNode> proxies = multiproxy.node("proxies").childrenMap();
+        if (proxies != null) {
+            for (Object proxy : proxies.keySet()) {
+                String ip = multiproxy.node("proxies", proxy, "ip").getString();
+                int port = multiproxy.node("proxies", proxy, "port").getInt();
+                Data.proxyMap.add(new Proxy(proxy.toString(), ip, port));
+                Nebula.util.log("Loaded proxy " + proxy + " with ip " + ip + " and port " + port + " from config");
+            }
+        }
+    }
+
     public void loadFiles(Path dataDirectory) {
         try {
             if (Files.notExists(dataDirectory)) {
@@ -181,6 +208,11 @@ public class FilesManager {
                 copyResource("messages.yml", messagesFile);
             }
             messages = YamlConfigurationLoader.builder().file(messagesFile).build().load();
+            File multiproxyFile = new File(dataDirectory.toFile(), "multi-proxy-config.yml");
+            if (!multiproxyFile.exists()) {
+                copyResource("multi-proxy-config.yml", multiproxyFile);
+            }
+            multiproxy = YamlConfigurationLoader.builder().file(multiproxyFile).build().load();
         } catch (IOException e) {
             Nebula.util.log("Error loading configuration files.", e);
             Nebula.server.shutdown();

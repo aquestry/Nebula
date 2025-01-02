@@ -11,6 +11,9 @@ import de.voasis.nebula.Nebula;
 import de.voasis.nebula.map.Party;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -90,6 +93,18 @@ public class Util {
                     }
                 }
             }));
+        }
+    }
+
+    public static String calculateHMAC(String data, String key) {
+        try {
+            Mac mac = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "HmacSHA256");
+            mac.init(secretKey);
+            byte[] hmacBytes = mac.doFinal(data.getBytes());
+            return Base64.getEncoder().encodeToString(hmacBytes);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to calculate HMAC", e);
         }
     }
 

@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public class QueueProcessor {
 
-    public void init() {
+    public QueueProcessor() {
         for (Queue queue : Data.queueMap) {
             int preloadCount = queue.getPreload();
             for (int i = 0; i < preloadCount; i++) {

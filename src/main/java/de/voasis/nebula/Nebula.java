@@ -36,6 +36,8 @@ public class Nebula {
     public static PartyManager partyManager;
     public static Util util;
     public static SSH ssh;
+    public static MultiProxyServer multiProxyServer;
+    public static MultiProxyClient multiProxyClient;
 
     @Inject
     public Nebula(ProxyServer proxy, @DataDirectory Path dataDirectory) {
@@ -49,13 +51,16 @@ public class Nebula {
         defaultsManager = new DefaultsManager();
         defaultsManager.createDefault();
         queueProcessor = new QueueProcessor();
-        queueProcessor.init();
         autoDeleter = new AutoDeleter();
         partyManager = new PartyManager();
     }
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
+        if(Data.multiProxyMode) {
+            multiProxyServer = new MultiProxyServer();
+            multiProxyClient = new MultiProxyClient();
+        }
         registerCommands();
         util.log(Data.Icon);
         server.getChannelRegistrar().register(channelMain);
