@@ -1,7 +1,7 @@
-package de.voasis.nebula.event.event;
+package de.voasis.nebula.event.events;
 
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
-import de.voasis.nebula.map.Container;
+import de.voasis.nebula.model.Container;
 import de.voasis.nebula.Nebula;
 import net.kyori.adventure.text.Component;
 

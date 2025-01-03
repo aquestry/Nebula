@@ -1,17 +1,17 @@
-package de.voasis.nebula.event.event;
+package de.voasis.nebula.event.events;
 
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
-import de.voasis.nebula.data.Data;
-import de.voasis.nebula.map.Container;
+import de.voasis.nebula.data.Config;
+import de.voasis.nebula.model.Container;
 import de.voasis.nebula.Nebula;
 import java.util.ArrayList;
 
 public class ProxyShutdown {
     public ProxyShutdown(ProxyShutdownEvent event) {
-        Data.quitting = true;
-        for(Container container : new ArrayList<>(Data.backendInfoMap)) {
+        Config.quitting = true;
+        for(Container container : new ArrayList<>(Config.backendInfoMap)) {
             if(container != null) {
-                Nebula.serverManager.delete(container, null);
+                Nebula.containerManager.delete(container, null);
             }
         }
         Nebula.ssh.closeAll();

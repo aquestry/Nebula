@@ -1,9 +1,9 @@
-package de.voasis.nebula.event.event;
+package de.voasis.nebula.event.events;
 
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.proxy.Player;
-import de.voasis.nebula.data.Data;
-import de.voasis.nebula.map.Container;
+import de.voasis.nebula.data.Config;
+import de.voasis.nebula.model.Container;
 import de.voasis.nebula.Nebula;
 
 public class Disconnect {
@@ -14,7 +14,7 @@ public class Disconnect {
         } else {
             Nebula.queueProcessor.leaveQueue(player, false);
         }
-        for(Container container : Data.backendInfoMap) {
+        for(Container container : Config.backendInfoMap) {
             container.removePendingPlayerConnection(player);
         }
     }

@@ -1,11 +1,11 @@
-package de.voasis.nebula.helper;
+package de.voasis.nebula.manager;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
-import de.voasis.nebula.data.Data;
+import de.voasis.nebula.data.Config;
 import de.voasis.nebula.data.Messages;
-import de.voasis.nebula.map.Group;
+import de.voasis.nebula.model.Group;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
@@ -26,7 +26,7 @@ public class PermissionFile {
         this.configFilePath = dataDirectory.resolve("perms.conf");
         initializeConfig();
         loadGroupsFromConfig();
-        Data.defaultGroupName = getDefaultGroupName();
+        Config.defaultGroupName = getDefaultGroupName();
     }
 
     private void initializeConfig() {

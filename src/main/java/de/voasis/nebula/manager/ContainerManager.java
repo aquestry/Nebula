@@ -1,24 +1,24 @@
-package de.voasis.nebula.helper;
+package de.voasis.nebula.manager;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.ServerInfo;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Messages;
-import de.voasis.nebula.map.Container;
-import de.voasis.nebula.data.Data;
-import de.voasis.nebula.map.Queue;
-import de.voasis.nebula.map.Node;
+import de.voasis.nebula.model.Container;
+import de.voasis.nebula.data.Config;
+import de.voasis.nebula.model.Queue;
+import de.voasis.nebula.model.Node;
 import net.kyori.adventure.text.Component;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServerManager {
+public class ContainerManager {
     public Container createFromTemplate(String templateName, String newName, CommandSource source, String... starterFlags) {
         try {
-            Node node = Data.nodeMap.getFirst();
-            for(Node n : Data.nodeMap) {
+            Node node = Config.nodeMap.getFirst();
+            for(Node n : Config.nodeMap) {
                 if(n.getBackendServers().size() < node.getBackendServers().size()) {
                     node = n;
                 }
@@ -29,15 +29,15 @@ public class ServerManager {
             }
             int tempPort = node.getFreePort();
             String FinalNewName = newName + "-" + node.getServerName();
-            for (Container container : Data.backendInfoMap) {
+            for (Container container : Config.backendInfoMap) {
                 if (container.getServerName().equals(FinalNewName)) {
                     Nebula.util.sendMessage(source, Messages.ALREADY_EXISTS.replace("<name>", FinalNewName));
                     return null;
                 }
             }
-            StringBuilder envVars = new StringBuilder(Data.envVars);
+            StringBuilder envVars = new StringBuilder(Config.envVars);
             for(String flags : starterFlags) {
-                for(Queue queue : Data.queueMap) {
+                for(Queue queue : Config.queueMap) {
                     if(queue.getName().equals(flags.replace("gamemode:", ""))) {
                         envVars.append(queue.getLocalEnvVars());
                         break;
@@ -52,7 +52,7 @@ public class ServerManager {
                     () -> {
                         ServerInfo newInfo = new ServerInfo(FinalNewName, new InetSocketAddress(finalnode.getIp(), tempPort));
                         Nebula.server.registerServer(newInfo);
-                        Data.backendInfoMap.add(container);
+                        Config.backendInfoMap.add(container);
                         Nebula.ssh.updateFreePort(finalnode);
                         Nebula.util.sendMessage(source, Messages.DONE);
                         container.removeFlag("retry");
@@ -128,7 +128,7 @@ public class ServerManager {
         Nebula.ssh.executeSSHCommand(node, "docker rm -f " + name,
                 () -> {
                     Nebula.server.unregisterServer(new ServerInfo(name, new InetSocketAddress(node.getIp(), serverToDelete.getPort())));
-                    Data.backendInfoMap.remove(serverToDelete);
+                    Config.backendInfoMap.remove(serverToDelete);
                     Nebula.util.sendMessage(source, Messages.DONE);
                 },
                 () -> Nebula.util.sendMessage(source, Messages.ERROR_DELETE.replace("<name>", name))

@@ -1,4 +1,4 @@
-package de.voasis.nebula.map;
+package de.voasis.nebula.model;
 
 import java.util.ArrayList;
 import java.util.List;

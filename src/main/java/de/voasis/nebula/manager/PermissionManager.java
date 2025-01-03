@@ -1,4 +1,4 @@
-package de.voasis.nebula.helper;
+package de.voasis.nebula.manager;
 
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.permission.PermissionFunction;
@@ -8,8 +8,8 @@ import com.velocitypowered.api.permission.Tristate;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.voasis.nebula.Nebula;
-import de.voasis.nebula.data.Data;
-import de.voasis.nebula.map.Group;
+import de.voasis.nebula.data.Config;
+import de.voasis.nebula.model.Group;
 import org.spongepowered.configurate.ConfigurationNode;
 import java.util.*;
 
@@ -55,7 +55,7 @@ public class PermissionManager implements PermissionProvider {
             cachedGroups.put(player, highestLevelGroup);
             return highestLevelGroup;
         }
-        Group defaultGroup = getGroupByName(Data.defaultGroupName);
+        Group defaultGroup = getGroupByName(Config.defaultGroupName);
         if (defaultGroup != null) {
             Nebula.permissionFile.addMemberToGroup(defaultGroup, player, null);
             Nebula.util.log("No specific group found. Assigning default group: {} to player {}", defaultGroup.getName(), playerUUID);
@@ -92,7 +92,7 @@ public class PermissionManager implements PermissionProvider {
     }
 
     public void deleteGroup(String name) {
-        if (!name.equalsIgnoreCase(Data.defaultGroupName)) {
+        if (!name.equalsIgnoreCase(Config.defaultGroupName)) {
             Nebula.permissionFile.groups.removeIf(group -> group.getName().equalsIgnoreCase(name));
             try {
                 ConfigurationNode rootNode = Nebula.permissionFile.getRootNode();

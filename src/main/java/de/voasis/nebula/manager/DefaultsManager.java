@@ -1,7 +1,7 @@
-package de.voasis.nebula.helper;
+package de.voasis.nebula.manager;
 
-import de.voasis.nebula.data.Data;
-import de.voasis.nebula.map.Container;
+import de.voasis.nebula.data.Config;
+import de.voasis.nebula.model.Container;
 import de.voasis.nebula.Nebula;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ public class DefaultsManager {
         Container target = getServerWithLowestPlayerCount();
         if(target != null) {
             int count = Nebula.server.getServer(target.getServerName()).get().getPlayersConnected().size();
-            if(count + 1 == Data.defaultmin && !isOtherUnderMin(target)) {
+            if(count + 1 == Config.defaultmin && !isOtherUnderMin(target)) {
                 createDefault();
             }
         }
@@ -24,7 +24,7 @@ public class DefaultsManager {
 
     private List<Container> getAvailableServers() {
         List<Container> servers = new ArrayList<>();
-        for (Container server : Data.backendInfoMap) {
+        for (Container server : Config.backendInfoMap) {
             if (server.getFlags().contains("lobby") && server.isOnline()) {
                 servers.add(server);
             }
@@ -60,7 +60,7 @@ public class DefaultsManager {
                     .get()
                     .getPlayersConnected()
                     .size();
-            if (playerCount < Data.defaultmin && !container.equals(other)) {
+            if (playerCount < Config.defaultmin && !container.equals(other)) {
                 return true;
             }
         }
@@ -73,7 +73,7 @@ public class DefaultsManager {
                     .get()
                     .getPlayersConnected()
                     .size();
-            if (playerCount >= Data.defaultmin && playerCount < Data.defaultmax) {
+            if (playerCount >= Config.defaultmin && playerCount < Config.defaultmax) {
                 return container;
             }
         }
@@ -82,8 +82,8 @@ public class DefaultsManager {
 
     public void createDefault() {
         String name = "Lobby-" + Nebula.util.generateUniqueString();
-        Container temp = Nebula.serverManager.createFromTemplate(
-                Data.defaultServerTemplate,
+        Container temp = Nebula.containerManager.createFromTemplate(
+                Config.defaultServerTemplate,
                 name,
                 Nebula.server.getConsoleCommandSource(),
                 "lobby", "retry"

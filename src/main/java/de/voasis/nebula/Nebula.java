@@ -10,11 +10,15 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import de.voasis.nebula.commands.*;
-import de.voasis.nebula.data.Data;
-import de.voasis.nebula.helper.Util;
+import de.voasis.nebula.data.Config;
+import de.voasis.nebula.manager.Util;
 import de.voasis.nebula.event.EventManager;
-import de.voasis.nebula.helper.*;
-import de.voasis.nebula.helper.PermissionManager;
+import de.voasis.nebula.manager.*;
+import de.voasis.nebula.manager.PermissionManager;
+import de.voasis.nebula.network.ContainerStateChecker;
+import de.voasis.nebula.network.MultiProxySender;
+import de.voasis.nebula.network.MultiProxyServer;
+import de.voasis.nebula.network.SshUtil;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +31,7 @@ public class Nebula {
     public static ChannelIdentifier channelScore = MinecraftChannelIdentifier.create("nebula", "scoreboard");
     public static MiniMessage mm = MiniMessage.miniMessage();
     public static FilesManager filesManager;
-    public static ServerManager serverManager;
+    public static ContainerManager containerManager;
     public static PermissionManager permissionManager;
     public static PermissionFile permissionFile;
     public static DefaultsManager defaultsManager;
@@ -38,15 +42,17 @@ public class Nebula {
     public static SshUtil ssh;
     public static MultiProxyServer multiProxyServer;
     public static MultiProxySender multiProxySender;
+    public static ContainerStateChecker containerStateChecker;
 
     @Inject
     public Nebula(ProxyServer proxy, @DataDirectory Path dataDirectory) {
         server = proxy;
         ssh = new SshUtil();
         util = new Util();
+        containerStateChecker = new ContainerStateChecker();
         permissionFile = new PermissionFile(dataDirectory);
         permissionManager  = new PermissionManager();
-        serverManager = new ServerManager();
+        containerManager = new ContainerManager();
         filesManager = new FilesManager(dataDirectory);
         defaultsManager = new DefaultsManager();
         defaultsManager.createDefault();
@@ -57,17 +63,17 @@ public class Nebula {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
-        if(Data.multiProxyMode) {
+        if(Config.multiProxyMode) {
             multiProxySender = new MultiProxySender();
             multiProxyServer = new MultiProxyServer();
         }
         registerCommands();
-        util.log(Data.Icon);
+        util.log(Config.Icon);
         server.getChannelRegistrar().register(channelMain);
         server.getChannelRegistrar().register(channelScore);
         server.getEventManager().register(this, new EventManager());
         server.getScheduler()
-                .buildTask(this, util::pingServers)
+                .buildTask(this, containerStateChecker::pingServers)
                 .repeat(700, TimeUnit.MILLISECONDS)
                 .schedule();
         server.getScheduler()

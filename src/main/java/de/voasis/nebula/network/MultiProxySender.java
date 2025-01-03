@@ -1,8 +1,8 @@
-package de.voasis.nebula.helper;
+package de.voasis.nebula.network;
 
 import de.voasis.nebula.Nebula;
-import de.voasis.nebula.data.Data;
-import de.voasis.nebula.map.Proxy;
+import de.voasis.nebula.data.Config;
+import de.voasis.nebula.model.Proxy;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,7 +11,7 @@ import java.net.Socket;
 
 public class MultiProxySender {
     public MultiProxySender() {
-        for(Proxy p : Data.proxyMap) {
+        for(Proxy p : Config.proxyMap) {
             try {
                 p.setSocket(new Socket(p.getIP(), p.getPort()));
                 if(sendMessage(p.getSocket(), "online").equals("metoo")) {
@@ -27,7 +27,7 @@ public class MultiProxySender {
         try {
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String hash = Nebula.util.calculateHMAC(message, Data.HMACSecret);
+            String hash = Nebula.util.calculateHMAC(message, Config.HMACSecret);
             out.println(message + "|" + hash);
             return in.readLine();
         } catch (IOException e) {

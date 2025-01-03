@@ -1,10 +1,10 @@
-package de.voasis.nebula.helper;
+package de.voasis.nebula.manager;
 
-import de.voasis.nebula.data.Data;
+import de.voasis.nebula.data.Config;
 import de.voasis.nebula.data.Messages;
-import de.voasis.nebula.map.Proxy;
-import de.voasis.nebula.map.Queue;
-import de.voasis.nebula.map.Node;
+import de.voasis.nebula.model.Proxy;
+import de.voasis.nebula.model.Queue;
+import de.voasis.nebula.model.Node;
 import de.voasis.nebula.Nebula;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
@@ -32,27 +32,27 @@ public class FilesManager {
     public void load() {
         try {
             loadMessageStrings();
-            Data.multiProxyMode = multiproxy.node("enabled").getBoolean();
-            if(Data.multiProxyMode) {
+            Config.multiProxyMode = multiproxy.node("enabled").getBoolean();
+            if(Config.multiProxyMode) {
                 loadProxies();
             }
-            Data.defaultServerTemplate = config.node("lobby-template").getString();
-            Data.defaultmax = config.node("lobby-max").getInt();
-            Data.defaultmin = config.node("lobby-min").getInt();
-            Data.pullStart = config.node("pull-start").getBoolean();
+            Config.defaultServerTemplate = config.node("lobby-template").getString();
+            Config.defaultmax = config.node("lobby-max").getInt();
+            Config.defaultmin = config.node("lobby-min").getInt();
+            Config.pullStart = config.node("pull-start").getBoolean();
             String envVars = config.node("env-vars").getString();
-            Data.envVars = (envVars != null && !"none".equals(envVars))
+            Config.envVars = (envVars != null && !"none".equals(envVars))
                     ? Arrays.stream(envVars.split(","))
                     .map(s -> " -e " + s)
                     .collect(Collectors.joining())
                     : "";
             loadNodes();
             loadGamemodes(envVars);
-            Data.alltemplates.add(Data.defaultServerTemplate);
-            if(Data.pullStart) {
-                Data.nodeMap.parallelStream().forEach(holdServer ->
-                        Data.alltemplates.parallelStream().forEach(template ->
-                                Nebula.serverManager.pull(holdServer, template, Nebula.server.getConsoleCommandSource())));
+            Config.alltemplates.add(Config.defaultServerTemplate);
+            if(Config.pullStart) {
+                Config.nodeMap.parallelStream().forEach(holdServer ->
+                        Config.alltemplates.parallelStream().forEach(template ->
+                                Nebula.containerManager.pull(holdServer, template, Nebula.server.getConsoleCommandSource())));
             }
         } catch (Exception e) {
             Nebula.util.log("Error in configuration loading {}", e);
@@ -153,7 +153,7 @@ public class FilesManager {
                 Nebula.ssh.updateFreePort(node);
             }
         }
-        if (Data.nodeMap.isEmpty()) {
+        if (Config.nodeMap.isEmpty()) {
             Nebula.util.log("No availble nodes, shutting down.");
             Nebula.server.shutdown();
         }
@@ -176,17 +176,17 @@ public class FilesManager {
                         .map(s -> " -e " + s)
                         .collect(Collectors.joining())
                         : "";
-                Data.alltemplates.add(template);
-                Data.queueMap.add(new Queue(queueName.toString(), template, neededPlayers, preload, localEnvVars));
+                Config.alltemplates.add(template);
+                Config.queueMap.add(new Queue(queueName.toString(), template, neededPlayers, preload, localEnvVars));
                 Nebula.util.log("Added gamemode to pool: {}, {}, {}.", queueName, template, neededPlayers);
             }
         }
     }
 
     private void loadProxies() {
-        Data.HMACSecret = multiproxy.node("hmac-secret").getString();
-        Data.multiProxyPort = multiproxy.node("port").getInt();
-        Data.multiProxyLevel = multiproxy.node("level").getInt();
+        Config.HMACSecret = multiproxy.node("hmac-secret").getString();
+        Config.multiProxyPort = multiproxy.node("port").getInt();
+        Config.multiProxyLevel = multiproxy.node("level").getInt();
         Map<Object, ? extends ConfigurationNode> proxies = multiproxy.node("proxies").childrenMap();
         if (proxies != null) {
             for (Object proxy : proxies.keySet()) {
@@ -197,7 +197,7 @@ public class FilesManager {
                     Nebula.util.log("Incomplete configuration for proxy '{}'. Skipping this proxy.", proxy);
                     continue;
                 }
-                Data.proxyMap.add(new Proxy(proxy.toString(), ip, port, level));
+                Config.proxyMap.add(new Proxy(proxy.toString(), ip, port, level));
                 Nebula.util.log("Loaded proxy " + proxy + " with ip " + ip + " and port " + port + " from config.");
             }
         }

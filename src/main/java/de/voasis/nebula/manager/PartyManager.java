@@ -1,11 +1,11 @@
-package de.voasis.nebula.helper;
+package de.voasis.nebula.manager;
 
 import com.velocitypowered.api.proxy.Player;
 import java.util.ArrayList;
 import java.util.List;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Messages;
-import de.voasis.nebula.map.Party;
+import de.voasis.nebula.model.Party;
 
 public class PartyManager {
 

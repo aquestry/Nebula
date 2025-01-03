@@ -1,9 +1,9 @@
-package de.voasis.nebula.helper;
+package de.voasis.nebula.network;
 
 import de.voasis.nebula.Nebula;
-import de.voasis.nebula.data.Data;
-import de.voasis.nebula.map.Container;
-import de.voasis.nebula.map.Proxy;
+import de.voasis.nebula.data.Config;
+import de.voasis.nebula.model.Container;
+import de.voasis.nebula.model.Proxy;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 public class MultiProxyServer {
     public MultiProxyServer() {
         new Thread(() -> {
-            try (ServerSocket server = new ServerSocket(Data.multiProxyPort)) {
-                Nebula.util.log("MultiProxy API started on port " + Data.multiProxyPort);
+            try (ServerSocket server = new ServerSocket(Config.multiProxyPort)) {
+                Nebula.util.log("MultiProxy API started on port " + Config.multiProxyPort);
                 while (true) {
                     Socket socket = server.accept();
                     String clientIP = socket.getRemoteSocketAddress().toString();
@@ -24,20 +24,20 @@ public class MultiProxyServer {
                 Nebula.server.shutdown();
             }
         }).start();
-        if(Data.proxyMap.isEmpty()) {
+        if(Config.proxyMap.isEmpty()) {
             Nebula.util.log("No proxies found, shutting down.");
             Nebula.server.shutdown();
             return;
         }
-        Data.masterProxy = Data.proxyMap.getFirst();
-        Data.proxyMap.add(new Proxy("Main", "localhost", Data.multiProxyPort, Data.multiProxyLevel));
-        for(Proxy p : Data.proxyMap) {
+        Config.masterProxy = Config.proxyMap.getFirst();
+        Config.proxyMap.add(new Proxy("Main", "localhost", Config.multiProxyPort, Config.multiProxyLevel));
+        for(Proxy p : Config.proxyMap) {
             Nebula.util.log("Proxy {} has priority of {}.", p.getName(), p.getLevel());
-            if(p.getLevel() > Data.masterProxy.getLevel()) {
-                Data.masterProxy = p;
+            if(p.getLevel() > Config.masterProxy.getLevel()) {
+                Config.masterProxy = p;
             }
         }
-        Nebula.util.log("Master proxy: {}.", Data.masterProxy.getName());
+        Nebula.util.log("Master proxy: {}.", Config.masterProxy.getName());
     }
 
 
@@ -55,10 +55,10 @@ public class MultiProxyServer {
                 }
                 String message = parts[0];
                 String receivedHash = parts[1];
-                String calculatedHash = Nebula.util.calculateHMAC(message, Data.HMACSecret);
+                String calculatedHash = Nebula.util.calculateHMAC(message, Config.HMACSecret);
                 boolean isValid = calculatedHash.equals(receivedHash);
                 if (isValid) {
-                    for(Proxy p : Data.proxyMap) {
+                    for(Proxy p : Config.proxyMap) {
                         if(p.getIP().equals(clientIP)) {
                             p.setOnline(true);
                         }
@@ -69,7 +69,7 @@ public class MultiProxyServer {
                 }
             }
         } catch (IOException e) {
-            for(Proxy p : Data.proxyMap) {
+            for(Proxy p : Config.proxyMap) {
                 if(p.getIP().equals(clientIP)) {
                     p.setOnline(false);
                 }
@@ -83,7 +83,7 @@ public class MultiProxyServer {
                 out.println("metoo");
                 break;
             case "listservers":
-                String all = Data.backendInfoMap.stream()
+                String all = Config.backendInfoMap.stream()
                         .map(Container::getServerName)
                         .collect(Collectors.joining(","));
                 out.println(all);

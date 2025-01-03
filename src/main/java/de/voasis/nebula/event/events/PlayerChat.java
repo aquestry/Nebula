@@ -1,4 +1,4 @@
-package de.voasis.nebula.event.event;
+package de.voasis.nebula.event.events;
 
 import com.velocitypowered.api.event.player.PlayerChatEvent;
 import com.velocitypowered.api.proxy.Player;

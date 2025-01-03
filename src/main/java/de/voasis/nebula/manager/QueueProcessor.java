@@ -1,12 +1,12 @@
-package de.voasis.nebula.helper;
+package de.voasis.nebula.manager;
 
 import com.velocitypowered.api.proxy.Player;
-import de.voasis.nebula.data.Data;
+import de.voasis.nebula.data.Config;
 import de.voasis.nebula.data.Messages;
-import de.voasis.nebula.map.Container;
-import de.voasis.nebula.map.Queue;
+import de.voasis.nebula.model.Container;
+import de.voasis.nebula.model.Queue;
 import de.voasis.nebula.Nebula;
-import de.voasis.nebula.map.Party;
+import de.voasis.nebula.model.Party;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +14,7 @@ import java.util.Optional;
 public class QueueProcessor {
 
     public QueueProcessor() {
-        for (Queue queue : Data.queueMap) {
+        for (Queue queue : Config.queueMap) {
             int preloadCount = queue.getPreload();
             for (int i = 0; i < preloadCount; i++) {
                 createPreloadedServer(queue);
@@ -23,7 +23,7 @@ public class QueueProcessor {
     }
 
     public void process() {
-        for (Queue queue : Data.queueMap) {
+        for (Queue queue : Config.queueMap) {
             int neededPlayers = queue.getNeededPlayers();
             if (queue.getInQueue().size() >= neededPlayers) {
                 List<Player> playersToMove = new ArrayList<>();
@@ -57,7 +57,7 @@ public class QueueProcessor {
     }
 
     private Optional<Container> findPreloadedServer(Queue queue) {
-        return Data.backendInfoMap.stream()
+        return Config.backendInfoMap.stream()
                 .filter(server -> {
                     boolean hasGamemode = server.getFlags().contains("gamemode:" + queue.getName());
                     boolean hasPreload = server.getFlags().contains("preload");
@@ -73,7 +73,7 @@ public class QueueProcessor {
 
     private Container createNewServer(Queue queue, String... flags) {
         String serverName = queue.getName() + "-" + Nebula.util.generateUniqueString();
-        return Nebula.serverManager.createFromTemplate(
+        return Nebula.containerManager.createFromTemplate(
                 queue.getTemplate(),
                 serverName,
                 Nebula.server.getConsoleCommandSource(),
@@ -93,7 +93,7 @@ public class QueueProcessor {
             Nebula.util.sendMessage(player, Messages.ALREADY_IN_QUEUE);
             return;
         }
-        Data.queueMap.stream()
+        Config.queueMap.stream()
                 .filter(queue -> queue.getName().equalsIgnoreCase(queueName))
                 .findFirst()
                 .ifPresentOrElse(
@@ -135,7 +135,7 @@ public class QueueProcessor {
                 return;
             }
         }
-        for (Queue queue : Data.queueMap) {
+        for (Queue queue : Config.queueMap) {
             if (queue.getInQueue().remove(player)) {
                 Nebula.util.sendMessage(player, Messages.REMOVED_FROM_QUEUE.replace("<queue>", queue.getName()));
             }
@@ -143,7 +143,7 @@ public class QueueProcessor {
     }
 
     public boolean isInAnyQueue(Player player) {
-        return Data.queueMap.stream()
+        return Config.queueMap.stream()
                 .anyMatch(queue -> queue.getInQueue().contains(player));
     }
 }

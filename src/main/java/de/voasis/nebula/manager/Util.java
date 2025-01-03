@@ -1,23 +1,18 @@
-package de.voasis.nebula.helper;
+package de.voasis.nebula.manager;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import de.voasis.nebula.data.Data;
+import de.voasis.nebula.data.Config;
 import de.voasis.nebula.data.Messages;
-import de.voasis.nebula.map.Container;
-import de.voasis.nebula.map.Group;
+import de.voasis.nebula.model.Container;
+import de.voasis.nebula.model.Group;
 import de.voasis.nebula.Nebula;
-import de.voasis.nebula.map.Party;
+import de.voasis.nebula.model.Party;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.*;
 
 public class Util {
@@ -44,59 +39,6 @@ public class Util {
         return result;
     }
 
-    private void stateComplete(RegisteredServer registeredServer) {
-        for (Container container : Data.backendInfoMap) {
-            if (registeredServer.getServerInfo().getName().equals(container.getServerName())) {
-                synchronized (container) {
-                    if (!container.isOnline()) {
-                        container.setOnline(true);
-                        callPending(container);
-                        CommandSource creator = container.getCreator();
-                        sendMessage(creator, Messages.ONLINE.replace("<name>", container.getServerName()));
-                    }
-                }
-            }
-        }
-    }
-
-    public void stateCompleteFailed(RegisteredServer registeredServer) {
-        for (Container container : Data.backendInfoMap) {
-            if (registeredServer.getServerInfo().getName().equals(container.getServerName())) {
-                synchronized (container) {
-                    if (container.isOnline()) {
-                        checkLobbys(true);
-                        container.setOnline(false);
-                        CommandSource creator = container.getCreator();
-                        sendMessage(creator, Messages.OFFLINE.replace("<name>", container.getServerName()));
-                    }
-                }
-            }
-        }
-    }
-
-    public void pingServers() {
-        if(Data.quitting) return;
-        checkLobbys(false);
-        for (Container container : new ArrayList<>(Data.backendInfoMap)) {
-            Optional<RegisteredServer> registeredServer = Nebula.server.getServer(container.getServerName());
-            registeredServer.ifPresent(regServer -> regServer.ping().whenComplete((result, exception) -> {
-                if (exception == null) {
-                    try {
-                        stateComplete(regServer);
-                    } catch (Exception e) {
-                        log("Error while executing success response for server: {}", regServer.getServerInfo().getName());
-                    }
-                } else {
-                    try {
-                        stateCompleteFailed(regServer);
-                    } catch (Exception e) {
-                        log("Error while executing failure response for server: {}", regServer.getServerInfo().getName());
-                    }
-                }
-            }));
-        }
-    }
-
     public static String calculateHMAC(String data, String key) {
         try {
             Mac mac = Mac.getInstance("HmacSHA256");
@@ -111,7 +53,7 @@ public class Util {
 
     public void checkLobbys(boolean online) {
         int lobbys = 0;
-        for(Container container : Data.backendInfoMap) {
+        for(Container container : Config.backendInfoMap) {
             if(container.getFlags().contains("lobby")) {
                 if(online && container.isOnline()) {
                     lobbys++;
@@ -146,7 +88,7 @@ public class Util {
     }
 
     public Container getBackendServer(String name) {
-        for (Container server : Data.backendInfoMap) {
+        for (Container server : Config.backendInfoMap) {
             if (server.getServerName().equals(name)) {
                 return server;
             }
@@ -167,29 +109,6 @@ public class Util {
         Nebula.util.sendMessage(source, "Name:      " + group.getName());
         Nebula.util.sendMessage(source, "Prefix:    " + group.getPrefix());
         Nebula.util.sendMessage(source, "Level:     " + group.getLevel());
-    }
-
-    public static String getPlayerNameFromUUID(String uuid) {
-        try {
-            String uuidStr = uuid.replace("-", "");
-            String url = "https://sessionserver.mojang.com/session/minecraft/profile/" + uuidStr;
-            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("User-Agent", "Velocity Plugin");
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
-            if (connection.getResponseCode() == 200) {
-                JsonObject json = JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
-                return json.get("name").getAsString();
-            } else if (connection.getResponseCode() == 204 || connection.getResponseCode() == 404) {
-                Nebula.util.log("Player not found for UUID: {}", uuid);
-            } else {
-                Nebula.util.log("Failed to fetch player name. HTTP Response: {}", connection.getResponseCode());
-            }
-        } catch (Exception e) {
-            Nebula.util.log(e.getMessage());
-        }
-        return "Null";
     }
 
     public int getPlayerCount(Object backendServer) {

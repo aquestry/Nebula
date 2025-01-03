@@ -1,4 +1,4 @@
-package de.voasis.nebula.map;
+package de.voasis.nebula.model;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;

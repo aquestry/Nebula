@@ -7,7 +7,7 @@ import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
 import com.velocitypowered.api.event.player.*;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
-import de.voasis.nebula.event.event.*;
+import de.voasis.nebula.event.events.*;
 import de.voasis.nebula.Nebula;
 
 public class EventManager {

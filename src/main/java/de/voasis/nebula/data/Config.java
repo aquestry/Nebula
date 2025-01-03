@@ -1,15 +1,15 @@
 package de.voasis.nebula.data;
 
-import de.voasis.nebula.map.Container;
-import de.voasis.nebula.map.Proxy;
-import de.voasis.nebula.map.Queue;
-import de.voasis.nebula.map.Node;
+import de.voasis.nebula.model.Container;
+import de.voasis.nebula.model.Proxy;
+import de.voasis.nebula.model.Queue;
+import de.voasis.nebula.model.Node;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Data {
+public class Config {
     public static String envVars;
     public static String HMACSecret;
     public static String defaultGroupName;

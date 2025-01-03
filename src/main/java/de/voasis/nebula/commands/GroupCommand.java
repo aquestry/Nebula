@@ -5,9 +5,9 @@ import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
-import de.voasis.nebula.data.Data;
+import de.voasis.nebula.data.Config;
 import de.voasis.nebula.data.Messages;
-import de.voasis.nebula.map.Group;
+import de.voasis.nebula.model.Group;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -100,7 +100,7 @@ public class GroupCommand implements SimpleCommand {
             return;
         }
         String groupName = args[1];
-        if (groupName.equalsIgnoreCase(Data.defaultGroupName)) {
+        if (groupName.equalsIgnoreCase(Config.defaultGroupName)) {
             Nebula.util.sendMessage(source, Messages.GROUP_DELETE_DEFAULT);
             return;
         }

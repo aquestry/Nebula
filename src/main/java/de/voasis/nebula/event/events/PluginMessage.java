@@ -1,9 +1,9 @@
-package de.voasis.nebula.event.event;
+package de.voasis.nebula.event.events;
 
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.proxy.ServerConnection;
 import de.voasis.nebula.Nebula;
-import de.voasis.nebula.data.Data;
+import de.voasis.nebula.data.Config;
 import java.nio.charset.StandardCharsets;
 
 public class PluginMessage {
@@ -17,8 +17,8 @@ public class PluginMessage {
         String action = parts[0];
         String playerName = parts[1];
         long now = System.currentTimeMillis();
-        if (Data.cooldownsPluginMessage.getOrDefault(playerName, 0L) + 1000 > now) return;
-        Data.cooldownsPluginMessage.put(playerName, now);
+        if (Config.cooldownsPluginMessage.getOrDefault(playerName, 0L) + 1000 > now) return;
+        Config.cooldownsPluginMessage.put(playerName, now);
         switch (action) {
             case "lobby" ->
                     Nebula.server.getPlayer(playerName).ifPresent(player ->

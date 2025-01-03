@@ -1,7 +1,7 @@
-package de.voasis.nebula.helper;
+package de.voasis.nebula.manager;
 
-import de.voasis.nebula.data.Data;
-import de.voasis.nebula.map.Container;
+import de.voasis.nebula.data.Config;
+import de.voasis.nebula.model.Container;
 import de.voasis.nebula.Nebula;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,11 +14,11 @@ public class AutoDeleter {
     private static final long DELETION_DELAY = 2000;
 
     public void process() {
-        if(Data.quitting) return;
+        if(Config.quitting) return;
         long currentTime = System.currentTimeMillis();
         List<Container> serversToDelete = new ArrayList<>();
         boolean lobbyServerDeleted = false;
-        for (Container container : Data.backendInfoMap) {
+        for (Container container : Config.backendInfoMap) {
             if (container.getFlags().contains("custom") || container.getFlags().contains("retry")) {
                 continue;
             }
@@ -45,13 +45,13 @@ public class AutoDeleter {
             }
         }
         for (Container serverToDelete : serversToDelete) {
-            Nebula.serverManager.delete(serverToDelete, null);
+            Nebula.containerManager.delete(serverToDelete, null);
         }
     }
 
     private boolean canDeleteLobbyServer(Container serverToExclude) {
-        for (Container otherServer : Data.backendInfoMap) {
-            if (!otherServer.equals(serverToExclude) && otherServer.getFlags().contains("lobby") && otherServer.isOnline() && Nebula.util.getPlayerCount(otherServer) < Data.defaultmin) {
+        for (Container otherServer : Config.backendInfoMap) {
+            if (!otherServer.equals(serverToExclude) && otherServer.getFlags().contains("lobby") && otherServer.isOnline() && Nebula.util.getPlayerCount(otherServer) < Config.defaultmin) {
                 return true;
             }
         }

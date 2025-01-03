@@ -1,6 +1,6 @@
-package de.voasis.nebula.map;
+package de.voasis.nebula.model;
 
-import de.voasis.nebula.data.Data;
+import de.voasis.nebula.data.Config;
 import java.util.List;
 
 public class Node {
@@ -33,7 +33,7 @@ public class Node {
     public int getFreePort() { return freePort; }
 
     public List<Container> getBackendServers() {
-        return Data.backendInfoMap.stream()
+        return Config.backendInfoMap.stream()
                 .filter(backendServer -> backendServer.getHoldServer().equals(this))
                 .toList();
     }

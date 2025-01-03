@@ -3,9 +3,9 @@ package de.voasis.nebula.commands;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
-import de.voasis.nebula.data.Data;
+import de.voasis.nebula.data.Config;
 import de.voasis.nebula.data.Messages;
-import de.voasis.nebula.map.Container;
+import de.voasis.nebula.model.Container;
 import de.voasis.nebula.Nebula;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -48,7 +48,7 @@ public class NodeCommand implements SimpleCommand {
         if(container == null) {
             Nebula.util.sendMessage(source, Messages.SERVER_NOT_FOUND.replace("<name>", args[1]));
         } else {
-            Nebula.serverManager.kill(container, source);
+            Nebula.containerManager.kill(container, source);
         }
     }
 
@@ -57,7 +57,7 @@ public class NodeCommand implements SimpleCommand {
         if(container == null) {
             Nebula.util.sendMessage(source, Messages.SERVER_NOT_FOUND.replace("<name>", args[1]));
         } else {
-            Nebula.serverManager.start(container, source);
+            Nebula.containerManager.start(container, source);
         }
     }
 
@@ -66,12 +66,12 @@ public class NodeCommand implements SimpleCommand {
         if(container == null) {
             Nebula.util.sendMessage(source, Messages.SERVER_NOT_FOUND.replace("<name>", args[1]));
         } else {
-            Nebula.serverManager.delete(container, source);
+            Nebula.containerManager.delete(container, source);
         }
     }
 
     private void handleTemplateCommand(CommandSource source, String[] args) {
-        Nebula.serverManager.createFromTemplate(args[1], args[2], source, "custom");
+        Nebula.containerManager.createFromTemplate(args[1], args[2], source, "custom");
     }
 
     @Override
@@ -87,23 +87,23 @@ public class NodeCommand implements SimpleCommand {
         }
         if (args.length == 2) {
             if ("template".equalsIgnoreCase(args[0])) {
-                return CompletableFuture.completedFuture(Data.alltemplates.stream()
+                return CompletableFuture.completedFuture(Config.alltemplates.stream()
                         .filter(template -> template.toLowerCase().startsWith(args[1].toLowerCase()))
                         .toList());
             } else if("start".equalsIgnoreCase(args[0])) {
-                return CompletableFuture.completedFuture(Data.backendInfoMap.stream()
+                return CompletableFuture.completedFuture(Config.backendInfoMap.stream()
                         .filter(backendServer -> !backendServer.isOnline())
                         .map(Container::getServerName)
                         .filter(serverName -> serverName.startsWith(args[1]))
                         .toList());
             } else if("kill".equalsIgnoreCase(args[0])) {
-                return CompletableFuture.completedFuture(Data.backendInfoMap.stream()
+                return CompletableFuture.completedFuture(Config.backendInfoMap.stream()
                         .filter(Container::isOnline)
                         .map(Container::getServerName)
                         .filter(serverName -> serverName.startsWith(args[1]))
                         .toList());
             } else {
-                return CompletableFuture.completedFuture(Data.backendInfoMap.stream()
+                return CompletableFuture.completedFuture(Config.backendInfoMap.stream()
                         .map(Container::getServerName)
                         .filter(serverName -> serverName.startsWith(args[1]))
                         .toList());

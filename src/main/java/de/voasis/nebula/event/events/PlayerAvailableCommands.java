@@ -1,4 +1,4 @@
-package de.voasis.nebula.event.event;
+package de.voasis.nebula.event.events;
 
 import com.mojang.brigadier.tree.RootCommandNode;
 import com.velocitypowered.api.event.command.PlayerAvailableCommandsEvent;

@@ -2,9 +2,9 @@ package de.voasis.nebula.commands;
 
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
-import de.voasis.nebula.data.Data;
+import de.voasis.nebula.data.Config;
 import de.voasis.nebula.data.Messages;
-import de.voasis.nebula.map.Queue;
+import de.voasis.nebula.model.Queue;
 import de.voasis.nebula.Nebula;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,7 +45,7 @@ public class QueueCommand implements SimpleCommand {
                     .collect(Collectors.toList());
         }
         if (args.length == 2 && "join".equalsIgnoreCase(args[0])) {
-            return Data.queueMap.stream()
+            return Config.queueMap.stream()
                     .map(Queue::getName)
                     .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
                     .collect(Collectors.toList());
