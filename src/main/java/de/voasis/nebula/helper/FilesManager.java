@@ -167,6 +167,10 @@ public class FilesManager {
                 int neededPlayers = config.node("gamemodes", queueName, "neededPlayers").getInt();
                 int preload = config.node("gamemodes", queueName, "preload").getInt();
                 String localEnvVars = config.node("gamemodes", queueName, "env-vars").getString();
+                if (template == null || neededPlayers == 0 || localEnvVars == null) {
+                    Nebula.util.log("Incomplete configuration for gamemode '{}'. Skipping this gamemode.", queueName);
+                    continue;
+                }
                 localEnvVars = (localEnvVars != null && !"none".equals(envVars))
                         ? Arrays.stream(envVars.split(","))
                         .map(s -> " -e " + s)
@@ -182,12 +186,18 @@ public class FilesManager {
     private void loadProxies() {
         Data.HMACSecret = multiproxy.node("hmac-secret").getString();
         Data.multiProxyPort = multiproxy.node("port").getInt();
+        Data.multiProxyLevel = multiproxy.node("level").getInt();
         Map<Object, ? extends ConfigurationNode> proxies = multiproxy.node("proxies").childrenMap();
         if (proxies != null) {
             for (Object proxy : proxies.keySet()) {
                 String ip = multiproxy.node("proxies", proxy, "ip").getString();
                 int port = multiproxy.node("proxies", proxy, "port").getInt();
-                Data.proxyMap.add(new Proxy(proxy.toString(), ip, port));
+                int level = multiproxy.node("proxies", proxy, "level").getInt();
+                if (port == 0 || ip == null || level == 0) {
+                    Nebula.util.log("Incomplete configuration for proxy '{}'. Skipping this proxy.", proxy);
+                    continue;
+                }
+                Data.proxyMap.add(new Proxy(proxy.toString(), ip, port, level));
                 Nebula.util.log("Loaded proxy " + proxy + " with ip " + ip + " and port " + port + " from config.");
             }
         }

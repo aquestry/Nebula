@@ -11,7 +11,7 @@ import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import de.voasis.nebula.commands.*;
 import de.voasis.nebula.data.Data;
-import de.voasis.nebula.data.Util;
+import de.voasis.nebula.helper.Util;
 import de.voasis.nebula.event.EventManager;
 import de.voasis.nebula.helper.*;
 import de.voasis.nebula.helper.PermissionManager;
@@ -35,14 +35,14 @@ public class Nebula {
     public static AutoDeleter autoDeleter;
     public static PartyManager partyManager;
     public static Util util;
-    public static SSH ssh;
+    public static SshUtil ssh;
     public static MultiProxyServer multiProxyServer;
     public static MultiProxySender multiProxySender;
 
     @Inject
     public Nebula(ProxyServer proxy, @DataDirectory Path dataDirectory) {
         server = proxy;
-        ssh = new SSH();
+        ssh = new SshUtil();
         util = new Util();
         permissionFile = new PermissionFile(dataDirectory);
         permissionManager  = new PermissionManager();

@@ -23,6 +23,7 @@ public class MultiProxyServer {
                 }
             } catch (IOException e) {
                 Nebula.util.log("Error starting MultiProxy API: " + e.getMessage());
+                Nebula.server.shutdown();
             }
         }).start();
         if(Data.proxyMap.isEmpty()) {
@@ -32,10 +33,10 @@ public class MultiProxyServer {
         }
         Data.masterProxy = Data.proxyMap.getFirst();
         String externalIP = getExternalIPv4();
-        Data.proxyMap.add(new Proxy("THIS", externalIP, Data.multiProxyPort));
+        Data.proxyMap.add(new Proxy("Main", externalIP, Data.multiProxyPort, Data.multiProxyLevel));
         for(Proxy p : Data.proxyMap) {
-            Nebula.util.log("Proxy {} has priority of {}.", p.getName(), p.getPriority());
-            if(p.getPriority() > Data.masterProxy.getPriority()) {
+            Nebula.util.log("Proxy {} has priority of {}.", p.getName(), p.getLevel());
+            if(p.getLevel() > Data.masterProxy.getLevel()) {
                 Data.masterProxy = p;
             }
         }
@@ -73,33 +74,43 @@ public class MultiProxyServer {
                 String calculatedHash = Nebula.util.calculateHMAC(message, Data.HMACSecret);
                 boolean isValid = calculatedHash.equals(receivedHash);
                 if (isValid) {
-                    for(Proxy p : Data.proxyMap) {
-                        if(p.getIP().equals(clientIP) && !p.isOnline()) {
-                            p.setOnline(true);
-                        }
-                    }
-                    switch (message) {
-                        case "online":
-                            out.println("metoo");
-                            break;
-                        case "listservers":
-                            String all = Data.backendInfoMap.stream()
-                                    .map(Container::getServerName)
-                                    .collect(Collectors.joining(","));
-                            out.println(all);
-                            Nebula.util.log("[MP-API] Request for listing the servers, returning {}.", all);
-                            break;
-                    }
+                    getProxy(clientIP).setOnline(true);
+                    processMessage(message, out);
                 } else {
                     out.println("failed");
                 }
             }
         } catch (IOException e) {
-            for(Proxy p : Data.proxyMap) {
-                if(p.getIP().equals(clientIP)) {
-                    p.setOnline(false);
-                }
+            getProxy(clientIP).setOnline(false);
+        }
+    }
+
+    private static void processMessage(String message, PrintWriter out) {
+        switch (message) {
+            case "online":
+                out.println("metoo");
+                break;
+            case "listservers":
+                String all = Data.backendInfoMap.stream()
+                        .map(Container::getServerName)
+                        .collect(Collectors.joining(","));
+                out.println(all);
+                Nebula.util.log("[MP-API] Request for listing the servers, returning {}.", all);
+                break;
+            case "playercount":
+                int count = Nebula.server.getPlayerCount();
+                out.println(count);
+                Nebula.util.log("[MP-API] Request for getting the player count, returning {}.", count);
+                break;
+        }
+    }
+
+    private static Proxy getProxy(String ip) {
+        for(Proxy p : Data.proxyMap) {
+            if(p.getIP().equals(ip) && !p.isOnline()) {
+                return p;
             }
         }
+        return null;
     }
 }

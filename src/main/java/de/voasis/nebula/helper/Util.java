@@ -1,10 +1,10 @@
-package de.voasis.nebula.data;
+package de.voasis.nebula.helper;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import de.voasis.nebula.data.Data;
+import de.voasis.nebula.data.Messages;
 import de.voasis.nebula.map.Container;
 import de.voasis.nebula.map.Group;
 import de.voasis.nebula.Nebula;
@@ -13,9 +13,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.*;
 
 public class Util {
@@ -95,15 +92,6 @@ public class Util {
         }
     }
 
-    public long getPriority(String ip) {
-        try {
-            return Long.parseLong(ip.replace(".", ""));
-        } catch (NumberFormatException e) {
-            System.err.println("Invalid IP format: " + ip);
-            return 0;
-        }
-    }
-
     public static String calculateHMAC(String data, String key) {
         try {
             Mac mac = Mac.getInstance("HmacSHA256");
@@ -174,29 +162,6 @@ public class Util {
         Nebula.util.sendMessage(source, "Name:      " + group.getName());
         Nebula.util.sendMessage(source, "Prefix:    " + group.getPrefix());
         Nebula.util.sendMessage(source, "Level:     " + group.getLevel());
-    }
-
-    public static String getPlayerNameFromUUID(String uuid) {
-        try {
-            String uuidStr = uuid.replace("-", "");
-            String url = "https://sessionserver.mojang.com/session/minecraft/profile/" + uuidStr;
-            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("User-Agent", "Velocity Plugin");
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
-            if (connection.getResponseCode() == 200) {
-                JsonObject json = JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
-                return json.get("name").getAsString();
-            } else if (connection.getResponseCode() == 204 || connection.getResponseCode() == 404) {
-                Nebula.util.log("Player not found for UUID: {}", uuid);
-            } else {
-                Nebula.util.log("Failed to fetch player name. HTTP Response: {}", connection.getResponseCode());
-            }
-        } catch (Exception e) {
-            Nebula.util.log(e.getMessage());
-        }
-        return "Null";
     }
 
     public int getPlayerCount(Object backendServer) {

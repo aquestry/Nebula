@@ -20,6 +20,7 @@ public class Data {
     public static int multiProxyPort;
     public static int defaultmax;
     public static int defaultmin;
+    public static int multiProxyLevel;
     public static Proxy masterProxy;
     public static List<Node> nodeMap = new ArrayList<>();
     public static List<Proxy> proxyMap = new ArrayList<>();

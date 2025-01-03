@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-public class SSH {
+public class SshUtil {
 
     private final Map<Node, Session> sessionPool = new HashMap<>();
 
