@@ -1,4 +1,4 @@
-package de.voasis.nebula.manager;
+package de.voasis.nebula.container;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;

@@ -1,4 +1,4 @@
-package de.voasis.nebula.manager;
+package de.voasis.nebula.container;
 
 import de.voasis.nebula.data.Config;
 import de.voasis.nebula.model.Container;
