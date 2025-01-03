@@ -5,10 +5,8 @@ import de.voasis.nebula.data.Data;
 import de.voasis.nebula.map.Container;
 import de.voasis.nebula.map.Proxy;
 import java.io.*;
-import java.net.HttpURLConnection;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URL;
 import java.util.stream.Collectors;
 
 public class MultiProxyServer {
@@ -32,8 +30,7 @@ public class MultiProxyServer {
             return;
         }
         Data.masterProxy = Data.proxyMap.getFirst();
-        String externalIP = getExternalIPv4();
-        Data.proxyMap.add(new Proxy("Main", externalIP, Data.multiProxyPort, Data.multiProxyLevel));
+        Data.proxyMap.add(new Proxy("Main", "localhost", Data.multiProxyPort, Data.multiProxyLevel));
         for(Proxy p : Data.proxyMap) {
             Nebula.util.log("Proxy {} has priority of {}.", p.getName(), p.getLevel());
             if(p.getLevel() > Data.masterProxy.getLevel()) {
@@ -43,19 +40,6 @@ public class MultiProxyServer {
         Nebula.util.log("Master proxy: {}.", Data.masterProxy.getName());
     }
 
-    public static String getExternalIPv4() {
-        try {
-            URL url = new URL("https://api.ipify.org");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                return in.readLine();
-            }
-        } catch (Exception e) {
-            System.err.println("Error fetching external IP: " + e.getMessage());
-            return null;
-        }
-    }
 
     private static void handleClient(Socket socket, String clientIP) {
         clientIP = clientIP.split(":")[0].replace("/", "");
@@ -74,14 +58,22 @@ public class MultiProxyServer {
                 String calculatedHash = Nebula.util.calculateHMAC(message, Data.HMACSecret);
                 boolean isValid = calculatedHash.equals(receivedHash);
                 if (isValid) {
-                    getProxy(clientIP).setOnline(true);
+                    for(Proxy p : Data.proxyMap) {
+                        if(p.getIP().equals(clientIP)) {
+                            p.setOnline(true);
+                        }
+                    }
                     processMessage(message, out);
                 } else {
                     out.println("failed");
                 }
             }
         } catch (IOException e) {
-            getProxy(clientIP).setOnline(false);
+            for(Proxy p : Data.proxyMap) {
+                if(p.getIP().equals(clientIP)) {
+                    p.setOnline(false);
+                }
+            }
         }
     }
 
@@ -103,14 +95,5 @@ public class MultiProxyServer {
                 Nebula.util.log("[MP-API] Request for getting the player count, returning {}.", count);
                 break;
         }
-    }
-
-    private static Proxy getProxy(String ip) {
-        for(Proxy p : Data.proxyMap) {
-            if(p.getIP().equals(ip) && !p.isOnline()) {
-                return p;
-            }
-        }
-        return null;
     }
 }
