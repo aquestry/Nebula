@@ -7,6 +7,7 @@ import de.voasis.nebula.model.Proxy;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class MultiProxyServer {
@@ -29,15 +30,8 @@ public class MultiProxyServer {
             Nebula.server.shutdown();
             return;
         }
-        Config.masterProxy = Config.proxyMap.getFirst();
-        Config.proxyMap.add(new Proxy("Main", "localhost", Config.multiProxyPort, Config.multiProxyLevel));
-        for(Proxy p : Config.proxyMap) {
-            Nebula.util.log("Proxy {} has priority of {}.", p.getName(), p.getLevel());
-            if(p.getLevel() > Config.masterProxy.getLevel()) {
-                Config.masterProxy = p;
-            }
-        }
-        Nebula.util.log("Master proxy: {}.", Config.masterProxy.getName());
+        Config.proxyMap.add(new Proxy("Main", "localhost", Config.multiProxyPort, Config.multiProxyLevel, true));
+        recheckMaster();
     }
 
 
@@ -59,7 +53,7 @@ public class MultiProxyServer {
                 boolean isValid = calculatedHash.equals(receivedHash);
                 if (isValid) {
                     for(Proxy p : Config.proxyMap) {
-                        if(p.getIP().equals(clientIP)) {
+                        if(p.getIP().equals(clientIP) && !p.isOnline()) {
                             p.setOnline(true);
                         }
                     }
@@ -94,6 +88,27 @@ public class MultiProxyServer {
                 out.println(count);
                 Nebula.util.log("[MP-API] Request for getting the player count, returning {}.", count);
                 break;
+        }
+    }
+
+    public void recheckMaster() {
+        List<Proxy> proxyList = Config.proxyMap.stream().filter(Proxy::isOnline).toList();
+        boolean log = false;
+        if(Config.masterProxy == null) {
+            Config.masterProxy = proxyList.getFirst();
+            log = true;
+        }
+        Proxy original = Config.masterProxy;
+        for(Proxy p : proxyList) {
+            if(p.getLevel() > Config.masterProxy.getLevel()) {
+                Config.masterProxy = p;
+            }
+        }
+        if(Config.masterProxy != original) {
+            log = true;
+        }
+        if(log){
+            Nebula.util.log("The new master proxy is: {}.", Config.masterProxy.getName());
         }
     }
 }

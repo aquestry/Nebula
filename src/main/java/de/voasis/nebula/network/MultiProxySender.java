@@ -17,9 +17,7 @@ public class MultiProxySender {
                 if(sendMessage(p.getSocket(), "online").equals("metoo")) {
                     p.setOnline(true);
                 }
-            } catch (Exception e) {
-                Nebula.util.log("Proxy: " + p.getName() + " is offline");
-            }
+            } catch (Exception ignored) {}
         }
     }
 
