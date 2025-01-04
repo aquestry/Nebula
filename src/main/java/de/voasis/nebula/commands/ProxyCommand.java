@@ -3,8 +3,11 @@ package de.voasis.nebula.commands;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
+import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Config;
+
+import java.net.InetSocketAddress;
 
 public class ProxyCommand implements SimpleCommand {
     @Override
@@ -19,6 +22,9 @@ public class ProxyCommand implements SimpleCommand {
         }
         if(args[0].equalsIgnoreCase("servers")) {
             Nebula.util.sendMessage(source, "Servers: " + Nebula.multiProxySender.getServers(Config.proxyMap.getFirst()));
+        }
+        if(args[0].equalsIgnoreCase("tp") && source instanceof Player player) {
+            player.transferToHost(new InetSocketAddress(Config.proxyMap.getFirst().getIP(), 25565));
         }
     }
     @Override

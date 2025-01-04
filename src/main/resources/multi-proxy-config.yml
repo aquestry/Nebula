@@ -13,4 +13,3 @@ proxies:
   example:
     ip: 0.0.0.0 # IP of the other proxy
     port: 5000  # Port from the other api
-    level: 1 # Define the level of this proxy will be used to determine the master proxy

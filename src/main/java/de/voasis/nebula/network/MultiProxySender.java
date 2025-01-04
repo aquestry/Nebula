@@ -12,17 +12,17 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class MultiProxySender {
-
-    public MultiProxySender() {
-        pingProxys();
-        Nebula.multiProxyServer.refreshMaster();
-    }
-
     public void pingProxys() {
         for(Proxy p : Config.proxyMap) {
-            sendMessage(p, "PING", response -> {
-                if(!p.isOnline() && !response.equals("FAILED")) {
-                    p.setOnline(true);
+            sendMessage(p, "GET&LEVEL", response -> {
+                if(!response.equals("INVALID")) {
+                    int level = Integer.parseInt(response);
+                    if(!p.isOnline()) {
+                        p.setOnline(true);
+                    }
+                    if(p.getLevel() != level) {
+                        p.setLevel(level);
+                    }
                     Nebula.multiProxyServer.refreshMaster();
                 }
             }, () -> {

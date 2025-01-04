@@ -49,9 +49,6 @@ public class MultiProxyServer {
                 if (isValid) {
                     String[] components = message.split("&");
                     switch (components[0]) {
-                        case "PING":
-                            out.println("SUCCESS");
-                            break;
                         case "GET":
                             out.println(handleGET(components));
                             break;
@@ -84,6 +81,8 @@ public class MultiProxyServer {
                         nodes.append(node.getServerName());
                     });
                     return nodes.toString();
+                case "LEVEL":
+                    return String.valueOf(Config.THIS_PROXY.getLevel());
             }
         }
         return "INVALID";
@@ -93,6 +92,7 @@ public class MultiProxyServer {
         if(Config.masterProxy == null || !Config.masterProxy.isOnline()) {
             Config.masterProxy = Config.THIS_PROXY;
         }
+        Proxy originalProxy = Config.masterProxy;
         for(Proxy p : Config.proxyMap.stream().filter(Proxy::isOnline).toList()) {
             if(p.getLevel() > Config.masterProxy.getLevel()) {
                 Config.masterProxy = p;

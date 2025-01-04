@@ -186,19 +186,20 @@ public class FilesManager {
     private void loadProxies() {
         Config.HMACSecret = multiproxy.node("hmac-secret").getString();
         Config.multiProxyPort = multiproxy.node("port").getInt();
-        Config.THIS_PROXY = new Proxy("THIS", "", Config.multiProxyPort, multiproxy.node("level").getInt(), true);
+        Config.THIS_PROXY = new Proxy("THIS", "", Config.multiProxyPort, true);
+        Config.THIS_PROXY.setLevel(multiproxy.node("level").getInt());
+        Config.masterProxy = Config.THIS_PROXY;
         Map<Object, ? extends ConfigurationNode> proxies = multiproxy.node("proxies").childrenMap();
         if (proxies != null) {
             for (Object proxy : proxies.keySet()) {
                 String ip = multiproxy.node("proxies", proxy, "ip").getString();
                 int port = multiproxy.node("proxies", proxy, "port").getInt();
-                int level = multiproxy.node("proxies", proxy, "level").getInt();
-                if (port == 0 || ip == null || level == 0) {
-                    Nebula.util.log("Incomplete configuration for proxy '{}'. Skipping this proxy.", proxy);
+                if (port == 0 || ip == null || proxy.toString().equals("THIS")) {
+                    Nebula.util.log("Invalid configuration for proxy '{}'. Skipping this proxy.", proxy);
                     continue;
                 }
-                Config.proxyMap.add(new Proxy(proxy.toString(), ip, port, level, false));
-                Nebula.util.log("Loaded proxy " + proxy + " with ip " + ip + " and port " + port + " from config.");
+                Config.proxyMap.add(new Proxy(proxy.toString(), ip, port, false));
+                Nebula.util.log("Loaded proxy {}.", proxy.toString());
             }
         }
     }
