@@ -57,6 +57,7 @@ public class FilesManager {
         } catch (Exception e) {
             Nebula.util.log("Error in configuration loading {}", e);
             Nebula.server.shutdown();
+            System.exit(0);
         }
     }
 
@@ -132,6 +133,7 @@ public class FilesManager {
         } catch (Exception e) {
             Nebula.util.log("Error loading message strings", e);
             Nebula.server.shutdown();
+            System.exit(0);
         }
     }
 
@@ -156,6 +158,7 @@ public class FilesManager {
         if (Config.nodeMap.isEmpty()) {
             Nebula.util.log("No availble nodes, shutting down.");
             Nebula.server.shutdown();
+            System.exit(0);
         }
     }
 
@@ -227,6 +230,7 @@ public class FilesManager {
         } catch (IOException e) {
             Nebula.util.log("Error loading configuration files.", e);
             Nebula.server.shutdown();
+            System.exit(0);
         }
     }
 

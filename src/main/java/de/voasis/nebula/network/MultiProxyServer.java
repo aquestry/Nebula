@@ -25,6 +25,7 @@ public class MultiProxyServer {
         if(Config.proxyMap.isEmpty()) {
             Nebula.util.log("No proxies found, shutting down.");
             Nebula.server.shutdown();
+            System.exit(0);
         }
     }
 

@@ -17,6 +17,11 @@ public class MultiProxySender {
             sendMessage(p, "GET&LEVEL", response -> {
                 if(!response.equals("INVALID")) {
                     int level = Integer.parseInt(response);
+                    if(level == Config.THIS_PROXY.getLevel()) {
+                        Nebula.util.log("{} has the same level, shutting down!");
+                        Nebula.server.shutdown();
+                        System.exit(0);
+                    }
                     if(!p.isOnline()) {
                         p.setOnline(true);
                     }
