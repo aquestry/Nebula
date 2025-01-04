@@ -39,10 +39,10 @@ public class Util {
         return result;
     }
 
-    public static String calculateHMAC(String data, String key) {
+    public String calculateHMAC(String data) {
         try {
             Mac mac = Mac.getInstance("HmacSHA256");
-            SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "HmacSHA256");
+            SecretKeySpec secretKey = new SecretKeySpec(Config.HMACSecret.getBytes(), "HmacSHA256");
             mac.init(secretKey);
             byte[] hmacBytes = mac.doFinal(data.getBytes());
             return Base64.getEncoder().encodeToString(hmacBytes);

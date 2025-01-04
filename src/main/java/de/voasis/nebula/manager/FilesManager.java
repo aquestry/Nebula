@@ -186,7 +186,7 @@ public class FilesManager {
     private void loadProxies() {
         Config.HMACSecret = multiproxy.node("hmac-secret").getString();
         Config.multiProxyPort = multiproxy.node("port").getInt();
-        Config.multiProxyLevel = multiproxy.node("level").getInt();
+        Config.THIS_PROXY = new Proxy("THIS", "", Config.multiProxyPort, multiproxy.node("level").getInt(), true);
         Map<Object, ? extends ConfigurationNode> proxies = multiproxy.node("proxies").childrenMap();
         if (proxies != null) {
             for (Object proxy : proxies.keySet()) {

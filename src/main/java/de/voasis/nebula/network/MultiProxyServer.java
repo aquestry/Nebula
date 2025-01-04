@@ -6,7 +6,6 @@ import de.voasis.nebula.model.Proxy;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.List;
 
 public class MultiProxyServer {
     public MultiProxyServer() {
@@ -18,7 +17,7 @@ public class MultiProxyServer {
                     String clientIP = socket.getRemoteSocketAddress().toString();
                     new Thread(() -> handleClient(socket, clientIP)).start();
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Nebula.util.log("Error starting MultiProxy API: " + e.getMessage());
                 Nebula.server.shutdown();
             }
@@ -26,15 +25,14 @@ public class MultiProxyServer {
         if(Config.proxyMap.isEmpty()) {
             Nebula.util.log("No proxies found, shutting down.");
             Nebula.server.shutdown();
-            return;
         }
-        Config.proxyMap.add(new Proxy("thisone", "", 0, Config.multiProxyLevel, true));
-        recheckMaster();
-        Nebula.util.log("Start complete, Master proxy: {}.", Config.masterProxy.getName());
     }
 
     private void handleClient(Socket socket, String clientIP) {
-        clientIP = clientIP.split(":")[0].replace("/", "");
+        if(!Config.proxyMap.stream().anyMatch(proxy -> proxy.getIP().equals(clientIP.split(":")[0].replace("/", "")))) {
+            Nebula.util.log("Got message from unknown IP: {}.", clientIP);
+            return;
+        }
         try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
             String messageLine;
@@ -46,50 +44,27 @@ public class MultiProxyServer {
                 }
                 String message = parts[0];
                 String receivedHash = parts[1];
-                String calculatedHash = Nebula.util.calculateHMAC(message, Config.HMACSecret);
+                String calculatedHash = Nebula.util.calculateHMAC(message);
                 boolean isValid = calculatedHash.equals(receivedHash);
                 if (isValid) {
-                    Proxy sender = null;
-                    for(Proxy p : Config.proxyMap) {
-                        if(p.getIP().equals(clientIP)) {
-                            sender = p;
-                        }
-                    }
-                    if(sender == null) return;
-                    if(!sender.isOnline()) {
-                        sender.setOnline(true);
-                        recheckMaster();
-                    }
-                    if(message.equals("ALIVE")) {
-                            out.println("OK");
-                            Nebula.util.log("Got alive message from {}.", sender.getName());
-                    }
+                    out.println("SUCCESS");
+                    // Give better response
                 } else {
                     out.println("FAILED");
                 }
             }
-        } catch (IOException e) {
-            for(Proxy p : Config.proxyMap) {
-                if(p.getIP().equals(clientIP)) {
-                    p.setOnline(false);
-                }
-            }
-        }
+        } catch (IOException ignored) {}
     }
 
-    public void recheckMaster() {
-        List<Proxy> proxyList = Config.proxyMap.stream().filter(Proxy::isOnline).toList();
-        if(Config.masterProxy == null) {
-            Config.masterProxy = proxyList.getFirst();
+    public void refreshMaster() {
+        if(Config.masterProxy == null || !Config.masterProxy.isOnline()) {
+            Config.masterProxy = Config.THIS_PROXY;
         }
-        Proxy original = Config.masterProxy;
-        for(Proxy p : proxyList) {
+        for(Proxy p : Config.proxyMap.stream().filter(Proxy::isOnline).toList()) {
             if(p.getLevel() > Config.masterProxy.getLevel()) {
                 Config.masterProxy = p;
             }
         }
-        if(!original.equals(Config.masterProxy)) {
-            Nebula.util.log("The new master proxy is: {}.", Config.masterProxy.getName());
-        }
+        Nebula.util.log("Master proxy: {}.", Config.masterProxy.getName());
     }
 }

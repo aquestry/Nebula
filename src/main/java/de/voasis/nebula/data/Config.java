@@ -20,8 +20,8 @@ public class Config {
     public static int multiProxyPort;
     public static int defaultmax;
     public static int defaultmin;
-    public static int multiProxyLevel;
     public static Proxy masterProxy;
+    public static Proxy THIS_PROXY;
     public static List<Node> nodeMap = new ArrayList<>();
     public static List<Proxy> proxyMap = new ArrayList<>();
     public static List<Container> backendInfoMap = new ArrayList<>();
