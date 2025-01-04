@@ -1,6 +1,7 @@
 package de.voasis.nebula.network;
 
 import com.jcraft.jsch.*;
+import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Config;
 import de.voasis.nebula.model.Node;
 import java.io.ByteArrayOutputStream;
@@ -15,7 +16,7 @@ public class SshUtil {
     public void init(Node node) {
         try {
             if (sessionPool.containsKey(node) && sessionPool.get(node).isConnected()) {
-                System.out.println("Session already initialized and connected for server: " + node.getIp());
+                Nebula.util.log("Session already initialized and connected for node: {}.", node.getServerName());
                 return;
             }
             JSch jsch = new JSch();
@@ -32,10 +33,10 @@ public class SshUtil {
             session.connect(10000);
             sessionPool.put(node, session);
             Config.nodeMap.add(node);
-            System.out.println("Session initialized successfully for server: " + node.getIp());
+            Nebula.util.log("Session initialized successfully for node: {}.", node.getServerName());
             updateFreePort(node);
         } catch (JSchException e) {
-            System.err.println("Failed to initialize SSH session for server " + node.getIp() + ": " + e.getMessage());
+            Nebula.util.log("Failed to initialize SSH session for node {}.", node.getServerName());
         }
     }
 
@@ -44,7 +45,7 @@ public class SshUtil {
         try {
             Session session = sessionPool.get(node);
             if (session == null || !session.isConnected()) {
-                System.err.println("Session not initialized or disconnected. Call init() first for server: " + node.getIp());
+                Nebula.util.log("Session not initialized or disconnected. Call init() first for node: {}.", node.getServerName());
                 return;
             }
             channel = (ChannelExec) session.openChannel("exec");
@@ -59,10 +60,10 @@ public class SshUtil {
             if (!output.isEmpty()) {
                 node.setFreePort(Integer.parseInt(output));
             } else {
-                System.err.println("No valid port response from server: " + node.getIp());
+                Nebula.util.log("No valid port response from server: {}.", node.getServerName());
             }
         } catch (Exception e) {
-            System.err.println("Error updating free port for server " + node.getIp() + ": " + e.getMessage());
+            Nebula.util.log("Error updating free port for server {}." + node.getServerName());
         } finally {
             if (channel != null) channel.disconnect();
         }
@@ -73,7 +74,7 @@ public class SshUtil {
         try {
             Session session = sessionPool.get(node);
             if (session == null || !session.isConnected()) {
-                System.err.println("Session not initialized or disconnected. Call init() first for server: " + node.getIp());
+                Nebula.util.log("Session not initialized or disconnected. Call init() first for node: {}." + node.getServerName());
                 return;
             }
             channel = (ChannelExec) session.openChannel("exec");
@@ -88,11 +89,11 @@ public class SshUtil {
             if (!output.isEmpty()) {
                 onSuccess.run();
             } else {
-                System.err.println("No output from command on server: " + node.getIp());
+                Nebula.util.log("No output from command on server: {}.", node.getServerName());
                 onError.run();
             }
         } catch (Exception e) {
-            System.err.println("Error executing SSH command on server " + node.getIp() + ": " + e.getMessage());
+            Nebula.util.log("Error executing SSH command on server {}.", node.getServerName());
             onError.run();
         } finally {
             if (channel != null) channel.disconnect();

@@ -69,10 +69,7 @@ public class Nebula {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
-        if(Config.multiProxyMode) {
-            multiProxySender = new MultiProxySender();
-            multiProxyServer = new MultiProxyServer();
-        }
+
         registerCommands();
         util.log(Config.Icon);
         server.getChannelRegistrar().register(channelMain);
@@ -94,6 +91,11 @@ public class Nebula {
                 .buildTask(this, partyManager::refresh)
                 .repeat(1500, TimeUnit.MILLISECONDS)
                 .schedule();
+
+        if(Config.multiProxyMode) {
+            multiProxyServer = new MultiProxyServer();
+            multiProxySender = new MultiProxySender();
+        }
     }
 
     private void registerCommands() {

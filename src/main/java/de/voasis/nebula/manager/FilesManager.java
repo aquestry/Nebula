@@ -32,10 +32,6 @@ public class FilesManager {
     public void load() {
         try {
             loadMessageStrings();
-            Config.multiProxyMode = multiproxy.node("enabled").getBoolean();
-            if(Config.multiProxyMode) {
-                loadProxies();
-            }
             Config.defaultServerTemplate = config.node("lobby-template").getString();
             Config.defaultmax = config.node("lobby-max").getInt();
             Config.defaultmin = config.node("lobby-min").getInt();
@@ -53,6 +49,10 @@ public class FilesManager {
                 Config.nodeMap.parallelStream().forEach(holdServer ->
                         Config.alltemplates.parallelStream().forEach(template ->
                                 Nebula.containerManager.pull(holdServer, template, Nebula.server.getConsoleCommandSource())));
+            }
+            Config.multiProxyMode = multiproxy.node("enabled").getBoolean();
+            if(Config.multiProxyMode) {
+                loadProxies();
             }
         } catch (Exception e) {
             Nebula.util.log("Error in configuration loading {}", e);

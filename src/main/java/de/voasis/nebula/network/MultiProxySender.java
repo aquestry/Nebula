@@ -14,10 +14,12 @@ public class MultiProxySender {
         for(Proxy p : Config.proxyMap) {
             try {
                 p.setSocket(new Socket(p.getIP(), p.getPort()));
-                if(sendMessage(p.getSocket(), "online").equals("metoo")) {
+                if(sendMessage(p.getSocket(), "ALIVE").equals("OK")) {
                     p.setOnline(true);
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                Nebula.util.log("Proxy {} is offline at initial check.");
+            }
         }
     }
 
@@ -30,7 +32,7 @@ public class MultiProxySender {
             return in.readLine();
         } catch (IOException e) {
             System.out.println("Error sending message: " + e.getMessage());
-            return null;
+            return "FAILED";
         }
     }
 }

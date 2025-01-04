@@ -2,13 +2,11 @@ package de.voasis.nebula.network;
 
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Config;
-import de.voasis.nebula.model.Container;
 import de.voasis.nebula.model.Proxy;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MultiProxyServer {
     public MultiProxyServer() {
@@ -30,12 +28,12 @@ public class MultiProxyServer {
             Nebula.server.shutdown();
             return;
         }
-        Config.proxyMap.add(new Proxy("Main", "localhost", Config.multiProxyPort, Config.multiProxyLevel, true));
+        Config.proxyMap.add(new Proxy("thisone", "", 0, Config.multiProxyLevel, true));
         recheckMaster();
+        Nebula.util.log("Start complete, Master proxy: {}.", Config.masterProxy.getName());
     }
 
-
-    private static void handleClient(Socket socket, String clientIP) {
+    private void handleClient(Socket socket, String clientIP) {
         clientIP = clientIP.split(":")[0].replace("/", "");
         try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
@@ -43,8 +41,7 @@ public class MultiProxyServer {
             while ((messageLine = in.readLine()) != null) {
                 String[] parts = messageLine.split("\\|");
                 if (parts.length != 2) {
-                    out.println("Invalid message format!");
-                    Nebula.util.log("Valid = false (Invalid format) | IP: " + clientIP);
+                    out.println("FAILED");
                     continue;
                 }
                 String message = parts[0];
@@ -52,14 +49,23 @@ public class MultiProxyServer {
                 String calculatedHash = Nebula.util.calculateHMAC(message, Config.HMACSecret);
                 boolean isValid = calculatedHash.equals(receivedHash);
                 if (isValid) {
+                    Proxy sender = null;
                     for(Proxy p : Config.proxyMap) {
-                        if(p.getIP().equals(clientIP) && !p.isOnline()) {
-                            p.setOnline(true);
+                        if(p.getIP().equals(clientIP)) {
+                            sender = p;
                         }
                     }
-                    processMessage(message, out);
+                    if(sender == null) return;
+                    if(!sender.isOnline()) {
+                        sender.setOnline(true);
+                        recheckMaster();
+                    }
+                    if(message.equals("ALIVE")) {
+                            out.println("OK");
+                            Nebula.util.log("Got alive message from {}.", sender.getName());
+                    }
                 } else {
-                    out.println("failed");
+                    out.println("FAILED");
                 }
             }
         } catch (IOException e) {
@@ -71,32 +77,10 @@ public class MultiProxyServer {
         }
     }
 
-    private static void processMessage(String message, PrintWriter out) {
-        switch (message) {
-            case "online":
-                out.println("metoo");
-                break;
-            case "listservers":
-                String all = Config.backendInfoMap.stream()
-                        .map(Container::getServerName)
-                        .collect(Collectors.joining(","));
-                out.println(all);
-                Nebula.util.log("[MP-API] Request for listing the servers, returning {}.", all);
-                break;
-            case "playercount":
-                int count = Nebula.server.getPlayerCount();
-                out.println(count);
-                Nebula.util.log("[MP-API] Request for getting the player count, returning {}.", count);
-                break;
-        }
-    }
-
     public void recheckMaster() {
         List<Proxy> proxyList = Config.proxyMap.stream().filter(Proxy::isOnline).toList();
-        boolean log = false;
         if(Config.masterProxy == null) {
             Config.masterProxy = proxyList.getFirst();
-            log = true;
         }
         Proxy original = Config.masterProxy;
         for(Proxy p : proxyList) {
@@ -104,10 +88,7 @@ public class MultiProxyServer {
                 Config.masterProxy = p;
             }
         }
-        if(Config.masterProxy != original) {
-            log = true;
-        }
-        if(log){
+        if(!original.equals(Config.masterProxy)) {
             Nebula.util.log("The new master proxy is: {}.", Config.masterProxy.getName());
         }
     }
