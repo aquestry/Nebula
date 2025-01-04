@@ -108,5 +108,6 @@ public class Nebula {
         commandManager.register("party", new PartyCommand());
         commandManager.register("p", new PartyCommand());
         commandManager.register("queue", new QueueCommand());
+        if(Config.multiProxyMode) commandManager.register("proxy", new ProxyCommand());
     }
 }

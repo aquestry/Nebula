@@ -19,7 +19,7 @@ public class Node {
         this.privateKeyFile = (privateKeyFile != null) ? privateKeyFile : "none";
         this.username = username;
         this.ip = ip;
-        this.port = (port > 0) ? port : 22;
+        this.port = port;
         this.freePort = freePort;
     }
 

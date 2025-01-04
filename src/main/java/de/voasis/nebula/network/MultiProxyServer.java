@@ -47,13 +47,46 @@ public class MultiProxyServer {
                 String calculatedHash = Nebula.util.calculateHMAC(message);
                 boolean isValid = calculatedHash.equals(receivedHash);
                 if (isValid) {
-                    out.println("SUCCESS");
-                    // Give better response
+                    String[] components = message.split("&");
+                    switch (components[0]) {
+                        case "PING":
+                            out.println("SUCCESS");
+                            break;
+                        case "GET":
+                            out.println(handleGET(components));
+                            break;
+                    }
                 } else {
                     out.println("FAILED");
                 }
             }
         } catch (IOException ignored) {}
+    }
+
+    private String handleGET(String[] components) {
+        if(components.length >= 2) {
+            switch (components[1]) {
+                case "SERVERS":
+                    StringBuilder servers = new StringBuilder();
+                    Config.backendInfoMap.stream().forEach(container -> {
+                        if (!servers.isEmpty()) {
+                            servers.append(",");
+                        }
+                        servers.append(container.getServerName());
+                    });
+                    return servers.toString();
+                case "NODES":
+                    StringBuilder nodes = new StringBuilder();
+                    Config.nodeMap.stream().forEach(node -> {
+                        if (!nodes.isEmpty()) {
+                            nodes.append(",");
+                        }
+                        nodes.append(node.getServerName());
+                    });
+                    return nodes.toString();
+            }
+        }
+        return "INVALID";
     }
 
     public void refreshMaster() {

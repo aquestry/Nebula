@@ -8,12 +8,20 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 public class MultiProxySender {
+
+    public MultiProxySender() {
+        pingProxys();
+        Nebula.multiProxyServer.refreshMaster();
+    }
+
     public void pingProxys() {
         for(Proxy p : Config.proxyMap) {
             sendMessage(p, "PING", response -> {
-                if(!p.isOnline()) {
+                if(!p.isOnline() && !response.equals("FAILED")) {
                     p.setOnline(true);
                     Nebula.multiProxyServer.refreshMaster();
                 }
@@ -26,17 +34,28 @@ public class MultiProxySender {
         }
     }
 
-    private void sendMessage(Proxy proxy, String message, java.util.function.Consumer<String> onSuccess, Runnable onFailure) {
-        final int TIMEOUT_MS = 2000;
-        try (Socket socket = new Socket()) {
-            socket.connect(new InetSocketAddress(proxy.getIP(), proxy.getPort()), TIMEOUT_MS);
-            socket.setSoTimeout(TIMEOUT_MS);
-            try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-                message = message + "|" + Nebula.util.calculateHMAC(message);
-                out.println(message);
-                onSuccess.accept(in.readLine());
-            }
+    public String getNodes(Proxy proxy) {
+        AtomicReference<String> result = new AtomicReference<>("FAILED");
+        sendMessage(proxy, "GET&NODES", result::set, () -> {});
+        return result.get();
+    }
+
+    public String getServers(Proxy proxy) {
+        AtomicReference<String> result = new AtomicReference<>("FAILED");
+        sendMessage(proxy, "GET&SERVERS", result::set, () -> {});
+        return result.get();
+    }
+
+    private void sendMessage(Proxy proxy, String message, Consumer<String> onSuccess, Runnable onFailure) {
+        try {
+            Socket socket = new Socket();
+            socket.connect(new InetSocketAddress(proxy.getIP(), proxy.getPort()), 2000);
+            socket.setSoTimeout(2000);
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            message = message + "|" + Nebula.util.calculateHMAC(message);
+            out.println(message);
+            onSuccess.accept(in.readLine());
         } catch (Exception e) {
             onFailure.run();
         }
