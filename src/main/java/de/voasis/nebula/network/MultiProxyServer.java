@@ -11,14 +11,14 @@ public class MultiProxyServer {
     public MultiProxyServer() {
         new Thread(() -> {
             try (ServerSocket server = new ServerSocket(Config.multiProxyPort)) {
-                Nebula.util.log("MultiProxy API started on port " + Config.multiProxyPort);
+                Nebula.util.log("MultiProxy API started on port {}.", Config.multiProxyPort);
                 while (true) {
                     Socket socket = server.accept();
                     String clientIP = socket.getRemoteSocketAddress().toString();
                     new Thread(() -> handleClient(socket, clientIP)).start();
                 }
             } catch (Exception e) {
-                Nebula.util.log("Error starting MultiProxy API: " + e.getMessage());
+                Nebula.util.log("Error starting MultiProxy API: {}.", e.getMessage());
                 Nebula.server.shutdown();
             }
         }).start();
