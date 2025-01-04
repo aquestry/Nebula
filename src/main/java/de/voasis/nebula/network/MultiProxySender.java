@@ -24,10 +24,10 @@ public class MultiProxySender {
                     }
                     if(!p.isOnline()) {
                         p.setOnline(true);
+                        Nebula.multiProxyServer.refreshMaster();
                     }
                     if(p.getLevel() != level) {
                         p.setLevel(level);
-                        Nebula.multiProxyServer.refreshMaster();
                     }
                 }
             }, () -> {
