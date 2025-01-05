@@ -82,6 +82,15 @@ public class MultiProxyServer {
                         nodes.append(node.getServerName());
                     });
                     return nodes.toString();
+                case "PERM":
+                    StringBuilder groups = new StringBuilder();
+                    for(String g : Nebula.permissionFile.getGroupNames()) {
+                        if(!groups.isEmpty()) {
+                            groups.append("+");
+                        }
+                        groups.append(g).append("[").append(String.join(":", Nebula.permissionFile.getGroupMembers(g))).append("]");
+                    }
+                    return groups.toString();
                 case "LEVEL":
                     return String.valueOf(Config.THIS_PROXY.getLevel());
             }
@@ -90,13 +99,15 @@ public class MultiProxyServer {
     }
 
     public void refreshMaster() {
-        if(Config.masterProxy == null || !Config.masterProxy.isOnline()) {
-            Config.masterProxy = Config.THIS_PROXY;
-        }
+        Config.masterProxy = Config.THIS_PROXY;
         Proxy originalProxy = Config.masterProxy;
+        Config.secondMasterProxy = Config.proxyMap.getFirst();
         for(Proxy p : Config.proxyMap.stream().filter(Proxy::isOnline).toList()) {
             if(p.getLevel() > Config.masterProxy.getLevel()) {
                 Config.masterProxy = p;
+            }
+            if(p.getLevel() > Config.secondMasterProxy.getLevel()) {
+                Config.secondMasterProxy = p;
             }
         }
         Nebula.util.log("Master proxy: {}.", Config.masterProxy.getName());

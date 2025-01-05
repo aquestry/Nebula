@@ -3,15 +3,24 @@ package de.voasis.nebula.network;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Config;
 import de.voasis.nebula.model.Proxy;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class MultiProxySender {
+
+    public MultiProxySender() {
+        pingProxys();
+        fetchPermsFromMaster();
+    }
+
     public void pingProxys() {
         for(Proxy p : Config.proxyMap) {
             sendMessage(p, "GET&LEVEL", response -> {
@@ -45,10 +54,45 @@ public class MultiProxySender {
         return result.get();
     }
 
-    public String getServers(Proxy proxy) {
+    public String getServers(@NotNull Proxy proxy) {
         AtomicReference<String> result = new AtomicReference<>("FAILED");
         sendMessage(proxy, "GET&SERVERS", result::set, () -> {});
         return result.get();
+    }
+
+    public void fetchPermsFromMaster() {
+        Proxy proxy = Config.proxyMap.stream()
+                .filter(Proxy::isOnline)
+                .max(Comparator.comparingInt(Proxy::getLevel))
+                .orElse(null);
+        if (proxy == null) {
+            Nebula.util.log("No online proxies available to fetch permissions from.");
+            return;
+        }
+        Nebula.util.log("Fetching permissions from proxy with highest level: {} (Level: {}).", proxy.getName(), proxy.getLevel());
+        sendMessage(proxy, "GET&PERM", response -> {
+            if (response == null || response.equals("INVALID") || response.isEmpty()) {
+                Nebula.util.log("Invalid permission fetch response from proxy {}", proxy.getName());
+                return;
+            }
+            for (String g : response.split("\\+")) {
+                String[] parts = g.split("[\\[\\]]");
+                if (parts.length < 2) {
+                    Nebula.util.log("Invalid group format: {}", g);
+                    continue;
+                }
+                String groupName = parts[0];
+                String[] members = parts[1].split(":");
+                Nebula.util.log("Group: {}", groupName);
+                if (members.length == 0 || (members.length == 1 && members[0].isEmpty())) {
+                    Nebula.util.log("No members found in group '{}'.", groupName);
+                    continue;
+                }
+                for (String m : members) {
+                    Nebula.util.log(" - Member: {}", m);
+                }
+            }
+        }, () -> Nebula.util.log("Failed to connect to proxy {} for permission fetch.", proxy.getName()));
     }
 
     private void sendMessage(Proxy proxy, String message, Consumer<String> onSuccess, Runnable onFailure) {
