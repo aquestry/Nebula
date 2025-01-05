@@ -50,7 +50,7 @@ public class PermissionFile {
         runtimeGroups.clear();
         initializeConfig();
         for (String groupName : getGroupNames()) {
-            ConfigurationNode groupNode = getGroupNode(groupName);
+            ConfigurationNode groupNode = rootNode.node("groups", groupName);
             if (groupNode != null) {
                 String prefix = groupNode.node("prefix").getString("");
                 int level = groupNode.node("level").getInt(0);
@@ -121,10 +121,6 @@ public class PermissionFile {
         return rootNode.node("groups").childrenMap().keySet().stream()
                 .map(Object::toString)
                 .collect(Collectors.toList());
-    }
-
-    public ConfigurationNode getGroupNode(String groupName) {
-        return rootNode.node("groups", groupName);
     }
 
     public Group getGroup(String groupName) {

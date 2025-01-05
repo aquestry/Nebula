@@ -6,6 +6,7 @@ import com.velocitypowered.api.permission.PermissionSubject;
 import com.velocitypowered.api.permission.Tristate;
 import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
+import de.voasis.nebula.data.Config;
 import de.voasis.nebula.model.Group;
 
 public class PermissionManager implements PermissionProvider {
@@ -23,24 +24,29 @@ public class PermissionManager implements PermissionProvider {
     }
 
     public Group getGroup(String uuid) {
-        return Nebula.permissionFile.runtimeGroups.stream()
-                .filter(group -> group.hasMember(uuid))
+        Group group = Nebula.permissionFile.runtimeGroups.stream()
+                .filter(g -> g.hasMember(uuid))
                 .findFirst()
                 .orElse(null);
+        if(group == null) {
+            Nebula.util.log("Giving {} the default group.", uuid);
+            group = Nebula.permissionFile.runtimeGroups.stream().filter(g -> g.getName().equals(Config.defaultGroupName)).toList().getFirst();
+            assignGroup(uuid, group);
+        }
+        return group;
     }
 
     public void assignGroup(String uuid, Group group) {
-        Group currentGroup = getGroup(uuid);
-        if (currentGroup != null) Nebula.permissionFile.removeMemberFromGroup(currentGroup, uuid);
+        for(Group g : Nebula.permissionFile.runtimeGroups) {
+            if(g.hasMember(uuid)) {
+                Nebula.permissionFile.removeMemberFromGroup(g, uuid);
+            }
+        }
         Nebula.permissionFile.addMemberToGroup(group, uuid);
     }
 
     public void sendInfotoBackend(Player player) {
         Group group = getGroup(player.getUniqueId().toString());
-        if (group == null) {
-            Nebula.util.log("No group found for player: " + player.getUsername());
-            return;
-        }
         String info = player.getUsername() + ":" + group.getName() + "#" + group.getLevel() + "#" + group.getPrefix();
         player.getCurrentServer().ifPresent(serverConnection -> serverConnection.getServer().sendPluginMessage(Nebula.channelMain, info.getBytes()));
     }

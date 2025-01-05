@@ -18,7 +18,11 @@ public class MultiProxySender {
 
     public MultiProxySender() {
         pingProxies();
-        fetchPermissions();
+        Proxy proxy = Config.proxyMap.stream()
+                .filter(Proxy::isOnline)
+                .max(Comparator.comparingInt(Proxy::getLevel))
+                .orElse(null);
+        fetchPermissions(proxy);
     }
 
     public void pingProxies() {
@@ -58,11 +62,7 @@ public class MultiProxySender {
         return result.get();
     }
 
-    public void fetchPermissions() {
-        Proxy proxy = Config.proxyMap.stream()
-                .filter(Proxy::isOnline)
-                .max(Comparator.comparingInt(Proxy::getLevel))
-                .orElse(null);
+    public void fetchPermissions(Proxy proxy) {
         if (proxy == null) {
             Nebula.util.log("No online proxies available to fetch permissions from.");
             return;
@@ -71,13 +71,24 @@ public class MultiProxySender {
             if (response == null || response.equals("INVALID") || response.isEmpty()) {
                 return;
             }
-            Nebula.util.log(response);
             processFetchedPermissions(response);
         }, () -> Nebula.util.log("Failed to connect to proxy {} for permission fetch.", proxy.getName()));
     }
 
+    public void sendGroups() {
+        for(Proxy proxy : Config.proxyMap.stream().filter(Proxy::isOnline).toList()) {
+            sendMessage(proxy, "POST&PERM", response -> {
+                if (response == null || response.equals("INVALID") || response.isEmpty()) {
+                    return;
+                }
+                if(response.equals("FETCHED")) {
+                    Nebula.util.log("Succesfully sended permissions.");
+                }
+            }, () -> Nebula.util.log("Failed to connect to proxy {} for permission post.", proxy.getName()));
+        }
+    }
+
     private void processFetchedPermissions(String response) {
-        Nebula.util.log("Perm response: {}.", response);
         for (String groupData : response.split("\\+")) {
             String[] parts = groupData.split("[\\[\\]]");
             if (parts.length < 2) {
@@ -95,6 +106,7 @@ public class MultiProxySender {
             }
         }
         Nebula.permissionFile.saveConfig();
+        sendGroups();
     }
 
     private void sendMessage(Proxy proxy, String message, Consumer<String> onSuccess, Runnable onFailure) {

@@ -4,6 +4,8 @@ import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Config;
 import de.voasis.nebula.model.Container;
 import de.voasis.nebula.model.Node;
+import de.voasis.nebula.model.Proxy;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -29,7 +31,8 @@ public class MultiProxyServer {
     }
 
     private void handleClient(Socket socket, String clientIP) {
-        if (Config.proxyMap.stream().noneMatch(proxy -> proxy.getIP().equals(clientIP.split(":")[0].replace("/", "")))) {
+        String ip = clientIP.split(":")[0].replace("/", "");
+        if (Config.proxyMap.stream().noneMatch(proxy -> proxy.getIP().equals(ip))) {
             Nebula.util.log("Got message from unknown IP: {}.", clientIP);
             return;
         }
@@ -41,7 +44,25 @@ public class MultiProxyServer {
                 out.println("FAILED");
                 return;
             }
-            out.println(handleGET(parts[0].split("&")));
+            if(parts[0].startsWith("POST")) {
+                Nebula.util.log("ClientIP: {}.", ip);
+                Proxy proxy = null;
+                for(Proxy p : Config.proxyMap) {
+                    Nebula.util.log("IP: {}.", p.getIP());
+                    if(p.getIP().equals(ip)) {
+                        proxy = p;
+                    }
+                }
+                if(proxy != null) {
+                    Nebula.util.log("Sending fetch request...");
+                    Nebula.multiProxySender.fetchPermissions(proxy);
+                    out.println("FETCHED");
+                }
+            }
+            if(parts[0].startsWith("GET")) {
+                out.println(handleGET(parts[0].split("&")));
+            }
+
         } catch (Exception ignored) {}
     }
 
