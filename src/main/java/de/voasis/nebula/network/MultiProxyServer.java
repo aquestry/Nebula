@@ -5,7 +5,6 @@ import de.voasis.nebula.data.Config;
 import de.voasis.nebula.model.Container;
 import de.voasis.nebula.model.Node;
 import de.voasis.nebula.model.Proxy;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -55,7 +54,6 @@ public class MultiProxyServer {
             if(parts[0].startsWith("GET")) {
                 out.println(handleGET(parts[0].split("&")));
             }
-
         } catch (Exception ignored) {}
     }
 

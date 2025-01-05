@@ -1,11 +1,9 @@
 package de.voasis.nebula.network;
 
-import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Config;
 import de.voasis.nebula.model.Group;
 import de.voasis.nebula.model.Proxy;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -78,14 +76,10 @@ public class MultiProxySender {
 
     public void sendGroups() {
         for(Proxy proxy : Config.proxyMap.stream().filter(Proxy::isOnline).toList()) {
-            sendMessage(proxy, "POST&PERM", response -> {
-                if (response == null || response.equals("INVALID") || response.isEmpty()) {
-                    return;
-                }
-                if(response.equals("FETCHED")) {
-                    Nebula.util.log("Succesfully sended permissions.");
-                }
-            }, () -> Nebula.util.log("Failed to connect to proxy {} for permission post.", proxy.getName()));
+            sendMessage(proxy
+                    , "POST&PERM", response -> {}
+                    , () -> Nebula.util.log("Failed to connect to proxy {} for permission post."
+                    , proxy.getName()));
         }
     }
 
@@ -107,9 +101,7 @@ public class MultiProxySender {
             }
         }
         Nebula.permissionFile.saveConfig();
-        for(Player player : Nebula.server.getAllPlayers()) {
-            Nebula.permissionManager.sendInfotoBackend(player);
-        }
+        Nebula.permissionFile.sendAlltoBackend();
     }
 
     private void sendMessage(Proxy proxy, String message, Consumer<String> onSuccess, Runnable onFailure) {

@@ -66,9 +66,7 @@ public class PermissionFile {
                 runtimeGroups.add(group);
             }
         }
-        for(Player player : Nebula.server.getAllPlayers()) {
-            Nebula.permissionManager.sendInfotoBackend(player);
-        }
+        sendAlltoBackend();
     }
 
     public void saveGroup(Group group) {
@@ -100,7 +98,7 @@ public class PermissionFile {
     }
 
     public void addPermissionToGroup(Group group, String permission) {
-        group.addMember(permission);
+        group.addPermission(permission);
         saveGroup(group);
     }
 
@@ -125,6 +123,54 @@ public class PermissionFile {
 
     public Group getGroup(String groupName) {
         return runtimeGroups.stream().filter(group -> group.getName().equals(groupName)).findFirst().orElse(null);
+    }
+
+    public void deleteGroup(String groupName) {
+        Group group = getGroup(groupName);
+        if (group == null) {
+            Nebula.util.log("Group '{}' does not exist.", groupName);
+            return;
+        }
+        runtimeGroups.remove(group);
+        try {
+            rootNode.node("groups").removeChild(groupName);
+            saveConfig();
+            Nebula.util.log("Group '{}' removed successfully.", groupName);
+        } catch (Exception e) {
+            Nebula.util.log("Failed to remove group '{}': {}", groupName, e.getMessage());
+        }
+    }
+
+    public void createGroup(String groupName, String prefix, int level) {
+        if (getGroup(groupName) != null) {
+            Nebula.util.log("Group '{}' already exists.", groupName);
+            return;
+        }
+        Group group = new Group(groupName, prefix, level);
+        runtimeGroups.add(group);
+        try {
+            ConfigurationNode groupNode = rootNode.node("groups", groupName);
+            groupNode.node("prefix").set(prefix);
+            groupNode.node("level").set(level);
+            groupNode.node("permissions").set(List.of());
+            groupNode.node("members").set(List.of());
+            saveConfig();
+            Nebula.util.log("Group '{}' created successfully.", groupName);
+        } catch (IOException e) {
+            Nebula.util.log("Failed to create group '{}': {}", groupName, e.getMessage());
+        }
+    }
+
+    public void sendAlltoBackend() {
+        for(Player player : Nebula.server.getAllPlayers()) {
+            sendInfotoBackend(player);
+        }
+    }
+
+    public void sendInfotoBackend(Player player) {
+        Group group = getGroup(player.getUniqueId().toString());
+        String info = player.getUsername() + ":" + group.getName() + "#" + group.getLevel() + "#" + group.getPrefix();
+        player.getCurrentServer().ifPresent(serverConnection -> serverConnection.getServer().sendPluginMessage(Nebula.channelMain, info.getBytes()));
     }
 
     public void saveConfig() {
