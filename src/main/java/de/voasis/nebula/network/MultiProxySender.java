@@ -1,5 +1,6 @@
 package de.voasis.nebula.network;
 
+import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Config;
 import de.voasis.nebula.model.Group;
@@ -106,7 +107,9 @@ public class MultiProxySender {
             }
         }
         Nebula.permissionFile.saveConfig();
-        sendGroups();
+        for(Player player : Nebula.server.getAllPlayers()) {
+            Nebula.permissionManager.sendInfotoBackend(player);
+        }
     }
 
     private void sendMessage(Proxy proxy, String message, Consumer<String> onSuccess, Runnable onFailure) {
