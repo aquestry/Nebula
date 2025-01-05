@@ -2,12 +2,16 @@ package de.voasis.nebula.network;
 
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Config;
-import de.voasis.nebula.model.Proxy;
-import java.io.*;
+import de.voasis.nebula.model.Container;
+import de.voasis.nebula.model.Node;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class MultiProxyServer {
+
     public MultiProxyServer() {
         new Thread(() -> {
             try (ServerSocket server = new ServerSocket(Config.multiProxyPort)) {
@@ -22,94 +26,33 @@ public class MultiProxyServer {
                 Nebula.server.shutdown();
             }
         }).start();
-        if(Config.proxyMap.isEmpty()) {
-            Nebula.util.log("No proxies found, shutting down.");
-            Nebula.server.shutdown();
-            System.exit(0);
-        }
     }
 
     private void handleClient(Socket socket, String clientIP) {
-        if(!Config.proxyMap.stream().anyMatch(proxy -> proxy.getIP().equals(clientIP.split(":")[0].replace("/", "")))) {
+        if (Config.proxyMap.stream().noneMatch(proxy -> proxy.getIP().equals(clientIP.split(":")[0].replace("/", "")))) {
             Nebula.util.log("Got message from unknown IP: {}.", clientIP);
             return;
         }
         try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
-            String messageLine;
-            while ((messageLine = in.readLine()) != null) {
-                String[] parts = messageLine.split("\\|");
-                if (parts.length != 2) {
-                    out.println("FAILED");
-                    continue;
-                }
-                String message = parts[0];
-                String receivedHash = parts[1];
-                String calculatedHash = Nebula.util.calculateHMAC(message);
-                boolean isValid = calculatedHash.equals(receivedHash);
-                if (isValid) {
-                    String[] components = message.split("&");
-                    switch (components[0]) {
-                        case "GET":
-                            out.println(handleGET(components));
-                            break;
-                    }
-                } else {
-                    out.println("FAILED");
-                }
+            String message = in.readLine();
+            String[] parts = message.split("\\|");
+            if (parts.length != 2 || !Nebula.util.calculateHMAC(parts[0]).equals(parts[1])) {
+                out.println("FAILED");
+                return;
             }
-        } catch (IOException ignored) {}
+            out.println(handleGET(parts[0].split("&")));
+        } catch (Exception ignored) {}
     }
 
     private String handleGET(String[] components) {
-        if(components.length >= 2) {
-            switch (components[1]) {
-                case "SERVERS":
-                    StringBuilder servers = new StringBuilder();
-                    Config.backendInfoMap.stream().forEach(container -> {
-                        if (!servers.isEmpty()) {
-                            servers.append(",");
-                        }
-                        servers.append(container.getServerName());
-                    });
-                    return servers.toString();
-                case "NODES":
-                    StringBuilder nodes = new StringBuilder();
-                    Config.nodeMap.stream().forEach(node -> {
-                        if (!nodes.isEmpty()) {
-                            nodes.append(",");
-                        }
-                        nodes.append(node.getServerName());
-                    });
-                    return nodes.toString();
-                case "PERM":
-                    StringBuilder groups = new StringBuilder();
-                    for(String g : Nebula.permissionFile.getGroupNames()) {
-                        if(!groups.isEmpty()) {
-                            groups.append("+");
-                        }
-                        groups.append(g).append("[").append(String.join(":", Nebula.permissionFile.getGroupMembers(g))).append("]");
-                    }
-                    return groups.toString();
-                case "LEVEL":
-                    return String.valueOf(Config.THIS_PROXY.getLevel());
-            }
+        switch (components[1]) {
+            case "SERVERS": return String.join(",", Config.backendInfoMap.stream().map(Container::getServerName).toList());
+            case "NODES": return String.join(",", Config.nodeMap.stream().map(Node::getServerName).toList());
+            case "PERM": return String.join("+", Nebula.permissionFile.getGroupNames().stream()
+                    .map(g -> g + "[" + String.join(":", Nebula.permissionFile.getGroupMembers(g)) + "]").toList());
+            case "LEVEL": return String.valueOf(Config.multiProxyLevel);
+            default: return "INVALID";
         }
-        return "INVALID";
-    }
-
-    public void refreshMaster() {
-        Config.masterProxy = Config.THIS_PROXY;
-        Proxy originalProxy = Config.masterProxy;
-        Config.secondMasterProxy = Config.proxyMap.getFirst();
-        for(Proxy p : Config.proxyMap.stream().filter(Proxy::isOnline).toList()) {
-            if(p.getLevel() > Config.masterProxy.getLevel()) {
-                Config.masterProxy = p;
-            }
-            if(p.getLevel() > Config.secondMasterProxy.getLevel()) {
-                Config.secondMasterProxy = p;
-            }
-        }
-        Nebula.util.log("Master proxy: {}.", Config.masterProxy.getName());
     }
 }

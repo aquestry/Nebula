@@ -94,7 +94,7 @@ public class Nebula {
             multiProxyServer = new MultiProxyServer();
             multiProxySender = new MultiProxySender();
             server.getScheduler()
-                    .buildTask(this, multiProxySender::pingProxys)
+                    .buildTask(this, multiProxySender::pingProxies)
                     .repeat(1000, TimeUnit.MILLISECONDS)
                     .schedule();
         }
@@ -103,10 +103,9 @@ public class Nebula {
     private void registerCommands() {
         CommandManager commandManager = server.getCommandManager();
         commandManager.register("node", new NodeCommand());
-        commandManager.register("group", new GroupCommand());
         commandManager.register("lobby", new LobbyCommand());
         commandManager.register("party", new PartyCommand());
-        commandManager.register("p", new PartyCommand());
+        commandManager.register("group", new GroupCommand());
         commandManager.register("queue", new QueueCommand());
         if(Config.multiProxyMode) commandManager.register("proxy", new ProxyCommand());
     }

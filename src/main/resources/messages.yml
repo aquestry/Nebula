@@ -36,7 +36,7 @@ party:
   target-invite-already: "<pre>The player <target> is already invited."
   sent-invite: "<pre>You have sent an invite to <target>."
   no-invite-from-leader: "<pre>You have no invite from <leader>'s party."
-  already-in-party: "<pre>You are already in a party. Use /p leave to leave your current party."
+  already-in-party: "<pre>You are already in a party. Use /party leave to leave your current party."
   joined-party: "<pre><player> joined the party of <leader>."
   left-party: "<pre><player> left the party led by <leader>."
   no-party-to-leave: "<pre>You are not in a party to leave."

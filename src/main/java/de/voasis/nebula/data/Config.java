@@ -18,11 +18,9 @@ public class Config {
     public static boolean multiProxyMode;
     public static boolean pullStart;
     public static int multiProxyPort;
+    public static int multiProxyLevel;
     public static int defaultmax;
     public static int defaultmin;
-    public static Proxy masterProxy;
-    public static Proxy secondMasterProxy;
-    public static Proxy THIS_PROXY;
     public static List<Node> nodeMap = new ArrayList<>();
     public static List<Proxy> proxyMap = new ArrayList<>();
     public static List<Container> backendInfoMap = new ArrayList<>();

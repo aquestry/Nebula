@@ -55,7 +55,7 @@ public class FilesManager {
                 loadProxies();
             }
         } catch (Exception e) {
-            Nebula.util.log("Error in configuration loading {}", e);
+            Nebula.util.log("Error in configuration loading {}.", e);
             Nebula.server.shutdown();
             System.exit(0);
         }
@@ -146,8 +146,8 @@ public class FilesManager {
                 String password = config.node("nodes", serverName, "password").getString();
                 String privateKeyFile = config.node("nodes", serverName, "privateKeyFile").getString();
                 int port = config.node("nodes", serverName, "port").getInt(22);
-                if (ip == null || username == null || password == null || privateKeyFile == null) {
-                    Nebula.util.log("Incomplete configuration for server '{}'. Skipping this server.", serverName);
+                if (ip == null || username == null || password == null || privateKeyFile == null || port == 0) {
+                    Nebula.util.log("Invalid configuration for node '{}'. Skipping this node.", serverName);
                     continue;
                 }
                 Node node = new Node(serverName.toString(), ip, username, password, privateKeyFile, port, 0);
@@ -171,7 +171,7 @@ public class FilesManager {
                 int preload = config.node("gamemodes", queueName, "preload").getInt();
                 String localEnvVars = config.node("gamemodes", queueName, "env-vars").getString();
                 if (template == null || neededPlayers == 0 || localEnvVars == null) {
-                    Nebula.util.log("Incomplete configuration for gamemode '{}'. Skipping this gamemode.", queueName);
+                    Nebula.util.log("Invalid configuration for gamemode '{}'. Skipping this gamemode.", queueName);
                     continue;
                 }
                 localEnvVars = (localEnvVars != null && !"none".equals(envVars))
@@ -181,7 +181,7 @@ public class FilesManager {
                         : "";
                 Config.alltemplates.add(template);
                 Config.queueMap.add(new Queue(queueName.toString(), template, neededPlayers, preload, localEnvVars));
-                Nebula.util.log("Added gamemode to pool: {}, {}, {}.", queueName, template, neededPlayers);
+                Nebula.util.log("Loaded gamemode {}.", queueName);
             }
         }
     }
@@ -189,9 +189,7 @@ public class FilesManager {
     private void loadProxies() {
         Config.HMACSecret = multiproxy.node("hmac-secret").getString();
         Config.multiProxyPort = multiproxy.node("port").getInt();
-        Config.THIS_PROXY = new Proxy("THIS", "", Config.multiProxyPort, true);
-        Config.THIS_PROXY.setLevel(multiproxy.node("level").getInt());
-        Config.masterProxy = Config.THIS_PROXY;
+        Config.multiProxyLevel = (multiproxy.node("level").getInt());
         Map<Object, ? extends ConfigurationNode> proxies = multiproxy.node("proxies").childrenMap();
         if (proxies != null) {
             for (Object proxy : proxies.keySet()) {

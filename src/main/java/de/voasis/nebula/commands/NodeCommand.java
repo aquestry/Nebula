@@ -16,7 +16,8 @@ public class NodeCommand implements SimpleCommand {
     public void execute(Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
-        if (args.length == 0 || args.length < 2) {
+        Nebula.permissionFile.reloadGroups();
+        if (args.length < 2) {
             Nebula.util.sendMessage(source, Messages.USAGE_ADMIN);
             return;
         }
