@@ -78,7 +78,7 @@ public class MultiProxySender {
             for (String g : response.split("\\+")) {
                 String[] parts = g.split("[\\[\\]]");
                 if (parts.length < 2) {
-                    Nebula.util.log("Invalid group format: {}", g);
+                    Nebula.util.log("Group is empty or has an invalid format: {}", g);
                     continue;
                 }
                 String groupName = parts[0];
