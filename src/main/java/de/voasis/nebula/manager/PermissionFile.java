@@ -168,7 +168,7 @@ public class PermissionFile {
     }
 
     public void sendInfotoBackend(Player player) {
-        Group group = getGroup(player.getUniqueId().toString());
+        Group group = Nebula.permissionManager.getGroup(player.getUniqueId().toString());
         String info = player.getUsername() + ":" + group.getName() + "#" + group.getLevel() + "#" + group.getPrefix();
         player.getCurrentServer().ifPresent(serverConnection -> serverConnection.getServer().sendPluginMessage(Nebula.channelMain, info.getBytes()));
     }
