@@ -45,14 +45,7 @@ public class MultiProxyServer {
                 return;
             }
             if(parts[0].startsWith("POST")) {
-                Nebula.util.log("ClientIP: {}.", ip);
-                Proxy proxy = null;
-                for(Proxy p : Config.proxyMap) {
-                    Nebula.util.log("IP: {}.", p.getIP());
-                    if(p.getIP().equals(ip)) {
-                        proxy = p;
-                    }
-                }
+                Proxy proxy = Config.proxyMap.stream().filter(p -> p.getIP().equals(ip)).findFirst().orElse(null);
                 if(proxy != null) {
                     Nebula.util.log("Sending fetch request...");
                     Nebula.multiProxySender.fetchPermissions(proxy);

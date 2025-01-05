@@ -3,7 +3,6 @@ package de.voasis.nebula.commands;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
-import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
 
 public class GroupCommand implements SimpleCommand {
@@ -24,6 +23,6 @@ public class GroupCommand implements SimpleCommand {
     @Override
     public boolean hasPermission(Invocation invocation) {
         CommandSource sender = invocation.source();
-        return sender.hasPermission("velocity.admin") ||  sender instanceof ConsoleCommandSource || (sender instanceof Player player && player.getUsername().equals("Aquestry"));
+        return sender.hasPermission("velocity.admin") || sender instanceof ConsoleCommandSource;
     }
 }
