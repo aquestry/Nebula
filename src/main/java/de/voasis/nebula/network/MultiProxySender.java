@@ -9,7 +9,9 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -84,9 +86,7 @@ public class MultiProxySender {
     }
 
     private void processFetchedPermissions(String response) {
-        for(Group group : Nebula.permissionFile.runtimeGroups) {
-            Nebula.permissionFile.deleteGroup(group.getName());
-        }
+        List<Group> groupsMentioned = new ArrayList<>();
         for (String groupData : response.split("\\+")) {
             String[] parts = groupData.split("[\\[\\]]");
             if (parts.length < 2) {
@@ -97,9 +97,15 @@ public class MultiProxySender {
             int level = Integer.parseInt(parts[0].split("\\?")[2]);
             String[] members = parts[1].split(":");
             Group group = Nebula.permissionFile.createGroup(groupName, prefix, level);
+            groupsMentioned.add(group);
             Nebula.permissionFile.clearMembers(group);
             for (String member : members) {
                 Nebula.permissionManager.assignGroup(member, group);
+            }
+        }
+        for(Group group : Nebula.permissionFile.runtimeGroups) {
+            if(!groupsMentioned.contains(group)) {
+                Nebula.permissionFile.deleteGroup(group.getName());
             }
         }
         Nebula.permissionFile.saveConfig();
