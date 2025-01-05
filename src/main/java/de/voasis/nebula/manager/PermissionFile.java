@@ -141,10 +141,11 @@ public class PermissionFile {
         }
     }
 
-    public void createGroup(String groupName, String prefix, int level) {
+    public Group createGroup(String groupName, String prefix, int level) {
+        Group checkGroup = getGroup(groupName);
         if (getGroup(groupName) != null) {
             Nebula.util.log("Group '{}' already exists.", groupName);
-            return;
+            return checkGroup;
         }
         Group group = new Group(groupName, prefix, level);
         runtimeGroups.add(group);
@@ -159,6 +160,7 @@ public class PermissionFile {
         } catch (IOException e) {
             Nebula.util.log("Failed to create group '{}': {}", groupName, e.getMessage());
         }
+        return group;
     }
 
     public void sendAlltoBackend() {

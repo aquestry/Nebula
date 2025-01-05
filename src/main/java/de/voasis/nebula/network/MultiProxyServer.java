@@ -61,8 +61,11 @@ public class MultiProxyServer {
         switch (components[1]) {
             case "SERVERS": return String.join(",", Config.backendInfoMap.stream().map(Container::getServerName).toList());
             case "NODES": return String.join(",", Config.nodeMap.stream().map(Node::getServerName).toList());
-            case "PERM": return String.join("+", Nebula.permissionFile.getGroupNames().stream()
-                    .map(g -> g + "[" + String.join(":", Nebula.permissionFile.getGroupMembers(g)) + "]").toList());
+            case "PERM":
+                String result = String.join("+", Nebula.permissionFile.runtimeGroups.stream()
+                    .map(g -> g.getName() + "?" + g.getPrefix() + "?" + g.getLevel() + "[" + String.join(":", Nebula.permissionFile.getGroupMembers(g.getName())) + "]").toList());
+                Nebula.util.log("Result {}", result);
+                return result;
             case "LEVEL": return String.valueOf(Config.multiProxyLevel);
             default: return "INVALID";
         }

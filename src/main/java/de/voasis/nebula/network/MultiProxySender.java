@@ -84,17 +84,19 @@ public class MultiProxySender {
     }
 
     private void processFetchedPermissions(String response) {
+        for(Group group : Nebula.permissionFile.runtimeGroups) {
+            Nebula.permissionFile.deleteGroup(group.getName());
+        }
         for (String groupData : response.split("\\+")) {
             String[] parts = groupData.split("[\\[\\]]");
             if (parts.length < 2) {
                 continue;
             }
-            String groupName = parts[0];
+            String groupName = parts[0].split("\\?")[0];
+            String prefix = parts[0].split("\\?")[1];
+            int level = Integer.parseInt(parts[0].split("\\?")[2]);
             String[] members = parts[1].split(":");
-            Group group = Nebula.permissionFile.getGroup(groupName);
-            if (group == null) {
-                continue;
-            }
+            Group group = Nebula.permissionFile.createGroup(groupName, prefix, level);
             Nebula.permissionFile.clearMembers(group);
             for (String member : members) {
                 Nebula.permissionManager.assignGroup(member, group);
