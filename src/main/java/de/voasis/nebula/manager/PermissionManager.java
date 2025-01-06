@@ -12,6 +12,7 @@ import de.voasis.nebula.model.Group;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class PermissionManager implements PermissionProvider {
 
@@ -28,6 +29,7 @@ public class PermissionManager implements PermissionProvider {
     }
 
     public Group getGroup(String uuid) {
+        if(uuid.isEmpty()) return null;
         Group group = Nebula.permissionFile.runtimeGroups.stream()
                 .filter(g -> g.hasMember(uuid))
                 .findFirst()
@@ -65,7 +67,8 @@ public class PermissionManager implements PermissionProvider {
             }
         }
         Nebula.permissionFile.addMemberToGroup(group, uuid);
-
+        Optional<Player> player = Nebula.server.getPlayer(uuid);
+        player.ifPresent(value -> Nebula.util.sendInfotoBackend(value));
     }
 
     public void processGroups(String response) {
