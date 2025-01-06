@@ -8,14 +8,10 @@ import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Config;
 import de.voasis.nebula.model.Group;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 public class PermissionManager implements PermissionProvider {
-
     public boolean hasPermission(Player player, String permission) {
         return Nebula.permissionFile.runtimeGroups.stream()
                 .anyMatch(group -> group.hasMember(player.getUniqueId().toString()) && group.hasPermission(permission));
@@ -64,18 +60,11 @@ public class PermissionManager implements PermissionProvider {
                 Nebula.permissionFile.removeMemberFromGroup(g, uuid);
             }
         }
-        Optional<Player> player = Nebula.server.getPlayer(uuid);
-        player.ifPresent(value -> Nebula.util.sendInfotoBackend(value));
+        Nebula.server.getPlayer(uuid).ifPresent(value -> Nebula.util.sendInfotoBackend(value));
     }
 
     public void processGroups(String response) {
         int updated = 0;
-        List<Group> safe = new ArrayList<>();
-        boolean deleteOthers = true;
-        if(response.startsWith("<update>")) {
-            deleteOthers = false;
-            response = response.replace("<update>", "");
-        }
         for (String groupData : response.split("~")) {
             try {
                 groupData = groupData.trim();
@@ -95,7 +84,6 @@ public class PermissionManager implements PermissionProvider {
                     }
                 }
                 Group group = Nebula.permissionFile.createGroup(groupName, prefix, level);
-                safe.add(group);
                 List<String> oldMembers = group.getMembers();
                 for (String oldMember : oldMembers) {
                     if (!Arrays.asList(members).contains(oldMember)) {
@@ -120,13 +108,6 @@ public class PermissionManager implements PermissionProvider {
                 Nebula.util.log("Failed to parse level in group data '{}'. Error: {}", groupData, e.getMessage());
             } catch (Exception e) {
                 Nebula.util.log("Failed to process group data '{}'. Error: {}", groupData, e.getMessage());
-            }
-        }
-        if(deleteOthers) {
-            for(Group group : Nebula.permissionFile.runtimeGroups) {
-                if(!safe.contains(group)) {
-                    Nebula.permissionFile.deleteGroup(group.getName());
-                }
             }
         }
         Nebula.permissionFile.saveConfig();

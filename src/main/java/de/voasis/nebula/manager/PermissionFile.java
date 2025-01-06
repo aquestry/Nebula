@@ -135,6 +135,9 @@ public class PermissionFile {
             Nebula.util.log("Group '{}' does not exist.", groupName);
             return;
         }
+        for(String member : group.getMembers()) {
+            Nebula.permissionManager.getGroup(member);
+        }
         runtimeGroups.remove(group);
         try {
             rootNode.node("groups").removeChild(groupName);
