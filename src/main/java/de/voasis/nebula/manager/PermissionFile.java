@@ -1,6 +1,5 @@
 package de.voasis.nebula.manager;
 
-import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Config;
 import de.voasis.nebula.model.Group;
@@ -66,7 +65,7 @@ public class PermissionFile {
                 runtimeGroups.add(group);
             }
         }
-        sendAlltoBackend();
+        Nebula.util.sendAlltoBackend();
     }
 
     public void saveGroup(Group group) {
@@ -165,18 +164,6 @@ public class PermissionFile {
             Nebula.util.log("Failed to create group '{}': {}", groupName, e.getMessage());
         }
         return group;
-    }
-
-    public void sendAlltoBackend() {
-        for(Player player : Nebula.server.getAllPlayers()) {
-            sendInfotoBackend(player);
-        }
-    }
-
-    public void sendInfotoBackend(Player player) {
-        Group group = Nebula.permissionManager.getGroup(player.getUniqueId().toString());
-        String info = player.getUsername() + ":" + group.getName() + "#" + group.getLevel() + "#" + group.getPrefix();
-        player.getCurrentServer().ifPresent(serverConnection -> serverConnection.getServer().sendPluginMessage(Nebula.channelMain, info.getBytes()));
     }
 
     public void saveConfig() {

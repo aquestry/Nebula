@@ -60,11 +60,22 @@ public class MultiProxySender {
                 , proxy.getName()));
     }
 
-    public void sendGroup(Proxy proxy, Group group) {
-        sendMessage(proxy
-                , "POST&PERM&" + Nebula.permissionManager.getGroupData(group), response -> {}
-                , e -> Nebula.util.log("Failed to connect to proxy {} for permission post."
-                        , proxy.getName()));
+    public void sendGroup(Group group) {
+        for(Proxy proxy : Config.proxyMap.stream().filter(Proxy::isOnline).toList()) {
+            sendMessage(proxy
+                    , "POST&PERM&" + Nebula.permissionManager.getGroupData(group), response -> {}
+                    , e -> Nebula.util.log("Failed to connect to proxy {} for permission post."
+                            , proxy.getName()));
+        }
+    }
+
+    public void sendDelete(String groupName) {
+        for(Proxy proxy : Config.proxyMap.stream().filter(Proxy::isOnline).toList()) {
+            sendMessage(proxy
+                    , "POST&PERM&<delete>" + groupName, response -> {}
+                    , e -> Nebula.util.log("Failed to connect to proxy {} for permission post."
+                            , proxy.getName()));
+        }
     }
 
     private void sendMessage(Proxy proxy, String message, Consumer<String> onSuccess, Consumer<String> onFailure) {

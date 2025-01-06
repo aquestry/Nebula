@@ -9,6 +9,10 @@ import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Config;
 import de.voasis.nebula.model.Group;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class PermissionManager implements PermissionProvider {
 
     public boolean hasPermission(Player player, String permission) {
@@ -37,7 +41,8 @@ public class PermissionManager implements PermissionProvider {
     }
 
     public String getGroupData(Group group) {
-        return group.getName()
+        return  "<update>"
+                + group.getName()
                 + "?" + group.getPrefix().replace(" ", "<space>")
                 + "?" + group.getLevel()
                 + "?" + String.join(":", Nebula.permissionFile.getGroupMembers(group.getName())
@@ -60,5 +65,72 @@ public class PermissionManager implements PermissionProvider {
             }
         }
         Nebula.permissionFile.addMemberToGroup(group, uuid);
+
+    }
+
+    public void processGroups(String response) {
+        int updated = 0;
+        List<Group> safe = new ArrayList<>();
+        boolean deleteOthers = true;
+        if(response.startsWith("<update>")) {
+            deleteOthers = false;
+            response = response.replace("<update>", "");
+        }
+        for (String groupData : response.split("~")) {
+            try {
+                groupData = groupData.trim();
+                String[] parts = groupData.split("\\?");
+                String groupName = parts[0].trim();
+                String prefix = parts[1].replace("<space>", " ");
+                int level = Integer.parseInt(parts[2].trim());
+                String[] members = new String[0];
+                String[] perms = new String[0];
+                if (parts.length == 4) {
+                    String[] uuidsPerm = parts[3].split("°");
+                    if (uuidsPerm.length > 0) {
+                        members = uuidsPerm[0].replace("[", "").replace("]", "").split(":");
+                    }
+                    if (uuidsPerm.length == 2) {
+                        perms = uuidsPerm[1].split(":");
+                    }
+                }
+                Group group = Nebula.permissionFile.createGroup(groupName, prefix, level);
+                safe.add(group);
+                List<String> oldMembers = group.getMembers();
+                for (String oldMember : oldMembers) {
+                    if (!Arrays.asList(members).contains(oldMember)) {
+                        Nebula.util.log("Removed member '{}' from group '{}'.", oldMember, groupName);
+                    }
+                }
+                Nebula.permissionFile.clearMembers(group);
+                for (String member : members) {
+                    if (!member.isEmpty()) {
+                        Nebula.permissionManager.assignGroup(member, group);
+                        Nebula.util.log("Added member '{}' to group '{}'.", member, groupName);
+                    }
+                }
+                Nebula.permissionFile.clearPermissions(group);
+                for (String perm : perms) {
+                    if (!perm.isEmpty()) {
+                        Nebula.permissionFile.addPermissionToGroup(group, perm);
+                    }
+                }
+                updated++;
+            } catch (NumberFormatException e) {
+                Nebula.util.log("Failed to parse level in group data '{}'. Error: {}", groupData, e.getMessage());
+            } catch (Exception e) {
+                Nebula.util.log("Failed to process group data '{}'. Error: {}", groupData, e.getMessage());
+            }
+        }
+        if(deleteOthers) {
+            for(Group group : Nebula.permissionFile.runtimeGroups) {
+                if(!safe.contains(group)) {
+                    Nebula.permissionFile.deleteGroup(group.getName());
+                }
+            }
+        }
+        Nebula.permissionFile.saveConfig();
+        Nebula.util.sendAlltoBackend();
+        Nebula.util.log("Group processing completed. Total groups updated: {}.", updated);
     }
 }

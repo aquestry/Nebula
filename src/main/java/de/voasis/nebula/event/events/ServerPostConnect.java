@@ -10,6 +10,6 @@ public class ServerPostConnect {
         Player player = event.getPlayer();
         RegisteredServer server = player.getCurrentServer().get().getServer();
         Nebula.util.getBackendServer(server.getServerInfo().getName()).removePendingPlayerConnection(player);
-        Nebula.permissionFile.sendInfotoBackend(player);
+        Nebula.util.sendInfotoBackend(player);
     }
 }

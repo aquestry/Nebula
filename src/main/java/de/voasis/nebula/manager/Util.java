@@ -1,5 +1,7 @@
 package de.voasis.nebula.manager;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
@@ -13,6 +15,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.*;
 
 public class Util {
@@ -142,5 +147,30 @@ public class Util {
             message = message.replaceFirst("\\{}", arg != null ? arg.toString() : "");
         }
         Nebula.server.getConsoleCommandSource().sendMessage(mm.deserialize(message));
+    }
+
+    public String getUUID(String name) {
+        String uuid;
+        try {
+            BufferedReader in = new BufferedReader(new InputStreamReader(new URL("https://api.mojang.com/users/profiles/minecraft/" + name).openStream()));
+            uuid = (((JsonObject)new JsonParser().parse(in)).get("id")).toString().replaceAll("\"", "");
+            uuid = uuid.replaceAll("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5");
+            in.close();
+        } catch (Exception e) {
+            uuid = "ERROR";
+        }
+        return uuid;
+    }
+
+    public void sendAlltoBackend() {
+        for(Player player : Nebula.server.getAllPlayers()) {
+            sendInfotoBackend(player);
+        }
+    }
+
+    public void sendInfotoBackend(Player player) {
+        Group group = Nebula.permissionManager.getGroup(player.getUniqueId().toString());
+        String info = player.getUsername() + ":" + group.getName() + "#" + group.getLevel() + "#" + group.getPrefix();
+        player.getCurrentServer().ifPresent(serverConnection -> serverConnection.getServer().sendPluginMessage(Nebula.channelMain, info.getBytes()));
     }
 }
