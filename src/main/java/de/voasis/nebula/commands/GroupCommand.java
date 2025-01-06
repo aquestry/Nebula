@@ -154,7 +154,7 @@ public class GroupCommand implements SimpleCommand {
                 Nebula.permissionFile.addPermissionToGroup(group, args[3]);
                 Nebula.multiProxySender.updateGroup(group);
             case "remove":
-                Nebula.permissionFile.removePermissionToGroup(group, args[3]);
+                Nebula.permissionFile.removePermissionFromGroup(group, args[3]);
                 Nebula.multiProxySender.updateGroup(group);
             case "list":
                 group.getPermissions().forEach(permission -> Nebula.util.sendMessage(source, permission));

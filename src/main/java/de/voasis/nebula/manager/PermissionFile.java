@@ -106,7 +106,7 @@ public class PermissionFile {
         saveGroup(group);
     }
 
-    public void removePermissionToGroup(Group group, String permission) {
+    public void removePermissionFromGroup(Group group, String permission) {
         group.removePermission(permission);
         saveGroup(group);
     }

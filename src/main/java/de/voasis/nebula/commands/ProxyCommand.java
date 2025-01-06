@@ -16,7 +16,7 @@ public class ProxyCommand implements SimpleCommand {
     public void execute(Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
-        if (args.length < 2 || !Config.multiProxyMode) {
+        if (args.length < 2) {
             return;
         }
         String action = args[0].toLowerCase();
@@ -42,8 +42,7 @@ public class ProxyCommand implements SimpleCommand {
     @Override
     public CompletableFuture<List<String>> suggestAsync(Invocation invocation) {
         String[] args = invocation.arguments();
-
-        if (args.length == 1) {
+        if (args.length < 2) {
             return CompletableFuture.completedFuture(
                     List.of("nodes", "servers").stream()
                             .filter(option -> option.startsWith(args[0].toLowerCase()))
