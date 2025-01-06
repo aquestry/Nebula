@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class MultiProxySender {
@@ -41,29 +40,17 @@ public class MultiProxySender {
         }
     }
 
-    public String getNodes(Proxy proxy) {
-        AtomicReference<String> result = new AtomicReference<>("FAILED");
-        sendMessage(proxy, "GET&NODES", result::set, e -> {});
-        return result.get();
-    }
-
-    public String getServers(Proxy proxy) {
-        AtomicReference<String> result = new AtomicReference<>("FAILED");
-        sendMessage(proxy, "GET&SERVERS", result::set, e -> {});
-        return result.get();
-    }
-
-    public void sendGroups(Proxy proxy) {
+    private void sendGroups(Proxy proxy) {
         sendMessage(proxy
-                , "POST&PERM&" + Nebula.permissionManager.getAllGroups(), response -> {}
+                , "POST&PERM&UPDATE&" + Nebula.permissionManager.getAllGroups(), response -> {}
                 , e -> Nebula.util.log("Failed to connect to proxy {} for permission post."
                 , proxy.getName()));
     }
 
-    public void sendGroup(Group group) {
+    public void updateGroup(Group group) {
         for(Proxy proxy : Config.proxyMap.stream().filter(Proxy::isOnline).toList()) {
             sendMessage(proxy
-                    , "POST&PERM&" + Nebula.permissionManager.getGroupData(group), response -> {}
+                    , "POST&PERM&UPDATE&" + Nebula.permissionManager.getGroupData(group), response -> {}
                     , e -> Nebula.util.log("Failed to connect to proxy {} for permission post."
                             , proxy.getName()));
         }
@@ -72,7 +59,7 @@ public class MultiProxySender {
     public void sendDelete(String groupName) {
         for(Proxy proxy : Config.proxyMap.stream().filter(Proxy::isOnline).toList()) {
             sendMessage(proxy
-                    , "POST&PERM&<delete>" + groupName, response -> {}
+                    , "POST&PERM&DELETE&" + groupName, response -> {}
                     , e -> Nebula.util.log("Failed to connect to proxy {} for permission post."
                             , proxy.getName()));
         }
@@ -93,9 +80,8 @@ public class MultiProxySender {
     }
 
     public boolean hasHighestLevel() {
-        int myLevel = Config.multiProxyLevel;
         return Config.proxyMap.stream()
                 .filter(Proxy::isOnline)
-                .allMatch(proxy -> proxy.getLevel() < myLevel);
+                .allMatch(proxy -> proxy.getLevel() < Config.multiProxyLevel);
     }
 }

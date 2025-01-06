@@ -2,8 +2,6 @@ package de.voasis.nebula.network;
 
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Config;
-import de.voasis.nebula.model.Container;
-import de.voasis.nebula.model.Node;
 import de.voasis.nebula.model.Proxy;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -38,35 +36,41 @@ public class MultiProxyServer {
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
             String message = in.readLine();
             String[] parts = message.split("\\|");
-            if (parts.length != 2 || !Nebula.util.calculateHMAC(parts[0]).equals(parts[1])) {
+            Proxy proxy = Config.proxyMap.stream().filter(p -> p.getIP().equals(ip)).findFirst().orElse(null);
+            if (parts.length != 2 || !Nebula.util.calculateHMAC(parts[0]).equals(parts[1]) || proxy == null) {
                 out.println("FAILED");
                 return;
             }
             String[] components = parts[0].split("&");
-            if(components[0].equals("POST") && components[1].equals("PERM")) {
-                Proxy proxy = Config.proxyMap.stream().filter(p -> p.getIP().equals(ip)).findFirst().orElse(null);
-                if(proxy != null) {
-                    if(components[2].startsWith("<delete>")) {
-                        Nebula.permissionFile.deleteGroup(components[2].replace("<delete>", ""));
-                        return;
-                    }
-                    Nebula.permissionManager.processGroups(components[2]);
-                    out.println("FETCHED");
-                    return;
+            if(components.length == 4) {
+                if(components[0].equals("POST")) {
+                    out.println(handlePOST(components));
                 }
             }
-            if(components[0].equals("GET")) {
-                out.println(handleGET(components));
+            if(components.length == 2) {
+                if(components[0].equals("GET")) {
+                    out.println(handleGET(components));
+                }
+
             }
         } catch (Exception ignored) {}
     }
 
     private String handleGET(String[] components) {
         switch (components[1]) {
-            case "SERVERS": return String.join(",", Config.backendInfoMap.stream().map(Container::getServerName).toList());
-            case "NODES": return String.join(",", Config.nodeMap.stream().map(Node::getServerName).toList());
-            case "PERM": return Nebula.permissionManager.getAllGroups();
             case "LEVEL": return String.valueOf(Config.multiProxyLevel);
+            default: return "INVALID";
+        }
+    }
+
+    private String handlePOST(String[] components) {
+        switch (components[2]) {
+            case "DELETE":
+                Nebula.permissionFile.deleteGroup(components[3]);
+                return "FETCHED";
+            case "UPDATE":
+                Nebula.permissionManager.processGroups(components[3]);
+                return "FETCHED";
             default: return "INVALID";
         }
     }

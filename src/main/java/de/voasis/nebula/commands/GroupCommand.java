@@ -41,14 +41,16 @@ public class GroupCommand implements SimpleCommand {
         }
         String playerName = args[1];
         String groupName = args[2];
-        String uuid = "";
+        String uuid;
         Optional<Player> player = Nebula.server.getPlayer(playerName);
         if (player.isEmpty()) {
             uuid = Nebula.util.getUUID(playerName);
-            if(uuid.equals("ERROR")) {
+            if (uuid.equals("ERROR")) {
                 Nebula.util.sendMessage(source, Messages.GROUP_ASSIGN_PLAYER_NOT_FOUND.replace("<player>", playerName));
                 return;
             }
+        } else {
+            uuid = player.get().getUniqueId().toString();
         }
         Group group = Nebula.permissionFile.getGroup(groupName);
         if (group == null) {
@@ -56,13 +58,17 @@ public class GroupCommand implements SimpleCommand {
             return;
         }
         Group oldGroup = Nebula.permissionManager.getGroup(uuid);
-        if (oldGroup.equals(group)) {
+        if (oldGroup != null && oldGroup.equals(group)) {
             Nebula.util.sendMessage(source, Messages.GROUP_ASSIGN_ALREADY.replace("<group>", groupName).replace("<player>", playerName));
             return;
         }
         Nebula.permissionManager.assignGroup(uuid, group);
-        Nebula.multiProxySender.sendGroup(oldGroup);
-        Nebula.multiProxySender.sendGroup(group);
+        if (oldGroup != null) {
+            Nebula.multiProxySender.updateGroup(oldGroup);
+            Nebula.util.log("Player '{}' removed from group '{}'.", playerName, oldGroup.getName());
+        }
+        Nebula.multiProxySender.updateGroup(group);
+        player.ifPresent(p -> Nebula.util.sendInfotoBackend(p));
         Nebula.util.sendMessage(source, Messages.GROUP_ASSIGN_SUCCESS.replace("<player>", playerName).replace("<group>", groupName));
     }
 
@@ -84,7 +90,7 @@ public class GroupCommand implements SimpleCommand {
             Nebula.util.sendMessage(source, Messages.GROUP_CREATE_ALREADY_EXISTS.replace("<group>", groupName));
             return;
         }
-        Nebula.multiProxySender.sendGroup(Nebula.permissionFile.createGroup(groupName, prefix, level));
+        Nebula.multiProxySender.updateGroup(Nebula.permissionFile.createGroup(groupName, prefix, level));
         Nebula.util.sendMessage(source, Messages.GROUP_CREATE_SUCCESS.replace("<group>", groupName).replace("<prefix>", prefix).replace("<level>", String.valueOf(level)));
     }
 
@@ -146,10 +152,10 @@ public class GroupCommand implements SimpleCommand {
         switch (action) {
             case "add":
                 Nebula.permissionFile.addPermissionToGroup(group, args[3]);
-                Nebula.multiProxySender.sendGroup(group);
+                Nebula.multiProxySender.updateGroup(group);
             case "remove":
                 Nebula.permissionFile.removePermissionToGroup(group, args[3]);
-                Nebula.multiProxySender.sendGroup(group);
+                Nebula.multiProxySender.updateGroup(group);
             case "list":
                 group.getPermissions().forEach(permission -> Nebula.util.sendMessage(source, permission));
         }

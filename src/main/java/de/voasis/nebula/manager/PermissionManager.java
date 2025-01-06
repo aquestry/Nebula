@@ -29,7 +29,6 @@ public class PermissionManager implements PermissionProvider {
     }
 
     public Group getGroup(String uuid) {
-        if(uuid.isEmpty()) return null;
         Group group = Nebula.permissionFile.runtimeGroups.stream()
                 .filter(g -> g.hasMember(uuid))
                 .findFirst()
@@ -43,17 +42,15 @@ public class PermissionManager implements PermissionProvider {
     }
 
     public String getGroupData(Group group) {
-        return  "<update>"
-                + group.getName()
-                + "?" + group.getPrefix().replace(" ", "<space>")
-                + "?" + group.getLevel()
-                + "?" + String.join(":", Nebula.permissionFile.getGroupMembers(group.getName())
-                + "°" + String.join(":", group.getPermissions()));
+        return group.getName()
+               + "?" + group.getPrefix().replace(" ", "<space>")
+               + "?" + group.getLevel()
+               + "?" + String.join(":", Nebula.permissionFile.getGroupMembers(group.getName())
+               + "°" + String.join(":", group.getPermissions()));
     }
 
     public String getAllGroups() {
-        return String.join("~", Nebula.permissionFile.runtimeGroups.stream()
-                .map(g -> g.getName() + "?"
+        return String.join("~", Nebula.permissionFile.runtimeGroups.stream().map(g -> g.getName() + "?"
                         + g.getPrefix().replace(" ", "<space>")
                         + "?" + g.getLevel()
                         + "?" + String.join(":", Nebula.permissionFile.getGroupMembers(g.getName())
@@ -61,12 +58,12 @@ public class PermissionManager implements PermissionProvider {
     }
 
     public void assignGroup(String uuid, Group group) {
+        Nebula.permissionFile.addMemberToGroup(group, uuid);
         for(Group g : Nebula.permissionFile.runtimeGroups) {
-            if(g.hasMember(uuid)) {
+            if(g.hasMember(uuid) && !g.equals(group)) {
                 Nebula.permissionFile.removeMemberFromGroup(g, uuid);
             }
         }
-        Nebula.permissionFile.addMemberToGroup(group, uuid);
         Optional<Player> player = Nebula.server.getPlayer(uuid);
         player.ifPresent(value -> Nebula.util.sendInfotoBackend(value));
     }
