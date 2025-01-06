@@ -42,13 +42,17 @@ public class ProxyCommand implements SimpleCommand {
     @Override
     public CompletableFuture<List<String>> suggestAsync(Invocation invocation) {
         String[] args = invocation.arguments();
-        if (args.length < 2) {
+        if (args.length == 0) {
+            return CompletableFuture.completedFuture(List.of("nodes", "servers"));
+        }
+        if (args.length == 1) {
             return CompletableFuture.completedFuture(
                     List.of("nodes", "servers").stream()
                             .filter(option -> option.startsWith(args[0].toLowerCase()))
                             .collect(Collectors.toList())
             );
-        } else if (args.length == 2 && (args[0].equalsIgnoreCase("nodes") || args[0].equalsIgnoreCase("servers"))) {
+        }
+        if (args.length == 2 && (args[0].equalsIgnoreCase("nodes") || args[0].equalsIgnoreCase("servers"))) {
             return CompletableFuture.completedFuture(
                     Config.proxyMap.stream()
                             .filter(Proxy::isOnline)

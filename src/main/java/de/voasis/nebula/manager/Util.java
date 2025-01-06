@@ -114,6 +114,14 @@ public class Util {
         Nebula.util.sendMessage(source, "Name:      " + group.getName());
         Nebula.util.sendMessage(source, "Prefix:    " + group.getPrefix());
         Nebula.util.sendMessage(source, "Level:     " + group.getLevel());
+        Nebula.util.sendMessage(source, "Members:     ");
+        for(String member : group.getMembers()) {
+            Nebula.util.sendMessage(source, member);
+        }
+        Nebula.util.sendMessage(source, "Permissions:     ");
+        for(String permission : group.getPermissions()) {
+            Nebula.util.sendMessage(source, permission);
+        }
     }
 
     public int getPlayerCount(Object backendServer) {

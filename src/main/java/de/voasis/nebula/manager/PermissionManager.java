@@ -40,16 +40,16 @@ public class PermissionManager implements PermissionProvider {
         return group.getName()
                + "?" + group.getPrefix().replace(" ", "<space>")
                + "?" + group.getLevel()
-               + "?" + String.join(":", Nebula.permissionFile.getGroupMembers(group.getName())
-               + "°" + String.join(":", group.getPermissions()));
+               + "?" + String.join(",:", Nebula.permissionFile.getGroupMembers(group.getName())
+               + "°" + String.join(",", group.getPermissions()));
     }
 
     public String getAllGroups() {
         return String.join("~", Nebula.permissionFile.runtimeGroups.stream().map(g -> g.getName() + "?"
                         + g.getPrefix().replace(" ", "<space>")
                         + "?" + g.getLevel()
-                        + "?" + String.join(":", Nebula.permissionFile.getGroupMembers(g.getName())
-                        + "°" + String.join(":", g.getPermissions()))).toList());
+                        + "?" + String.join(",", Nebula.permissionFile.getGroupMembers(g.getName())
+                        + "°" + String.join(",", g.getPermissions()))).toList());
     }
 
     public void assignGroup(String uuid, Group group) {
@@ -60,7 +60,11 @@ public class PermissionManager implements PermissionProvider {
             }
         }
         Nebula.util.log("'{}' is now in group {} sending info to backend.", uuid, group.getName());
-        Nebula.server.getAllPlayers().stream().filter(p -> p.getUniqueId().toString().equals(uuid)).toList().forEach(p -> Nebula.util.sendInfotoBackend(p));
+        Nebula.server.getAllPlayers().stream().forEach(p -> {
+          if(p.getUniqueId().toString().equals(uuid)) {
+              Nebula.util.sendInfotoBackend(p);
+          }
+        });
     }
 
     public void processGroups(String response) {
@@ -72,17 +76,20 @@ public class PermissionManager implements PermissionProvider {
                 String groupName = parts[0].trim();
                 String prefix = parts[1].replace("<space>", " ");
                 int level = Integer.parseInt(parts[2].trim());
-                String[] members = new String[0];
+                String[] membersRaw = new String[0];
                 String[] perms = new String[0];
                 if (parts.length == 4) {
                     String[] uuidsPerm = parts[3].split("°");
                     if (uuidsPerm.length > 0) {
-                        members = uuidsPerm[0].replace("[", "").replace("]", "").split(":");
+                        membersRaw = uuidsPerm[0].replace("[", "").replace("]", "").split(",");
                     }
                     if (uuidsPerm.length == 2) {
-                        perms = uuidsPerm[1].split(":");
+                        perms = uuidsPerm[1].split(",");
                     }
                 }
+                String [] members = new String[membersRaw.length];
+                for (int i = 0; i < membersRaw.length; i++)
+                    members[i] = membersRaw[i].trim();
                 Group group = Nebula.permissionFile.createGroup(groupName, prefix, level);
                 Nebula.permissionFile.clearMembers(group);
                 for (String member : members) {
