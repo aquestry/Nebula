@@ -23,7 +23,7 @@ public class Config {
     public static int defaultmin;
     public static List<Node> nodeMap = new ArrayList<>();
     public static List<Proxy> proxyMap = new ArrayList<>();
-    public static List<Container> backendInfoMap = new ArrayList<>();
+    public static List<Container> containerMap = new ArrayList<>();
     public static List<Queue> queueMap = new ArrayList<>();
     public static List<String> alltemplates = new ArrayList<>();
     public static final Map<String, Long> cooldownsPluginMessage = new ConcurrentHashMap<>();

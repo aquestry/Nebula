@@ -61,7 +61,8 @@ public class PermissionManager implements PermissionProvider {
                 Nebula.permissionFile.removeMemberFromGroup(g, uuid);
             }
         }
-        Nebula.server.getPlayer(uuid).ifPresent(value -> Nebula.util.sendInfotoBackend(value));
+        Nebula.util.log("'{}' is now in group {} sending info to backend.", uuid, group.getName());
+        Nebula.server.getAllPlayers().stream().filter(p -> p.getUniqueId().toString().equals(uuid)).toList().forEach(p -> Nebula.util.sendInfotoBackend(p));
     }
 
     public void processGroups(String response) {
@@ -94,8 +95,7 @@ public class PermissionManager implements PermissionProvider {
                 Nebula.permissionFile.clearMembers(group);
                 for (String member : members) {
                     if (!member.isEmpty()) {
-                        Nebula.permissionManager.assignGroup(member, group);
-                        Nebula.server.getPlayer(member).ifPresent(p -> Nebula.util.sendInfotoBackend(p));
+                        assignGroup(member, group);
                         Nebula.util.log("Added member '{}' to group '{}'.", member, groupName);
                     }
                 }

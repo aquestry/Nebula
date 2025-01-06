@@ -43,15 +43,29 @@ public class MultiProxySender {
     private void sendGroups(Proxy proxy) {
         sendMessage(proxy
                 , "POST&PERM&UPDATE&" + Nebula.permissionManager.getAllGroups(), response -> {}
-                , e -> Nebula.util.log("Failed to connect to proxy {} for permission post."
+                , e -> Nebula.util.log("Failed to connect to proxy {} for group post."
                 , proxy.getName()));
+    }
+
+    public String getNodes(Proxy proxy) {
+        final String[] result = {"FAILED"};
+        sendMessage(proxy, "GET&NODES",
+                response -> result[0] = response, e -> {});
+        return result[0];
+    }
+
+    public String getServers(Proxy proxy) {
+        final String[] result = {"FAILED"};
+        sendMessage(proxy, "GET&SERVERS",
+                response -> result[0] = response, e -> {});
+        return result[0];
     }
 
     public void updateGroup(Group group) {
         for(Proxy proxy : Config.proxyMap.stream().filter(Proxy::isOnline).toList()) {
             sendMessage(proxy
                     , "POST&PERM&UPDATE&" + Nebula.permissionManager.getGroupData(group), response -> {}
-                    , e -> Nebula.util.log("Failed to connect to proxy {} for permission post."
+                    , e -> Nebula.util.log("Failed to connect to proxy {} for group post."
                             , proxy.getName()));
         }
     }
@@ -60,7 +74,7 @@ public class MultiProxySender {
         for(Proxy proxy : Config.proxyMap.stream().filter(Proxy::isOnline).toList()) {
             sendMessage(proxy
                     , "POST&PERM&DELETE&" + groupName, response -> {}
-                    , e -> Nebula.util.log("Failed to connect to proxy {} for permission post."
+                    , e -> Nebula.util.log("Failed to connect to proxy {} for group deletion."
                             , proxy.getName()));
         }
     }

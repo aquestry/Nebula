@@ -91,19 +91,19 @@ public class NodeCommand implements SimpleCommand {
                         .filter(template -> template.toLowerCase().startsWith(args[1].toLowerCase()))
                         .toList());
             } else if("start".equalsIgnoreCase(args[0])) {
-                return CompletableFuture.completedFuture(Config.backendInfoMap.stream()
+                return CompletableFuture.completedFuture(Config.containerMap.stream()
                         .filter(backendServer -> !backendServer.isOnline())
                         .map(Container::getServerName)
                         .filter(serverName -> serverName.startsWith(args[1]))
                         .toList());
             } else if("kill".equalsIgnoreCase(args[0])) {
-                return CompletableFuture.completedFuture(Config.backendInfoMap.stream()
+                return CompletableFuture.completedFuture(Config.containerMap.stream()
                         .filter(Container::isOnline)
                         .map(Container::getServerName)
                         .filter(serverName -> serverName.startsWith(args[1]))
                         .toList());
             } else {
-                return CompletableFuture.completedFuture(Config.backendInfoMap.stream()
+                return CompletableFuture.completedFuture(Config.containerMap.stream()
                         .map(Container::getServerName)
                         .filter(serverName -> serverName.startsWith(args[1]))
                         .toList());

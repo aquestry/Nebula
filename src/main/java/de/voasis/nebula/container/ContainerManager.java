@@ -29,7 +29,7 @@ public class ContainerManager {
             }
             int tempPort = node.getFreePort();
             String FinalNewName = newName + "-" + node.getServerName();
-            for (Container container : Config.backendInfoMap) {
+            for (Container container : Config.containerMap) {
                 if (container.getServerName().equals(FinalNewName)) {
                     Nebula.util.sendMessage(source, Messages.ALREADY_EXISTS.replace("<name>", FinalNewName));
                     return null;
@@ -52,7 +52,7 @@ public class ContainerManager {
                     () -> {
                         ServerInfo newInfo = new ServerInfo(FinalNewName, new InetSocketAddress(finalnode.getIp(), tempPort));
                         Nebula.server.registerServer(newInfo);
-                        Config.backendInfoMap.add(container);
+                        Config.containerMap.add(container);
                         Nebula.ssh.updateFreePort(finalnode);
                         Nebula.util.sendMessage(source, Messages.DONE);
                         container.removeFlag("retry");
@@ -128,7 +128,7 @@ public class ContainerManager {
         Nebula.ssh.executeSSHCommand(node, "docker rm -f " + name,
                 () -> {
                     Nebula.server.unregisterServer(new ServerInfo(name, new InetSocketAddress(node.getIp(), serverToDelete.getPort())));
-                    Config.backendInfoMap.remove(serverToDelete);
+                    Config.containerMap.remove(serverToDelete);
                     Nebula.util.sendMessage(source, Messages.DONE);
                 },
                 () -> Nebula.util.sendMessage(source, Messages.ERROR_DELETE.replace("<name>", name))

@@ -91,7 +91,7 @@ public class GroupCommand implements SimpleCommand {
             return;
         }
         Nebula.multiProxySender.updateGroup(Nebula.permissionFile.createGroup(groupName, prefix, level));
-        Nebula.util.sendMessage(source, Messages.GROUP_CREATE_SUCCESS.replace("<group>", groupName).replace("<prefix>", prefix).replace("<level>", String.valueOf(level)));
+        Nebula.util.sendMessage(source, Messages.GROUP_CREATE_SUCCESS.replace("<group>", groupName).replace("<prefix>", "'" + prefix + "'").replace("<level>", String.valueOf(level)));
     }
 
     private void handleDelete(String[] args, CommandSource source) {

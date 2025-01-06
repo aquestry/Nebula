@@ -33,7 +33,7 @@ public class Node {
     public int getFreePort() { return freePort; }
 
     public List<Container> getBackendServers() {
-        return Config.backendInfoMap.stream()
+        return Config.containerMap.stream()
                 .filter(backendServer -> backendServer.getHoldServer().equals(this))
                 .toList();
     }

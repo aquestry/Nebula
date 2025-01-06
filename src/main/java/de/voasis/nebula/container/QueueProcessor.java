@@ -57,7 +57,7 @@ public class QueueProcessor {
     }
 
     private Optional<Container> findPreloadedServer(Queue queue) {
-        return Config.backendInfoMap.stream()
+        return Config.containerMap.stream()
                 .filter(server -> {
                     boolean hasGamemode = server.getFlags().contains("gamemode:" + queue.getName());
                     boolean hasPreload = server.getFlags().contains("preload");

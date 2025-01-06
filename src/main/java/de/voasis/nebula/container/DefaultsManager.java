@@ -24,7 +24,7 @@ public class DefaultsManager {
 
     private List<Container> getAvailableServers() {
         List<Container> servers = new ArrayList<>();
-        for (Container server : Config.backendInfoMap) {
+        for (Container server : Config.containerMap) {
             if (server.getFlags().contains("lobby") && server.isOnline()) {
                 servers.add(server);
             }

@@ -18,7 +18,7 @@ public class AutoDeleter {
         long currentTime = System.currentTimeMillis();
         List<Container> serversToDelete = new ArrayList<>();
         boolean lobbyServerDeleted = false;
-        for (Container container : Config.backendInfoMap) {
+        for (Container container : Config.containerMap) {
             if (container.getFlags().contains("custom") || container.getFlags().contains("retry")) {
                 continue;
             }
@@ -50,7 +50,7 @@ public class AutoDeleter {
     }
 
     private boolean canDeleteLobbyServer(Container serverToExclude) {
-        for (Container otherServer : Config.backendInfoMap) {
+        for (Container otherServer : Config.containerMap) {
             if (!otherServer.equals(serverToExclude) && otherServer.getFlags().contains("lobby") && otherServer.isOnline() && Nebula.util.getPlayerCount(otherServer) < Config.defaultmin) {
                 return true;
             }

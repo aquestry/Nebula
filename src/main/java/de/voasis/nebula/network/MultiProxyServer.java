@@ -2,6 +2,8 @@ package de.voasis.nebula.network;
 
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Config;
+import de.voasis.nebula.model.Container;
+import de.voasis.nebula.model.Node;
 import de.voasis.nebula.model.Proxy;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -59,6 +61,8 @@ public class MultiProxyServer {
     private String handleGET(String[] components) {
         switch (components[1]) {
             case "LEVEL": return String.valueOf(Config.multiProxyLevel);
+            case "NODES": return String.join(",", Config.nodeMap.stream().map(Node::getServerName).toList());
+            case "SERVERS": return String.join(",", Config.containerMap.stream().map(Container::getServerName).toList());
             default: return "INVALID";
         }
     }

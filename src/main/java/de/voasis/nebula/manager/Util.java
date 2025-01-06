@@ -58,7 +58,7 @@ public class Util {
 
     public void checkLobbys(boolean online) {
         int lobbys = 0;
-        for(Container container : Config.backendInfoMap) {
+        for(Container container : Config.containerMap) {
             if(container.getFlags().contains("lobby")) {
                 if(online && container.isOnline()) {
                     lobbys++;
@@ -93,7 +93,7 @@ public class Util {
     }
 
     public Container getBackendServer(String name) {
-        for (Container server : Config.backendInfoMap) {
+        for (Container server : Config.containerMap) {
             if (server.getServerName().equals(name)) {
                 return server;
             }

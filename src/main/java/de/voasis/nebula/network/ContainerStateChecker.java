@@ -13,7 +13,7 @@ public class ContainerStateChecker {
     public void pingServers() {
         if(Config.quitting) return;
         Nebula.util.checkLobbys(false);
-        for (Container container : new ArrayList<>(Config.backendInfoMap)) {
+        for (Container container : new ArrayList<>(Config.containerMap)) {
             Optional<RegisteredServer> registeredServer = Nebula.server.getServer(container.getServerName());
             registeredServer.ifPresent(regServer -> regServer.ping().whenComplete((result, exception) -> {
                 if (exception == null) {
@@ -34,7 +34,7 @@ public class ContainerStateChecker {
     }
 
     private void stateComplete(RegisteredServer registeredServer) {
-        for (Container container : Config.backendInfoMap) {
+        for (Container container : Config.containerMap) {
             if (registeredServer.getServerInfo().getName().equals(container.getServerName())) {
                 synchronized (container) {
                     if (!container.isOnline()) {
@@ -49,7 +49,7 @@ public class ContainerStateChecker {
     }
 
     public void stateCompleteFailed(RegisteredServer registeredServer) {
-        for (Container container : Config.backendInfoMap) {
+        for (Container container : Config.containerMap) {
             if (registeredServer.getServerInfo().getName().equals(container.getServerName())) {
                 synchronized (container) {
                     if (container.isOnline()) {

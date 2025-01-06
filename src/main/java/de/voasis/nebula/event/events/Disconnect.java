@@ -14,7 +14,7 @@ public class Disconnect {
         } else {
             Nebula.queueProcessor.leaveQueue(player, false);
         }
-        for(Container container : Config.backendInfoMap) {
+        for(Container container : Config.containerMap) {
             container.removePendingPlayerConnection(player);
         }
     }
