@@ -181,9 +181,7 @@ public class GroupCommand implements SimpleCommand {
                             ? Nebula.permissionFile.getGroupNames().stream().filter(g -> g.startsWith(args[2])).toList()
                             : List.of()
             );
-            case "create" -> CompletableFuture.completedFuture(
-                    args.length == 2 ? List.of("<groupName>") : args.length == 3 ? List.of("<level>") : List.of("<prefix...>")
-            );
+            case "create" -> CompletableFuture.completedFuture(args.length == 2 ? List.of("<groupName>") : args.length == 3 ? List.of("<level>") : List.of("<prefix...>"));
             case "permission" -> CompletableFuture.completedFuture(
                     args.length == 2
                             ? Stream.of("add", "remove", "list").filter(s -> s.startsWith(args[1])).toList()
@@ -195,6 +193,7 @@ public class GroupCommand implements SimpleCommand {
                             .orElse(List.of())
                             : List.of()
             );
+            case "list" -> CompletableFuture.completedFuture(List.of());
             default -> CompletableFuture.completedFuture(
                     List.of("assign", "create", "delete", "list", "permission", "info").stream()
                             .filter(command -> command.startsWith(args[0].toLowerCase()))

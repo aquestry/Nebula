@@ -8,8 +8,6 @@ import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Config;
 import de.voasis.nebula.model.Group;
-import java.util.Arrays;
-import java.util.List;
 
 public class PermissionManager implements PermissionProvider {
     public boolean hasPermission(Player player, String permission) {
@@ -86,17 +84,10 @@ public class PermissionManager implements PermissionProvider {
                     }
                 }
                 Group group = Nebula.permissionFile.createGroup(groupName, prefix, level);
-                List<String> oldMembers = group.getMembers();
-                for (String oldMember : oldMembers) {
-                    if (!Arrays.asList(members).contains(oldMember)) {
-                        Nebula.util.log("Removed member '{}' from group '{}'.", oldMember, groupName);
-                    }
-                }
                 Nebula.permissionFile.clearMembers(group);
                 for (String member : members) {
                     if (!member.isEmpty()) {
                         assignGroup(member, group);
-                        Nebula.util.log("Added member '{}' to group '{}'.", member, groupName);
                     }
                 }
                 Nebula.permissionFile.clearPermissions(group);
@@ -113,6 +104,6 @@ public class PermissionManager implements PermissionProvider {
             }
         }
         Nebula.permissionFile.saveConfig();
-        Nebula.util.log("Group processing completed. Total groups updated: {}.", updated);
+        Nebula.util.log("Group syncing completed. Total groups updated: {}.", updated);
     }
 }
