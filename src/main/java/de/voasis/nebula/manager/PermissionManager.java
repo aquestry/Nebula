@@ -33,6 +33,7 @@ public class PermissionManager implements PermissionProvider {
             Nebula.util.log("Giving {} the default group.", uuid);
             group = Nebula.permissionFile.runtimeGroups.stream().filter(g -> g.getName().equals(Config.defaultGroupName)).toList().getFirst();
             assignGroup(uuid, group);
+            Nebula.server.getPlayer(uuid).ifPresent(p -> Nebula.util.sendInfotoBackend(p));
         }
         return group;
     }
@@ -94,6 +95,7 @@ public class PermissionManager implements PermissionProvider {
                 for (String member : members) {
                     if (!member.isEmpty()) {
                         Nebula.permissionManager.assignGroup(member, group);
+                        Nebula.server.getPlayer(member).ifPresent(p -> Nebula.util.sendInfotoBackend(p));
                         Nebula.util.log("Added member '{}' to group '{}'.", member, groupName);
                     }
                 }
@@ -111,7 +113,6 @@ public class PermissionManager implements PermissionProvider {
             }
         }
         Nebula.permissionFile.saveConfig();
-        Nebula.util.sendAlltoBackend();
         Nebula.util.log("Group processing completed. Total groups updated: {}.", updated);
     }
 }
