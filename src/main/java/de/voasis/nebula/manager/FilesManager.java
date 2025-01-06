@@ -199,7 +199,7 @@ public class FilesManager {
                     Nebula.util.log("Invalid configuration for proxy '{}'. Skipping this proxy.", proxy);
                     continue;
                 }
-                Config.proxyMap.add(new Proxy(proxy.toString(), ip, port, false));
+                Config.proxyMap.add(new Proxy(proxy.toString(), ip, port, true));
                 Nebula.util.log("Loaded proxy {}.", proxy.toString());
             }
         }

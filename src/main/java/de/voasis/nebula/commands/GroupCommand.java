@@ -8,6 +8,8 @@ import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Config;
 import de.voasis.nebula.data.Messages;
 import de.voasis.nebula.model.Group;
+import de.voasis.nebula.model.Proxy;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -57,7 +59,9 @@ public class GroupCommand implements SimpleCommand {
         }
         Nebula.permissionManager.assignGroup(player.get().getUniqueId().toString(), group);
         Nebula.permissionFile.sendAlltoBackend();
-        Nebula.multiProxySender.sendGroups();
+        for(Proxy proxy : Config.proxyMap.stream().filter(Proxy::isOnline).toList()) {
+            Nebula.multiProxySender.sendGroup(proxy, group);
+        }
         Nebula.util.sendMessage(source, Messages.GROUP_ASSIGN_SUCCESS.replace("<player>", playerName).replace("<group>", groupName));
     }
 

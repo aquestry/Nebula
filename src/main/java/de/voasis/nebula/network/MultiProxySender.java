@@ -9,22 +9,10 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class MultiProxySender {
-
-    public MultiProxySender() {
-        pingProxies();
-        Proxy proxy = Config.proxyMap.stream()
-                .filter(Proxy::isOnline)
-                .max(Comparator.comparingInt(Proxy::getLevel))
-                .orElse(null);
-        fetchPermissions(proxy);
-    }
 
     public void pingProxies() {
         for (Proxy proxy : Config.proxyMap) {
@@ -36,14 +24,16 @@ public class MultiProxySender {
                         Nebula.server.shutdown();
                         System.exit(0);
                     }
-                    if (!proxy.isOnline()) {
-                        proxy.setOnline(true);
-                    }
                     if (proxy.getLevel() != level) {
                         proxy.setLevel(level);
                     }
-                }
-            }, () -> {
+                    if (!proxy.isOnline()) {
+                        proxy.setOnline(true);
+                        if(hasHighestLevel()) {
+                            sendGroups(proxy);
+                        }
+                    }
+                }}, e -> {
                 if (proxy.isOnline()) {
                     proxy.setOnline(false);
                 }
@@ -53,66 +43,31 @@ public class MultiProxySender {
 
     public String getNodes(Proxy proxy) {
         AtomicReference<String> result = new AtomicReference<>("FAILED");
-        sendMessage(proxy, "GET&NODES", result::set, () -> {});
+        sendMessage(proxy, "GET&NODES", result::set, e -> {});
         return result.get();
     }
 
     public String getServers(Proxy proxy) {
         AtomicReference<String> result = new AtomicReference<>("FAILED");
-        sendMessage(proxy, "GET&SERVERS", result::set, () -> {});
+        sendMessage(proxy, "GET&SERVERS", result::set, e -> {});
         return result.get();
     }
 
-    public void fetchPermissions(Proxy proxy) {
-        if (proxy == null) {
-            Nebula.util.log("No online proxies available to fetch permissions from.");
-            return;
-        }
-        sendMessage(proxy, "GET&PERM", response -> {
-            if (response == null || response.equals("INVALID") || response.isEmpty()) {
-                return;
-            }
-            processFetchedPermissions(response);
-        }, () -> Nebula.util.log("Failed to connect to proxy {} for permission fetch.", proxy.getName()));
+    public void sendGroups(Proxy proxy) {
+        sendMessage(proxy
+                , "POST&PERM&" + Nebula.permissionManager.getAllGroups(), response -> {}
+                , e -> Nebula.util.log("Failed to connect to proxy {} for permission post."
+                , proxy.getName()));
     }
 
-    public void sendGroups() {
-        for(Proxy proxy : Config.proxyMap.stream().filter(Proxy::isOnline).toList()) {
-            sendMessage(proxy
-                    , "POST&PERM", response -> {}
-                    , () -> Nebula.util.log("Failed to connect to proxy {} for permission post."
-                    , proxy.getName()));
-        }
+    public void sendGroup(Proxy proxy, Group group) {
+        sendMessage(proxy
+                , "POST&PERM&" + Nebula.permissionManager.getGroupData(group), response -> {}
+                , e -> Nebula.util.log("Failed to connect to proxy {} for permission post."
+                        , proxy.getName()));
     }
 
-    private void processFetchedPermissions(String response) {
-        List<Group> groupsMentioned = new ArrayList<>();
-        for (String groupData : response.split("\\+")) {
-            String[] parts = groupData.split("[\\[\\]]");
-            if (parts.length < 2) {
-                continue;
-            }
-            String groupName = parts[0].split("\\?")[0];
-            String prefix = parts[0].split("\\?")[1];
-            int level = Integer.parseInt(parts[0].split("\\?")[2]);
-            String[] members = parts[1].split(":");
-            Group group = Nebula.permissionFile.createGroup(groupName, prefix, level);
-            groupsMentioned.add(group);
-            Nebula.permissionFile.clearMembers(group);
-            for (String member : members) {
-                Nebula.permissionManager.assignGroup(member, group);
-            }
-        }
-        for(Group group : Nebula.permissionFile.runtimeGroups) {
-            if(!groupsMentioned.contains(group)) {
-                Nebula.permissionFile.deleteGroup(group.getName());
-            }
-        }
-        Nebula.permissionFile.saveConfig();
-        Nebula.permissionFile.sendAlltoBackend();
-    }
-
-    private void sendMessage(Proxy proxy, String message, Consumer<String> onSuccess, Runnable onFailure) {
+    private void sendMessage(Proxy proxy, String message, Consumer<String> onSuccess, Consumer<String> onFailure) {
         try (Socket socket = new Socket()) {
             socket.connect(new InetSocketAddress(proxy.getIP(), proxy.getPort()), 2000);
             socket.setSoTimeout(2000);
@@ -122,7 +77,14 @@ public class MultiProxySender {
             out.println(message);
             onSuccess.accept(in.readLine());
         } catch (Exception e) {
-            onFailure.run();
+            onFailure.accept(e.getMessage());
         }
+    }
+
+    public boolean hasHighestLevel() {
+        int myLevel = Config.multiProxyLevel;
+        return Config.proxyMap.stream()
+                .filter(Proxy::isOnline)
+                .allMatch(proxy -> proxy.getLevel() < myLevel);
     }
 }

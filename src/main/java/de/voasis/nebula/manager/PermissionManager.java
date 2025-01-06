@@ -36,6 +36,23 @@ public class PermissionManager implements PermissionProvider {
         return group;
     }
 
+    public String getGroupData(Group group) {
+        return group.getName()
+                + "?" + group.getPrefix().replace(" ", "<space>")
+                + "?" + group.getLevel()
+                + "?" + String.join(":", Nebula.permissionFile.getGroupMembers(group.getName())
+                + "°" + String.join(":", group.getPermissions()));
+    }
+
+    public String getAllGroups() {
+        return String.join("~", Nebula.permissionFile.runtimeGroups.stream()
+                .map(g -> g.getName() + "?"
+                        + g.getPrefix().replace(" ", "<space>")
+                        + "?" + g.getLevel()
+                        + "?" + String.join(":", Nebula.permissionFile.getGroupMembers(g.getName())
+                        + "°" + String.join(":", g.getPermissions()))).toList());
+    }
+
     public void assignGroup(String uuid, Group group) {
         for(Group g : Nebula.permissionFile.runtimeGroups) {
             if(g.hasMember(uuid)) {

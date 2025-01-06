@@ -29,4 +29,5 @@ public class Group {
     public void removeMember(String uuid) { members.remove(uuid); }
     public boolean hasMember(String uuid) { return members.contains(uuid); }
     public void clearMembers() { members.clear(); }
+    public void clearPermissions() { permissions.clear(); }
 }

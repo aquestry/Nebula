@@ -87,6 +87,11 @@ public class PermissionFile {
         saveGroup(group);
     }
 
+    public void clearPermissions(Group group) {
+        group.clearPermissions();
+        saveGroup(group);
+    }
+
     public void addMemberToGroup(Group group, String uuid) {
         group.addMember(uuid);
         saveGroup(group);
@@ -144,7 +149,6 @@ public class PermissionFile {
     public Group createGroup(String groupName, String prefix, int level) {
         Group checkGroup = getGroup(groupName);
         if (getGroup(groupName) != null) {
-            Nebula.util.log("Group '{}' already exists.", groupName);
             return checkGroup;
         }
         Group group = new Group(groupName, prefix, level);
