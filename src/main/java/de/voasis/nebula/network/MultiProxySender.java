@@ -80,6 +80,7 @@ public class MultiProxySender {
     }
 
     private void sendMessage(Proxy proxy, String message, Consumer<String> onSuccess, Consumer<String> onFailure) {
+        if(Config.quitting) return;
         try (Socket socket = new Socket()) {
             socket.connect(new InetSocketAddress(proxy.getIP(), proxy.getPort()), 2000);
             socket.setSoTimeout(2000);

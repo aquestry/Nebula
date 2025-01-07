@@ -1,4 +1,4 @@
-package de.voasis.nebula.manager;
+package de.voasis.nebula.file;
 
 import com.velocitypowered.api.permission.PermissionFunction;
 import com.velocitypowered.api.permission.PermissionProvider;
@@ -65,52 +65,5 @@ public class PermissionManager implements PermissionProvider {
               Nebula.util.sendInfotoBackend(p);
           }
         });
-    }
-
-    public void processGroups(String response) {
-        int updated = 0;
-        for (String groupData : response.split("~")) {
-            try {
-                groupData = groupData.trim();
-                String[] parts = groupData.split("\\?");
-                String groupName = parts[0].trim();
-                String prefix = parts[1].replace("<space>", " ");
-                int level = Integer.parseInt(parts[2].trim());
-                String[] membersRaw = new String[0];
-                String[] perms = new String[0];
-                if (parts.length == 4) {
-                    String[] uuidsPerm = parts[3].split("°");
-                    if (uuidsPerm.length > 0) {
-                        membersRaw = uuidsPerm[0].replace("[", "").replace("]", "").split(",");
-                    }
-                    if (uuidsPerm.length == 2) {
-                        perms = uuidsPerm[1].split(",");
-                    }
-                }
-                String [] members = new String[membersRaw.length];
-                for (int i = 0; i < membersRaw.length; i++)
-                    members[i] = membersRaw[i].trim();
-                Group group = Nebula.permissionFile.createGroup(groupName, prefix, level);
-                Nebula.permissionFile.clearMembers(group);
-                for (String member : members) {
-                    if (!member.isEmpty()) {
-                        assignGroup(member, group);
-                    }
-                }
-                Nebula.permissionFile.clearPermissions(group);
-                for (String perm : perms) {
-                    if (!perm.isEmpty()) {
-                        Nebula.permissionFile.addPermissionToGroup(group, perm);
-                    }
-                }
-                updated++;
-            } catch (NumberFormatException e) {
-                Nebula.util.log("Failed to parse level in group data '{}'. Error: {}", groupData, e.getMessage());
-            } catch (Exception e) {
-                Nebula.util.log("Failed to process group data '{}'. Error: {}", groupData, e.getMessage());
-            }
-        }
-        Nebula.permissionFile.saveConfig();
-        Nebula.util.log("Group syncing completed. Total groups updated: {}.", updated);
     }
 }

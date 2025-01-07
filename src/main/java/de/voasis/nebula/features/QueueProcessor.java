@@ -1,4 +1,4 @@
-package de.voasis.nebula.container;
+package de.voasis.nebula.features;
 
 import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.data.Config;

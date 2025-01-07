@@ -1,4 +1,4 @@
-package de.voasis.nebula.manager;
+package de.voasis.nebula.file;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -168,12 +168,6 @@ public class Util {
             uuid = "ERROR";
         }
         return uuid;
-    }
-
-    public void sendAlltoBackend() {
-        for(Player player : Nebula.server.getAllPlayers()) {
-            sendInfotoBackend(player);
-        }
     }
 
     public void sendInfotoBackend(Player player) {

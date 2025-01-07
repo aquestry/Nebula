@@ -1,5 +1,6 @@
-package de.voasis.nebula.manager;
+package de.voasis.nebula.file;
 
+import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Config;
 import de.voasis.nebula.model.Group;
@@ -65,7 +66,9 @@ public class PermissionFile {
                 runtimeGroups.add(group);
             }
         }
-        Nebula.util.sendAlltoBackend();
+        for(Player player : Nebula.server.getAllPlayers()) {
+            Nebula.util.sendInfotoBackend(player);
+        }
     }
 
     public void saveGroup(Group group) {

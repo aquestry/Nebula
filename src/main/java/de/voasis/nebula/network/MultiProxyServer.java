@@ -3,6 +3,7 @@ package de.voasis.nebula.network;
 import de.voasis.nebula.Nebula;
 import de.voasis.nebula.data.Config;
 import de.voasis.nebula.model.Container;
+import de.voasis.nebula.model.Group;
 import de.voasis.nebula.model.Node;
 import de.voasis.nebula.model.Proxy;
 import java.io.BufferedReader;
@@ -30,31 +31,24 @@ public class MultiProxyServer {
 
     private void handleClient(Socket socket, String clientIP) {
         String ip = clientIP.split(":")[0].replace("/", "");
-        if (Config.proxyMap.stream().noneMatch(proxy -> proxy.getIP().equals(ip))) {
-            Nebula.util.log("Got message from unknown IP: {}.", clientIP);
-            return;
-        }
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-             PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
-            String message = in.readLine();
-            String[] parts = message.split("\\|");
-            Proxy proxy = Config.proxyMap.stream().filter(p -> p.getIP().equals(ip)).findFirst().orElse(null);
-            if (parts.length != 2 || !Nebula.util.calculateHMAC(parts[0]).equals(parts[1]) || proxy == null) {
-                out.println("FAILED");
-                return;
+        Proxy proxy = Config.proxyMap.stream().filter(p -> p.getIP().equals(ip)).findFirst().orElse(null);
+        if (proxy == null) return;
+        try (var in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+             var out = new PrintWriter(socket.getOutputStream(), true)) {
+            String[] parts = in.readLine().split("\\|");
+            if (parts.length != 2 || !Nebula.util.calculateHMAC(parts[0]).equals(parts[1])) {
+                out.println("FAILED"); return;
             }
-            String[] components = parts[0].split("&");
-            if(components.length == 4) {
-                if(components[0].equals("POST")) {
-                    out.println(handlePOST(components));
+            String[] c = parts[0].split("&");
+            if(c[0].equals("POST")) {
+                if(c[1].equals("PERM") && c.length == 4) {
+                    out.println(handlePERM(c));
                 }
             }
-            if(components.length == 2) {
-                if(components[0].equals("GET")) {
-                    out.println(handleGET(components));
-                }
-
+            if(c[0].equals("GET")) {
+                out.println(handleGET(c));
             }
+            out.println("INVALID");
         } catch (Exception ignored) {}
     }
 
@@ -67,15 +61,57 @@ public class MultiProxyServer {
         }
     }
 
-    private String handlePOST(String[] components) {
+    private String handlePERM(String[] components) {
         switch (components[2]) {
-            case "DELETE":
-                Nebula.permissionFile.deleteGroup(components[3]);
-                return "FETCHED";
-            case "UPDATE":
-                Nebula.permissionManager.processGroups(components[3]);
-                return "FETCHED";
+            case "DELETE": Nebula.permissionFile.deleteGroup(components[3]); return "FETCHED";
+            case "UPDATE": processGroups(components[3]); return "FETCHED";
             default: return "INVALID";
         }
+    }
+
+    public void processGroups(String response) {
+        int updated = 0;
+        for (String groupData : response.split("~")) {
+            try {
+                String[] parts = groupData.split("\\?");
+                String groupName = parts[0].trim();
+                String prefix = parts[1].replace("<space>", " ");
+                int level = Integer.parseInt(parts[2].trim());
+                String[] membersRaw = new String[0];
+                String[] perms = new String[0];
+                if (parts.length == 4) {
+                    String[] uuidsPerm = parts[3].split("°");
+                    if (uuidsPerm.length > 0) {
+                        membersRaw = uuidsPerm[0].replace("[", "").replace("]", "").split(",");
+                    }
+                    if (uuidsPerm.length == 2) {
+                        perms = uuidsPerm[1].split(",");
+                    }
+                }
+                String [] members = new String[membersRaw.length];
+                for (int i = 0; i < membersRaw.length; i++)
+                    members[i] = membersRaw[i].trim();
+                Group group = Nebula.permissionFile.createGroup(groupName, prefix, level);
+                Nebula.permissionFile.clearMembers(group);
+                for (String member : members) {
+                    if (!member.isEmpty()) {
+                        Nebula.permissionManager.assignGroup(member, group);
+                    }
+                }
+                Nebula.permissionFile.clearPermissions(group);
+                for (String perm : perms) {
+                    if (!perm.isEmpty()) {
+                        Nebula.permissionFile.addPermissionToGroup(group, perm);
+                    }
+                }
+                updated++;
+            } catch (NumberFormatException e) {
+                Nebula.util.log("Failed to parse level in group data '{}'. Error: {}", groupData, e.getMessage());
+            } catch (Exception e) {
+                Nebula.util.log("Failed to process group data '{}'. Error: {}", groupData, e.getMessage());
+            }
+        }
+        Nebula.permissionFile.saveConfig();
+        Nebula.util.log("Group syncing completed. Total groups updated: {}.", updated);
     }
 }
