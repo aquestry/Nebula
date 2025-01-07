@@ -1,4 +1,4 @@
-package de.voasis.nebula.features;
+package de.voasis.nebula.feature;
 
 import com.velocitypowered.api.proxy.Player;
 import java.util.ArrayList;

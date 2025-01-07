@@ -44,17 +44,13 @@ public class AutoDeleter {
                 deletionTimers.remove(container);
             }
         }
-        for (Container serverToDelete : serversToDelete) {
-            Nebula.containerManager.delete(serverToDelete, null);
-        }
+        serversToDelete.forEach(container -> Nebula.containerManager.delete(container, null));
     }
 
     private boolean canDeleteLobbyServer(Container serverToExclude) {
-        for (Container otherServer : Config.containerMap) {
-            if (!otherServer.equals(serverToExclude) && otherServer.getFlags().contains("lobby") && otherServer.isOnline() && Nebula.util.getPlayerCount(otherServer) < Config.defaultmin) {
-                return true;
-            }
-        }
-        return false;
+        return Config.containerMap.stream().anyMatch(container -> container.equals(serverToExclude)
+                && container.getFlags().contains("lobby")
+                && container.isOnline()
+                && Nebula.util.getPlayerCount(container) < Config.defaultmin);
     }
 }

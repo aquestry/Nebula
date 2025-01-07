@@ -149,21 +149,28 @@ public class GroupCommand implements SimpleCommand {
             Nebula.util.sendMessage(source, Messages.GROUP_INFO_NOT_FOUND.replace("<group>", groupName));
             return;
         }
+        String actionPerm = args[3];
         switch (action) {
             case "add":
-                Nebula.permissionFile.addPermissionToGroup(group, args[3]);
+                if(group.hasPermission(actionPerm)) {
+                    Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_ALREADY_EXISTS.replace("<group>", groupName).replace("<permission>", actionPerm));
+                    return;
+                }
+                Nebula.permissionFile.addPermissionToGroup(group, actionPerm);
+                Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_ADD_SUCCESS.replace("<group>", groupName).replace("<permission>", actionPerm));
                 Nebula.multiProxySender.updateGroup(group);
             case "remove":
-                Nebula.permissionFile.removePermissionFromGroup(group, args[3]);
+                if(!group.hasPermission(actionPerm)) {
+                    Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_REMOVE_NOT_FOUND.replace("<group>", groupName).replace("<permission>", actionPerm));
+                    return;
+                }
+                Nebula.permissionFile.removePermissionFromGroup(group, actionPerm);
+                Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_REMOVE_SUCCESS.replace("<group>", groupName).replace("<permission>", actionPerm));
                 Nebula.multiProxySender.updateGroup(group);
             case "list":
+                Nebula.util.sendMessage(source, Messages.GROUP_PERMISSION_LIST_HEADER);
                 group.getPermissions().forEach(permission -> Nebula.util.sendMessage(source, permission));
         }
-
-    }
-
-    private void sendUsageMessage(CommandSource source) {
-        Nebula.util.sendMessage(source, Messages.GROUP_USAGE);
     }
 
     @Override
@@ -205,5 +212,9 @@ public class GroupCommand implements SimpleCommand {
     @Override
     public boolean hasPermission(Invocation invocation) {
         return invocation.source().hasPermission("velocity.admin") || invocation.source() instanceof ConsoleCommandSource;
+    }
+
+    private void sendUsageMessage(CommandSource source) {
+        Nebula.util.sendMessage(source, Messages.GROUP_USAGE);
     }
 }

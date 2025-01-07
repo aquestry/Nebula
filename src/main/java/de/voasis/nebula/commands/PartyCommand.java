@@ -1,5 +1,6 @@
 package de.voasis.nebula.commands;
 
+import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
 import de.voasis.nebula.Nebula;
@@ -20,7 +21,7 @@ public class PartyCommand implements SimpleCommand {
                             if(!Nebula.partyManager.getAllInvites(player).isEmpty()) {
                                 Nebula.partyManager.tryJoin(player, Nebula.partyManager.getAllInvites(player).getFirst());
                             } else {
-                                Nebula.util.sendMessage(player, Messages.USAGE_PARTY);
+                                sendUsageMessage(player);
                             }
                         }
                         break;
@@ -28,18 +29,18 @@ public class PartyCommand implements SimpleCommand {
                         if (args.length >= 2) {
                             Nebula.partyManager.inviteCommand(player, args[1]);
                         } else {
-                            Nebula.util.sendMessage(player, Messages.USAGE_PARTY);
+                            sendUsageMessage(player);
                         }
                         break;
                     case "leave":
                         Nebula.partyManager.quit(player);
                         break;
                     default:
-                        Nebula.util.sendMessage(player, Messages.USAGE_PARTY);
+                        sendUsageMessage(player);
                         break;
                 }
             } else {
-                Nebula.util.sendMessage(player, Messages.USAGE_PARTY);
+                sendUsageMessage(player);
             }
         }
     }
@@ -70,5 +71,9 @@ public class PartyCommand implements SimpleCommand {
             }
         }
         return List.of();
+    }
+
+    private void sendUsageMessage(CommandSource source) {
+        Nebula.util.sendMessage(source, Messages.USAGE_PARTY);
     }
 }

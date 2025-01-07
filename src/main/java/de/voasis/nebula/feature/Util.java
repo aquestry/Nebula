@@ -1,4 +1,4 @@
-package de.voasis.nebula.file;
+package de.voasis.nebula.feature;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
