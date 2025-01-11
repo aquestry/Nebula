@@ -48,7 +48,7 @@ public class AutoDeleter {
     }
 
     private boolean canDeleteLobbyServer(Container serverToExclude) {
-        return Config.containerMap.stream().anyMatch(container -> container.equals(serverToExclude)
+        return Config.containerMap.stream().anyMatch(container -> !container.equals(serverToExclude)
                 && container.getFlags().contains("lobby")
                 && container.isOnline()
                 && Nebula.util.getPlayerCount(container) < Config.defaultmin);
