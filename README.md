@@ -28,7 +28,7 @@ On start, Velocity will try to create a server on the first backend server via t
 Later on, it will create more lobby servers according to the player count limits defined in the config.
 ## In-Game Commands
 Nebula also supports in-game commands for admins to manage server instances directly within Minecraft.
-You dont have to use them, Nebula does handle the queue and lobby scalign on its own.
+You dont have to use them, Nebula does handle the queue and lobby scaling on its own.
 But here they are:
 
 ### **Admin Commands:** **Permission: 'velocity.admin'**
