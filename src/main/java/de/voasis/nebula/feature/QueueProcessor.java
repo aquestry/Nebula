@@ -124,8 +124,8 @@ public class QueueProcessor {
     }
 
     public void leaveQueue(Player player, boolean warn) {
-        if (!isInAnyQueue(player)) {
-            if(warn) { Nebula.util.sendMessage(player, Messages.NOT_IN_QUEUE); }
+        if (!isInAnyQueue(player) && warn) {
+            Nebula.util.sendMessage(player, Messages.NOT_IN_QUEUE);
             return;
         }
         Party party = Nebula.partyManager.getParty(player);
