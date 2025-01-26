@@ -67,8 +67,8 @@ public class FileLoader {
                 String ip = config.node("nodes", serverName, "ip").getString();
                 String username = config.node("nodes", serverName, "username").getString();
                 String password = config.node("nodes", serverName, "password").getString();
-                String privateKeyFile = config.node("nodes", serverName, "privateKeyFile").getString();
                 int port = config.node("nodes", serverName, "port").getInt(22);
+                String privateKeyFile = config.node("nodes", serverName, "privateKeyFile").getString();
                 if (ip == null || username == null || password == null || privateKeyFile == null || port == 0) {
                     Nebula.util.log("Invalid configuration for node '{}'. Skipping this node.", serverName);
                     continue;
