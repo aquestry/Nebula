@@ -63,11 +63,13 @@ public class GroupCommand implements SimpleCommand {
             return;
         }
         Nebula.permissionManager.assignGroup(uuid, group);
-        if (oldGroup != null) {
-            Nebula.multiProxySender.updateGroup(oldGroup);
-            Nebula.util.log("Player '{}' removed from group '{}'.", playerName, oldGroup.getName());
+        if(Config.multiProxyMode) {
+            if (oldGroup != null) {
+                Nebula.multiProxySender.updateGroup(oldGroup);
+                Nebula.util.log("Player '{}' removed from group '{}'.", playerName, oldGroup.getName());
+            }
+            Nebula.multiProxySender.updateGroup(group);
         }
-        Nebula.multiProxySender.updateGroup(group);
         player.ifPresent(p -> Nebula.util.sendInfotoBackend(p));
         Nebula.util.sendMessage(source, Messages.GROUP_ASSIGN_SUCCESS.replace("<player>", playerName).replace("<group>", groupName));
     }
