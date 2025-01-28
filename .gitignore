@@ -3,5 +3,6 @@ target/classes/
 target/generated-sources
 target/maven-archiver
 target/maven-status
+target/original-nebula.jar
 load.py
 nebula.iml
