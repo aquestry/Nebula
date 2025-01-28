@@ -15,10 +15,6 @@ public class SshUtil {
 
     public void init(Node node) {
         try {
-            if (sessionPool.containsKey(node) && sessionPool.get(node).isConnected()) {
-                Nebula.util.log("Session already initialized and connected for node: {}.", node.getServerName());
-                return;
-            }
             JSch jsch = new JSch();
             if (node.getPrivateKeyFile() != null && !node.getPrivateKeyFile().equals("none")) {
                 jsch.addIdentity(node.getPrivateKeyFile());

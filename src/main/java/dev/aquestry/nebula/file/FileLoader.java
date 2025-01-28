@@ -75,7 +75,6 @@ public class FileLoader {
                 }
                 Node node = new Node(serverName.toString(), ip, username, password, privateKeyFile, port, 0);
                 Nebula.ssh.init(node);
-                Nebula.ssh.updateFreePort(node);
             }
         }
         if (Config.nodeMap.isEmpty()) {
