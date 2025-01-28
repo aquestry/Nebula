@@ -157,6 +157,14 @@ But here they are:
     ```
     /party leave
     ```
-        
-## Future Enhancements:
-- Multi-Proxy-System
+    
+# Multi-Proxy-System
+
+The Multi-Proxy-System is made for server networks with international players, so everybody has a good ping.
+You can configure other proxies in the config, there you can also define the HMAC secret and the port.
+Also define the level and dont give two proxies the same level else they will shutdown!
+After you setup everything correctly groups will now sync.
+When a proxy comes only it will get the state and the current groups of the highest level proxy defined in the config.
+But after the first sync it will only get the changes.
+For example if a admin changes the group of a player that is on another proxie theire nametag will update
+if you are using NebulaAPI on the backend. And even if you are not using it, the other proxy will still get the changes.
