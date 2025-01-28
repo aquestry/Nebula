@@ -1,4 +1,4 @@
-.idea
-target/
+/.idea/
+/target/
 load.py
 nebula.iml
