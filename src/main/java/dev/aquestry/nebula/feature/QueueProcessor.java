@@ -27,9 +27,9 @@ public class QueueProcessor {
             int neededPlayers = queue.getNeededPlayers();
             if (queue.getInQueue().size() >= neededPlayers) {
                 List<Player> playersToMove = new ArrayList<>();
-                Party p = Nebula.partyManager.getParty(queue.getInQueue().getFirst());
-                if(p != null) {
-                    playersToMove = p.getMembers();
+                Optional<Party> p = Nebula.partyManager.getParty(queue.getInQueue().getFirst());
+                if(p.isPresent()) {
+                    playersToMove = p.get().getMembers();
                     for(Player player : playersToMove) {
                         queue.getInQueue().remove(player);
                     }
@@ -98,17 +98,17 @@ public class QueueProcessor {
                 .findFirst()
                 .ifPresentOrElse(
                         queue -> {
-                            Party playerParty = Nebula.partyManager.getParty(player);
-                            if(playerParty != null) {
-                                if(!playerParty.getLeader().equals(player)) {
+                            Optional<Party> playerParty = Nebula.partyManager.getParty(player);
+                            if(playerParty.isPresent()) {
+                                if(!playerParty.get().getLeader().equals(player)) {
                                     Nebula.util.sendMessage(player, Messages.PARTY_NOT_ALLOWED);
                                     return;
                                 }
-                                if(queue.getNeededPlayers() != playerParty.getMembers().size()) {
+                                if(queue.getNeededPlayers() != playerParty.get().getMembers().size()) {
                                     Nebula.util.sendMessage(player, Messages.QUEUE_PLAYER_COUNT_MISMATCH);
                                     return;
                                 }
-                                playerParty.getMembers().forEach(member -> {
+                                playerParty.get().getMembers().forEach(member -> {
                                     if (!queue.getInQueue().contains(member)) {
                                         queue.getInQueue().add(member);
                                         Nebula.util.sendMessage(member, Messages.ADDED_TO_QUEUE.replace("<queue>", queueName));
@@ -128,9 +128,9 @@ public class QueueProcessor {
             Nebula.util.sendMessage(player, Messages.NOT_IN_QUEUE);
             return;
         }
-        Party party = Nebula.partyManager.getParty(player);
-        if(party != null) {
-            if(!party.getLeader().equals(player)) {
+        Optional<Party> party = Nebula.partyManager.getParty(player);
+        if(party.isPresent()) {
+            if(!party.get().getLeader().equals(player)) {
                 Nebula.util.sendMessage(player, Messages.PARTY_NOT_ALLOWED);
                 return;
             }
