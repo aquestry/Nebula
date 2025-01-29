@@ -19,11 +19,8 @@ public class PartyManager {
 
     public void inviteCommand(Player player, String targetName) {
         Player target = Nebula.server.getPlayer(targetName).orElse(null);
-        if (target == null) {
+        if (target == null || target.equals(player)) {
             Nebula.util.sendMessage(player, Messages.TARGET_INVITE_NOT_FOUND.replace("<target>", targetName));
-            return;
-        }
-        if(target.equals(player)) {
             return;
         }
         Optional<Party> partyOpt = getParty(player);
