@@ -32,7 +32,7 @@ queue:
   lobby-only: "<pre>You can only join a queue from the lobby."
   queue-not-found: "<pre>Queue not found."
 party:
-  target-invite-not-found: "<pre>The player <target> is not online."
+  target-invite-not-found: "<pre>The player <target> is not available."
   target-invite-already: "<pre>The player <target> is already invited."
   sent-invite: "<pre>You have sent an invite to <target>."
   no-invite-from-leader: "<pre>You have no invite from <leader>'s party."

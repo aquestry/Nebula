@@ -1,8 +1,8 @@
 import shutil
 import os
 
-source_dir = r"C:\Users\anton\IdeaProjects\Nebula\target\nebula-1.0.jar"
-destination_dir = r"C:\Users\anton\Documents\Projekte\Developing\Debug\plugins\nebula-1.0.jar"
+source_dir = r"C:\Users\anton\IdeaProjects\Nebula\target\nebula.jar"
+destination_dir = r"C:\Users\anton\Documents\Projekte\Developing\Debug\plugins\nebula.jar"
 
 if os.path.exists(source_dir):
     try:

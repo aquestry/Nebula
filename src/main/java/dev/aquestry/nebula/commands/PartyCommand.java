@@ -5,7 +5,6 @@ import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
 import dev.aquestry.nebula.Nebula;
 import dev.aquestry.nebula.data.Messages;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,22 +51,24 @@ public class PartyCommand implements SimpleCommand {
         String[] args = invocation.arguments();
         if (invocation.source() instanceof Player player) {
             List<String> options = new ArrayList<>();
-            Nebula.partyManager.getParty(player).ifPresent(party -> {
+            boolean isLeader = Nebula.partyManager.getParty(player).map(p -> p.getLeader().equals(player)).orElse(false);
+            boolean inParty = Nebula.partyManager.getParty(player).isPresent();
+            if(inParty) {
                 options.add("leave");
-                if(Nebula.partyManager.getParty(player).get().getLeader().equals(player)) {
-                    options.add("invite");
-                }
-                if(!Nebula.partyManager.getAllInvites(player).isEmpty()) {
-                    options.add("accept");
-                }
-            });
+            }
+            if(isLeader|| !inParty) {
+                options.add("invite");
+            }
+            if(!Nebula.partyManager.getAllInvites(player).isEmpty()) {
+                options.add("accept");
+            }
             if (args.length == 0) { return options; }
             if (args.length == 1) {
                 return options.stream()
                         .filter(subcommand -> subcommand.toLowerCase().startsWith(args[0].toLowerCase()))
                         .toList();
             }
-            if (args.length == 2 && "invite".equalsIgnoreCase(args[0]) && Nebula.partyManager.getParty(player).map(p -> p.getLeader().equals(player)).orElse(false)) {
+            if (args.length == 2 && "invite".equalsIgnoreCase(args[0]) && (isLeader || !inParty)) {
                 return Nebula.server.getAllPlayers().stream()
                         .filter(p -> Nebula.partyManager.getParty(p).isEmpty())
                         .filter(p -> p.getUsername().toLowerCase().startsWith(args[1].toLowerCase()))
