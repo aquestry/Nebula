@@ -33,8 +33,8 @@ public class ProxyCommand implements SimpleCommand {
             case "nodes":
                 Nebula.util.sendMessage(source, Nebula.multiProxySender.getNodes(proxy));
                 break;
-            case "servers":
-                Nebula.util.sendMessage(source, Nebula.multiProxySender.getServers(proxy));
+            case "containers":
+                Nebula.util.sendMessage(source, Nebula.multiProxySender.getContainers(proxy));
                 break;
         }
     }
@@ -43,16 +43,16 @@ public class ProxyCommand implements SimpleCommand {
     public CompletableFuture<List<String>> suggestAsync(Invocation invocation) {
         String[] args = invocation.arguments();
         if (args.length == 0) {
-            return CompletableFuture.completedFuture(List.of("nodes", "servers"));
+            return CompletableFuture.completedFuture(List.of("nodes", "containers"));
         }
         if (args.length == 1) {
             return CompletableFuture.completedFuture(
-                    List.of("nodes", "servers").stream()
+                    List.of("nodes", "containers").stream()
                             .filter(option -> option.startsWith(args[0].toLowerCase()))
                             .collect(Collectors.toList())
             );
         }
-        if (args.length == 2 && (args[0].equalsIgnoreCase("nodes") || args[0].equalsIgnoreCase("servers"))) {
+        if (args.length == 2 && (args[0].equalsIgnoreCase("nodes") || args[0].equalsIgnoreCase("containers"))) {
             return CompletableFuture.completedFuture(
                     Config.proxyMap.stream()
                             .filter(Proxy::isOnline)

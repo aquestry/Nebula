@@ -54,7 +54,7 @@ public class MultiProxySender {
         return result[0];
     }
 
-    public String getServers(Proxy proxy) {
+    public String getContainers(Proxy proxy) {
         final String[] result = {"FAILED"};
         sendMessage(proxy, "GET&SERVERS",
                 response -> result[0] = response, e -> {});
