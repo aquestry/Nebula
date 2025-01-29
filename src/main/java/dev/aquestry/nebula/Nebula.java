@@ -102,7 +102,7 @@ public class Nebula {
 
     private void registerCommands() {
         CommandManager commandManager = server.getCommandManager();
-        commandManager.register("node", new NodeCommand());
+        commandManager.register("container", new ContainerCommand());
         commandManager.register("lobby", new LobbyCommand());
         commandManager.register("party", new PartyCommand());
         commandManager.register("group", new GroupCommand());

@@ -9,25 +9,25 @@ public class MessageLoader {
         try {
             String prefix = messages.node("prefix").getString("[Server] ");
             Messages.PREFIX = prefix;
-            // Admin Messages
-            Messages.USAGE_ADMIN = messages.node("admin", "usage").getString("<pre>Usage: /admin <stop|delete|template> <args...>").replace("<pre>", prefix);
-            Messages.KILL_CONTAINER = messages.node("admin", "kill-start").getString("<pre>Killing server instance <name>.").replace("<pre>", prefix);
-            Messages.DELETE_CONTAINER = messages.node("admin", "delete-start").getString("<pre>Deleting server instance <name>.").replace("<pre>", prefix);
-            Messages.CREATE_CONTAINER = messages.node("admin", "server-create").getString("<pre>Creating server instance from template...").replace("<pre>", prefix);
-            Messages.START_CONTAINER = messages.node("admin", "server-start").getString("<pre>Starting server instance <name>.").replace("<pre>", prefix);
-            Messages.PULL_TEMPLATE = messages.node("admin", "server-pull").getString("<pre>Pulling template <template> on server <name>.").replace("<pre>", prefix);
-            Messages.DONE_PULL = messages.node("admin", "done-pull").getString("<pre>Done pulling template <template> on server <name>.").replace("<pre>", prefix);
-            Messages.ALREADY_EXISTS = messages.node("admin", "server-exists").getString("<pre>Server <name> already exists.").replace("<pre>", prefix);
+            // container Messages
+            Messages.USAGE_CONTAINER = messages.node("container", "usage").getString("<pre>Usage: /container <stop|delete|template> <args...>").replace("<pre>", prefix);
+            Messages.KILL_CONTAINER = messages.node("container", "kill-start").getString("<pre>Killing server instance <name>.").replace("<pre>", prefix);
+            Messages.DELETE_CONTAINER = messages.node("container", "delete-start").getString("<pre>Deleting server instance <name>.").replace("<pre>", prefix);
+            Messages.CREATE_CONTAINER = messages.node("container", "server-create").getString("<pre>Creating server instance from template...").replace("<pre>", prefix);
+            Messages.START_CONTAINER = messages.node("container", "server-start").getString("<pre>Starting server instance <name>.").replace("<pre>", prefix);
+            Messages.PULL_TEMPLATE = messages.node("container", "server-pull").getString("<pre>Pulling template <template> on server <name>.").replace("<pre>", prefix);
+            Messages.DONE_PULL = messages.node("container", "done-pull").getString("<pre>Done pulling template <template> on server <name>.").replace("<pre>", prefix);
+            Messages.ALREADY_EXISTS = messages.node("container", "server-exists").getString("<pre>Server <name> already exists.").replace("<pre>", prefix);
             Messages.SERVER_CONNECT = messages.node("util", "server-connect").getString("<green>Connecting to server <name>...").replace("<pre>", prefix);
-            Messages.SERVER_RUNNING = messages.node("admin", "server-running").getString("<pre>Server <name> is already running.").replace("<pre>", prefix);
-            Messages.SERVER_STOPPED = messages.node("admin", "server-stopped").getString("<pre>Server <name> is already stopped.").replace("<pre>", prefix);
-            Messages.SERVER_NOT_FOUND = messages.node("admin", "server-not-found").getString("<pre>Server <name> not found.").replace("<pre>", prefix);
-            Messages.ERROR_CREATE = messages.node("admin", "error-create").getString("<pre>Error creating server instance <name>.").replace("<pre>", prefix);
-            Messages.ERROR_KILL = messages.node("admin", "error-kill").getString("<pre>Error killing server instance <name>.").replace("<pre>", prefix);
-            Messages.ERROR_DELETE = messages.node("admin", "error-delete").getString("<pre>Error deleting server instance <name>.").replace("<pre>", prefix);
-            Messages.ERROR_PULL = messages.node("admin", "error-pull").getString("<pre>Error pulling template <template> on server <name>.").replace("<pre>", prefix);
-            Messages.ERROR_START = messages.node("admin", "error-start").getString("<pre>Error starting server <name>.").replace("<pre>", prefix);
-            Messages.DONE = messages.node("admin", "done").getString("<pre>Done.").replace("<pre>", prefix);
+            Messages.SERVER_RUNNING = messages.node("container", "server-running").getString("<pre>Server <name> is already running.").replace("<pre>", prefix);
+            Messages.SERVER_STOPPED = messages.node("container", "server-stopped").getString("<pre>Server <name> is already stopped.").replace("<pre>", prefix);
+            Messages.SERVER_NOT_FOUND = messages.node("container", "server-not-found").getString("<pre>Server <name> not found.").replace("<pre>", prefix);
+            Messages.ERROR_CREATE = messages.node("container", "error-create").getString("<pre>Error creating server instance <name>.").replace("<pre>", prefix);
+            Messages.ERROR_KILL = messages.node("container", "error-kill").getString("<pre>Error killing server instance <name>.").replace("<pre>", prefix);
+            Messages.ERROR_DELETE = messages.node("container", "error-delete").getString("<pre>Error deleting server instance <name>.").replace("<pre>", prefix);
+            Messages.ERROR_PULL = messages.node("container", "error-pull").getString("<pre>Error pulling template <template> on server <name>.").replace("<pre>", prefix);
+            Messages.ERROR_START = messages.node("container", "error-start").getString("<pre>Error starting server <name>.").replace("<pre>", prefix);
+            Messages.DONE = messages.node("container", "done").getString("<pre>Done.").replace("<pre>", prefix);
             Messages.ONLINE = messages.node("util", "server-online").getString("<pre>Server <name> is now online.").replace("<pre>", prefix);
             Messages.OFFLINE = messages.node("util", "server-offline").getString("<pre>Server <name> is now offline.").replace("<pre>", prefix);
             // Queue Messages

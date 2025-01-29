@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-public class NodeCommand implements SimpleCommand {
+public class ContainerCommand implements SimpleCommand {
     @Override
     public void execute(Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
         if (args.length < 2) {
-            Nebula.util.sendMessage(source, Messages.USAGE_ADMIN);
+            Nebula.util.sendMessage(source, Messages.USAGE_CONTAINER);
             return;
         }
         switch (args[0].toLowerCase()) {
@@ -32,13 +32,13 @@ public class NodeCommand implements SimpleCommand {
                 break;
             case "template":
                 if (args.length < 3) {
-                    Nebula.util.sendMessage(source, Messages.USAGE_ADMIN);
+                    Nebula.util.sendMessage(source, Messages.USAGE_CONTAINER);
                     return;
                 }
                 handleTemplateCommand(source, args);
                 break;
             default:
-                Nebula.util.sendMessage(source, Messages.USAGE_ADMIN);
+                Nebula.util.sendMessage(source, Messages.USAGE_CONTAINER);
                 break;
         }
     }

@@ -1,10 +1,9 @@
 package dev.aquestry.nebula.data;
 
 public class Messages {
-    // Prefix
     public static String PREFIX;
-    // Admin Messages
-    public static String USAGE_ADMIN;
+
+    public static String USAGE_CONTAINER;
     public static String KILL_CONTAINER;
     public static String DELETE_CONTAINER;
     public static String PULL_TEMPLATE;
@@ -24,7 +23,7 @@ public class Messages {
     public static String DONE;
     public static String ONLINE;
     public static String OFFLINE;
-    // Queue Messages
+
     public static String USAGE_QUEUE;
     public static String ADDED_TO_QUEUE;
     public static String REMOVED_FROM_QUEUE;
@@ -32,7 +31,7 @@ public class Messages {
     public static String NOT_IN_QUEUE;
     public static String LOBBY_ONLY;
     public static String QUEUE_NOT_FOUND;
-    // Party Messages
+
     public static String TARGET_INVITE_NOT_FOUND;
     public static String TARGET_INVITE_ALREADY;
     public static String SENT_INVITE;
@@ -47,7 +46,7 @@ public class Messages {
     public static String QUEUE_PLAYER_COUNT_MISMATCH ;
     public static String PARTY_NOT_ALLOWED;
     public static String USAGE_PARTY;
-    // Group Messages
+
     public static String GROUP_USAGE;
     public static String GROUP_ASSIGN_SUCCESS;
     public static String GROUP_ASSIGN_PLAYER_NOT_FOUND;
