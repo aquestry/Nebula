@@ -48,23 +48,23 @@ public class PartyCommand implements SimpleCommand {
 
     @Override
     public List<String> suggest(Invocation invocation) {
-        String[] args = invocation.arguments();
         if (invocation.source() instanceof Player player) {
-            List<String> options = new ArrayList<>();
+            String[] args = invocation.arguments();
+            List<String> suggestions = new ArrayList<>();
             boolean isLeader = Nebula.partyManager.getParty(player).map(p -> p.getLeader().equals(player)).orElse(false);
             boolean inParty = Nebula.partyManager.getParty(player).isPresent();
             if(inParty) {
-                options.add("leave");
+                suggestions.add("leave");
             }
             if(isLeader|| !inParty) {
-                options.add("invite");
+                suggestions.add("invite");
             }
             if(!Nebula.partyManager.getAllInvites(player).isEmpty()) {
-                options.add("accept");
+                suggestions.add("accept");
             }
-            if (args.length == 0) { return options; }
+            if (args.length == 0) { return suggestions; }
             if (args.length == 1) {
-                return options.stream()
+                return suggestions.stream()
                         .filter(subcommand -> subcommand.toLowerCase().startsWith(args[0].toLowerCase()))
                         .toList();
             }

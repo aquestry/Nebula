@@ -6,9 +6,9 @@ import dev.aquestry.nebula.data.Config;
 import dev.aquestry.nebula.data.Messages;
 import dev.aquestry.nebula.model.Queue;
 import dev.aquestry.nebula.Nebula;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class QueueCommand implements SimpleCommand {
     @Override
@@ -35,20 +35,27 @@ public class QueueCommand implements SimpleCommand {
 
     @Override
     public List<String> suggest(Invocation invocation) {
-        String[] args = invocation.arguments();
-        if (args.length == 0) {
-            return List.of("join", "leave");
-        }
-        if (args.length == 1) {
-            return Stream.of("join", "leave")
-                    .filter(command -> command.startsWith(args[0].toLowerCase()))
-                    .collect(Collectors.toList());
-        }
-        if (args.length == 2 && "join".equalsIgnoreCase(args[0])) {
-            return Config.queueMap.stream()
-                    .map(Queue::getName)
-                    .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
-                    .collect(Collectors.toList());
+        if (invocation.source() instanceof Player player) {
+            String[] args = invocation.arguments();
+            List<String> suggestions = new ArrayList<>();
+            boolean inQueue = Nebula.queueProcessor.isInAnyQueue(player);
+            if(inQueue) {
+                suggestions.add("leave");
+            } else {
+                suggestions.add("join");
+            }
+            if (args.length == 0) { return suggestions; }
+            if (args.length == 1) {
+                return suggestions.stream()
+                        .filter(command -> command.startsWith(args[0].toLowerCase()))
+                        .collect(Collectors.toList());
+            }
+            if (args.length == 2 && "join".equalsIgnoreCase(args[0]) && !inQueue) {
+                return Config.queueMap.stream()
+                        .map(Queue::getName)
+                        .filter(name -> name.toLowerCase().startsWith(args[1].toLowerCase()))
+                        .collect(Collectors.toList());
+            }
         }
         return List.of();
     }
