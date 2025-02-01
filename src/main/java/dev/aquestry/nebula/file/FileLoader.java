@@ -35,6 +35,7 @@ public class FileLoader {
             Config.defaultmax = config.node("lobby-max").getInt();
             Config.defaultmin = config.node("lobby-min").getInt();
             Config.pullStart = config.node("pull-start").getBoolean();
+            Config.localNode = config.node("local-node").getBoolean();
             String envVars = config.node("env-vars").getString();
             Config.envVars = (envVars != null && !"none".equals(envVars))
                     ? Arrays.stream(envVars.split(","))
@@ -61,6 +62,12 @@ public class FileLoader {
     }
 
     private void loadNodes() {
+        if(Config.localNode) {
+            Nebula.util.log("Using proxy as a local node!");
+            Node node = new Node("", "", "", "", "", 0, 0, "local");
+            Config.nodeMap.add(node);
+            Nebula.ssh.updateFreePort(node);
+        }
         Map<Object, ? extends ConfigurationNode> managerServers = config.node("nodes").childrenMap();
         if (managerServers != null) {
             for (Object serverName : managerServers.keySet()) {
@@ -73,7 +80,7 @@ public class FileLoader {
                     Nebula.util.log("Invalid configuration for node '{}'. Skipping this node.", serverName);
                     continue;
                 }
-                Node node = new Node(serverName.toString(), ip, username, password, privateKeyFile, port, 0);
+                Node node = new Node(serverName.toString(), ip, username, password, privateKeyFile, port, 0, "normal");
                 Nebula.ssh.init(node);
             }
         }

@@ -17,6 +17,7 @@ public class Config {
     public static boolean quitting;
     public static boolean multiProxyMode;
     public static boolean pullStart;
+    public static boolean localNode;
     public static int multiProxyPort;
     public static int multiProxyLevel;
     public static int defaultmax;

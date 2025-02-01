@@ -12,6 +12,9 @@ lobby-max: 5
 # The current server will continue accepting players until it reaches the player limit (5),
 # at which point new players will start connecting to the newly created lobby server.
 lobby-min: 3
+# If you enable this the server where the proxy itself is run will be used as a node ,so you don't need other nodes.
+# This works without an ssh server too, but will still need docker but not ruby to be installed.
+local-node: false
 # Nodes, at least one.
 nodes:
   example:

@@ -9,7 +9,7 @@ import dev.aquestry.nebula.Nebula;
 public class Disconnect {
     public Disconnect(DisconnectEvent event) {
         Player player = event.getPlayer();
-        if(Nebula.partyManager.getParty(player) != null) {
+        if(Nebula.partyManager.getParty(player).isPresent()) {
             Nebula.partyManager.quit(player);
         } else {
             Nebula.queueProcessor.leaveQueue(player, false);

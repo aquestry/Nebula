@@ -5,7 +5,7 @@ file-version: 1
 prefix: "<dark_gray>[<#AA00AA>Server<dark_gray>] <white>"
 # <pre> is a placeholder for the prefix.
 container:
-  usage: "<pre>Usage: /container <stop|delete|template> <args...>"
+  usage: "<pre>Usage: /container <stop|delete|kill|template> <args...>"
   kill-start: "<pre>Killing server instance <name>."
   delete-start: "<pre>Deleting server instance <name>."
   server-pull: "<pre>Pulling template <template> on server <name>."

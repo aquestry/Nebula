@@ -4,7 +4,8 @@ import com.jcraft.jsch.*;
 import dev.aquestry.nebula.Nebula;
 import dev.aquestry.nebula.data.Config;
 import dev.aquestry.nebula.model.Node;
-import java.io.ByteArrayOutputStream;
+import java.io.*;
+import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -37,62 +38,101 @@ public class SshUtil {
     }
 
     public void updateFreePort(Node node) {
-        ChannelExec channel = null;
-        try {
-            Session session = sessionPool.get(node);
-            if (session == null || !session.isConnected()) {
-                Nebula.util.log("Session not initialized or disconnected. Call init() first for node: {}.", node.getServerName());
-                return;
+        if(node.getTag().equals("normal")) {
+            ChannelExec channel = null;
+            try {
+                Session session = sessionPool.get(node);
+                if (session == null || !session.isConnected()) {
+                    Nebula.util.log("Session not initialized or disconnected. Call init() first for node: {}.", node.getServerName());
+                    return;
+                }
+                channel = (ChannelExec) session.openChannel("exec");
+                channel.setCommand("ruby -e 'require \"socket\"; puts Addrinfo.tcp(\"\", 0).bind {|s| s.local_address.ip_port }'");
+                ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
+                channel.setOutputStream(responseStream);
+                channel.connect(10000);
+                while (!channel.isClosed()) {
+                    Thread.sleep(100);
+                }
+                String output = responseStream.toString().trim();
+                if (!output.isEmpty()) {
+                    node.setFreePort(Integer.parseInt(output));
+                } else {
+                    Nebula.util.log("No valid port response from server: {}.", node.getServerName());
+                }
+            } catch (Exception e) {
+                Nebula.util.log("Error updating free port for server {}." + node.getServerName());
+            } finally {
+                if (channel != null) channel.disconnect();
             }
-            channel = (ChannelExec) session.openChannel("exec");
-            channel.setCommand("ruby -e 'require \"socket\"; puts Addrinfo.tcp(\"\", 0).bind {|s| s.local_address.ip_port }'");
-            ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
-            channel.setOutputStream(responseStream);
-            channel.connect(10000);
-            while (!channel.isClosed()) {
-                Thread.sleep(100);
+        } else {
+            try {
+                ServerSocket socket = new ServerSocket(0);
+                node.setFreePort(socket.getLocalPort());
+                socket.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-            String output = responseStream.toString().trim();
-            if (!output.isEmpty()) {
-                node.setFreePort(Integer.parseInt(output));
-            } else {
-                Nebula.util.log("No valid port response from server: {}.", node.getServerName());
-            }
-        } catch (Exception e) {
-            Nebula.util.log("Error updating free port for server {}." + node.getServerName());
-        } finally {
-            if (channel != null) channel.disconnect();
         }
     }
 
     public void executeSSHCommand(Node node, String command, Runnable onSuccess, Runnable onError) {
-        ChannelExec channel = null;
-        try {
-            Session session = sessionPool.get(node);
-            if (session == null || !session.isConnected()) {
-                Nebula.util.log("Session not initialized or disconnected. Call init() first for node: {}." + node.getServerName());
-                return;
-            }
-            channel = (ChannelExec) session.openChannel("exec");
-            channel.setCommand(command);
-            ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
-            channel.setOutputStream(responseStream);
-            channel.connect(10000);
-            while (!channel.isClosed()) {
-                Thread.sleep(100);
-            }
-            String output = responseStream.toString().trim();
-            if (!output.isEmpty()) {
-                onSuccess.run();
-            } else {
-                Nebula.util.log("No output from command on server: {}.", node.getServerName());
+        if ("normal".equals(node.getTag())) {
+            ChannelExec channel = null;
+            try {
+                Session session = sessionPool.get(node);
+                if (session == null || !session.isConnected()) {
+                    Nebula.util.log("Session not initialized or disconnected for node: {}.", node.getServerName());
+                    onError.run();
+                    return;
+                }
+                channel = (ChannelExec) session.openChannel("exec");
+                channel.setCommand(command);
+                ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
+                channel.setOutputStream(responseStream);
+                channel.connect(10000);
+                while (!channel.isClosed()) Thread.sleep(100);
+                String output = responseStream.toString().trim();
+                if (!output.isEmpty()) onSuccess.run();
+                else {
+                    Nebula.util.log("No output from command on server: {}.", node.getServerName());
+                    onError.run();
+                }
+            } catch (Exception e) {
+                Nebula.util.log("Error executing SSH command on server {}: {}", node.getServerName(), e.getMessage());
                 onError.run();
+            } finally {
+                if (channel != null) channel.disconnect();
             }
-        } catch (Exception e) {
-            Nebula.util.log("Error executing SSH command on server {}.", node.getServerName());
-            onError.run();
-        } finally {
-            if (channel != null) channel.disconnect();
+        } else {
+            Process process = null;
+            try {
+                String os = System.getProperty("os.name").toLowerCase();
+                ProcessBuilder pb = os.contains("win")
+                        ? new ProcessBuilder("cmd.exe", "/c", command)
+                        : new ProcessBuilder("sh", "-c", command);
+                pb.redirectErrorStream(true);
+                process = pb.start();
+                StringBuilder outputBuilder = new StringBuilder();
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        outputBuilder.append(line).append("\n");
+                    }
+                }
+                int exitCode = process.waitFor();
+                String output = outputBuilder.toString().trim();
+                if (!output.isEmpty() && exitCode == 0) onSuccess.run();
+                else {
+                    Nebula.util.log("Local command error. Exit code: {}. Output: {}", exitCode, output);
+                    onError.run();
+                }
+            } catch (Exception e) {
+                Nebula.util.log("Error executing local command: {}", e.getMessage());
+                onError.run();
+            } finally {
+                if (process != null) process.destroy();
+            }
         }
     }
 
