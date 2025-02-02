@@ -35,8 +35,8 @@ public class Party {
         invites.entrySet().removeIf(entry -> {
             boolean isExpired = currentTime - entry.getValue() > 30000;
             if (isExpired) {
-                Nebula.util.sendMessage(entry.getKey(), Messages.INVITE_EXPIRED.replace("<leader>", leader.getUsername()));
-                Nebula.util.sendMessage(leader, Messages.INVITE_TO_PLAYER_EXPIRED.replace("<player>", entry.getKey().getUsername()));
+                Nebula.util.sendMessage(entry.getKey(), Messages.INVITE_NOT_ACCEPT.replace("<leader>", leader.getUsername()));
+                Nebula.util.sendMessage(leader, Messages.INVITE_TO_PLAYER_NOT_ACCEPT.replace("<player>", entry.getKey().getUsername()));
             }
             return isExpired;
         });

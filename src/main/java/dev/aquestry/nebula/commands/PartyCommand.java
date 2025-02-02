@@ -26,6 +26,17 @@ public class PartyCommand implements SimpleCommand {
                             }
                         }
                         break;
+                    case "decline":
+                        if (args.length >= 2) {
+                            Nebula.partyManager.tryDecline(player, args[1]);
+                        } else {
+                            if(!Nebula.partyManager.getAllInvites(player).isEmpty()) {
+                                Nebula.partyManager.tryDecline(player, Nebula.partyManager.getAllInvites(player).getFirst());
+                            } else {
+                                sendUsageMessage(player);
+                            }
+                        }
+                        break;
                     case "invite":
                         if (args.length >= 2) {
                             Nebula.partyManager.inviteCommand(player, args[1]);
@@ -60,7 +71,7 @@ public class PartyCommand implements SimpleCommand {
                 suggestions.add("invite");
             }
             if(!Nebula.partyManager.getAllInvites(player).isEmpty()) {
-                suggestions.add("accept");
+                suggestions.addAll(List.of("accept", "decline"));
             }
             if (args.length == 0) { return suggestions; }
             if (args.length == 1) {
@@ -77,7 +88,7 @@ public class PartyCommand implements SimpleCommand {
                         .map(Player::getUsername)
                         .toList();
             }
-            if (args.length == 2 && "accept".equalsIgnoreCase(args[0]) && !Nebula.partyManager.getAllInvites(player).isEmpty()) {
+            if (args.length == 2 && ("accept".equalsIgnoreCase(args[0]) || "decline".equalsIgnoreCase(args[0])) && !Nebula.partyManager.getAllInvites(player).isEmpty()) {
                 return Nebula.partyManager.getAllInvites(player);
             }
         }

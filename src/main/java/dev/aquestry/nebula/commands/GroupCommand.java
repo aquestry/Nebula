@@ -185,9 +185,22 @@ public class GroupCommand implements SimpleCommand {
                     : CompletableFuture.completedFuture(List.of());
             case "assign" -> CompletableFuture.completedFuture(
                     args.length == 2
-                            ? Nebula.server.getAllPlayers().stream().map(Player::getUsername).filter(p -> p.startsWith(args[1])).toList()
+                            ? Nebula.server.getAllPlayers().stream()
+                            .map(Player::getUsername)
+                            .filter(p -> p.startsWith(args[1]))
+                            .toList()
                             : args.length == 3
-                            ? Nebula.permissionFile.getGroupNames().stream().filter(g -> g.startsWith(args[2])).toList()
+                            ? Nebula.server.getAllPlayers().stream()
+                            .filter(p -> p.getUsername().equalsIgnoreCase(args[1]))
+                            .findFirst()
+                            .map(targetPlayer -> {
+                                String currentGroup = Nebula.permissionManager.getGroup(targetPlayer.getUniqueId().toString()).getName();
+                                return Nebula.permissionFile.getGroupNames().stream()
+                                        .filter(g -> !g.equalsIgnoreCase(currentGroup))
+                                        .filter(g -> g.startsWith(args[2]))
+                                        .toList();
+                            })
+                            .orElse(List.of())
                             : List.of()
             );
             case "create" -> CompletableFuture.completedFuture(args.length == 2 ? List.of("<groupName>") : args.length == 3 ? List.of("<level>") : List.of("<prefix...>"));

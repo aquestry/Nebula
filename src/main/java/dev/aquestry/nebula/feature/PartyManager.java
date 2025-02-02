@@ -71,6 +71,27 @@ public class PartyManager {
         }
     }
 
+    public void tryDecline(Player player, String targetName) {
+        Player target = Nebula.server.getPlayer(targetName).orElse(null);
+        if (target == null) {
+            Nebula.util.sendMessage(player, Messages.NO_INVITE_FROM_LEADER.replace("<leader>", targetName));
+            return;
+        }
+        Optional<Party> targetPartyOpt = getParty(target);
+        if (targetPartyOpt.isEmpty()) {
+            Nebula.util.sendMessage(player, Messages.NO_INVITE_FROM_LEADER.replace("<leader>", targetName));
+            return;
+        }
+        Party targetParty = targetPartyOpt.get();
+        if (targetParty.isInvited(player)) {
+            targetParty.removeInvite(player);
+            Nebula.util.sendMessage(player, Messages.INVITE_NOT_ACCEPT.replace("<leader>", targetName));
+            Nebula.util.sendMessage(target, Messages.INVITE_TO_PLAYER_NOT_ACCEPT.replace("<player>", player.getUsername()));
+        } else {
+            Nebula.util.sendMessage(player, Messages.NO_INVITE_FROM_LEADER.replace("<leader>", targetName));
+        }
+    }
+
     public Optional<Party> getParty(Player player) {
         return parties.stream()
                 .filter(p -> p.isMember(player))

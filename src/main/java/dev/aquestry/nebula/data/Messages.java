@@ -41,8 +41,8 @@ public class Messages {
     public static String LEFT_PARTY;
     public static String NO_PARTY_TO_LEAVE;
     public static String INVITED_MESSAGE;
-    public static String INVITE_EXPIRED;
-    public static String INVITE_TO_PLAYER_EXPIRED;
+    public static String INVITE_NOT_ACCEPT;
+    public static String INVITE_TO_PLAYER_NOT_ACCEPT;
     public static String QUEUE_PLAYER_COUNT_MISMATCH ;
     public static String PARTY_NOT_ALLOWED;
     public static String USAGE_PARTY;

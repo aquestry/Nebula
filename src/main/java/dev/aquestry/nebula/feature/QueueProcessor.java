@@ -121,6 +121,7 @@ public class QueueProcessor {
                         },
                         () -> Nebula.util.sendMessage(player, Messages.QUEUE_NOT_FOUND)
                 );
+        process();
     }
 
     public void leaveQueue(Player player, boolean warn) {
