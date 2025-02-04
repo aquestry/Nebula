@@ -4,4 +4,4 @@
 
 **Nebula** is a server management tool built with Java and integrated with Velocity, designed to handle the dynamic creation, management, and control of minecraft server instances. It uses Docker to manage Backend-Servers.
 
-Visit [Nebula](https://voasis.de/about) for more information!
+Visit [Nebula](https://voasis.de/nebula) for more information!
