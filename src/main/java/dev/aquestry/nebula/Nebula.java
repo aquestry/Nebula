@@ -99,8 +99,8 @@ public class Nebula {
     private void registerCommands() {
         CommandManager commandManager = server.getCommandManager();
         commandManager.register("container", new ContainerCommand());
-        commandManager.register("lobby", new LobbyCommand());
-        commandManager.register("party", new PartyCommand());
+        commandManager.register("lobby", new LobbyCommand(), "leave", "hub");
+        commandManager.register("party", new PartyCommand() ,"p");
         commandManager.register("group", new GroupCommand());
         commandManager.register("queue", new QueueCommand());
         if(Config.multiProxyMode) commandManager.register("proxy", new ProxyCommand());

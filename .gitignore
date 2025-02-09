@@ -1,12 +1,7 @@
 .idea
-target
-move.ps1
-*.iml
-*.jar
 .gradle
-build/
-gradle-app.setting
-.gradletasknamecache
 build
+move.ps1
+nebula.iml
 gradlew
 gradlew.bat
