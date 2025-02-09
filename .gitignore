@@ -1,4 +1,13 @@
 .idea/
 target/
 move.ps1
-nebula.iml
+*.iml
+*.jar
+.gradle
+build/
+gradle-app.setting
+.gradletasknamecache
+**/build/
+run/
+runs/
+!gradle-wrapper.jar

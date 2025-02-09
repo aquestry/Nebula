@@ -12,7 +12,6 @@ import java.net.Socket;
 import java.util.function.Consumer;
 
 public class MultiProxySender {
-
     public void pingProxies() {
         for (Proxy proxy : Config.proxyMap) {
             sendMessage(proxy, "GET&LEVEL", response -> {

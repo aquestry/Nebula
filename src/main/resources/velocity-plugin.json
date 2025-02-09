@@ -1,0 +1,14 @@
+{
+  "id": "nebula",
+  "name": "Nebula",
+  "version": "1.0",
+  "authors": ["Aquestry"],
+  "description": "Dynamic server manager.",
+  "main": "dev.aquestry.nebula.Nebula",
+  "dependencies": [
+    {
+      "id": "velocity",
+      "optional": true
+    }
+  ]
+}
