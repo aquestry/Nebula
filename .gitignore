@@ -1,5 +1,5 @@
-.idea/
-target/
+.idea
+target
 move.ps1
 *.iml
 *.jar
@@ -7,7 +7,6 @@ move.ps1
 build/
 gradle-app.setting
 .gradletasknamecache
-**/build/
-run/
-runs/
-!gradle-wrapper.jar
+build
+gradlew
+gradlew.bat
