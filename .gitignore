@@ -1,5 +1,6 @@
 .idea
 .gradle
+gradle
 build
 move.ps1
 nebula.iml
