@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class QueueProcessor {
-
     public QueueProcessor() {
         for (Queue queue : Config.queueMap) {
             int preloadCount = queue.getPreload();
@@ -28,9 +27,9 @@ public class QueueProcessor {
             if (queue.getInQueue().size() >= neededPlayers) {
                 List<Player> playersToMove = new ArrayList<>();
                 Optional<Party> p = Nebula.partyManager.getParty(queue.getInQueue().getFirst());
-                if(p.isPresent()) {
+                if (p.isPresent()) {
                     playersToMove = p.get().getMembers();
-                    for(Player player : playersToMove) {
+                    for (Player player : playersToMove) {
                         queue.getInQueue().remove(player);
                     }
                 } else {
@@ -89,7 +88,7 @@ public class QueueProcessor {
             Nebula.util.sendMessage(player, Messages.LOBBY_ONLY);
             return;
         }
-        if (isInAnyQueue(player)) {
+        if (isInAnyQueue(player) || Nebula.util.isPendingTransfer(player)) {
             Nebula.util.sendMessage(player, Messages.ALREADY_IN_QUEUE);
             return;
         }
@@ -99,14 +98,20 @@ public class QueueProcessor {
                 .ifPresentOrElse(
                         queue -> {
                             Optional<Party> playerParty = Nebula.partyManager.getParty(player);
-                            if(playerParty.isPresent()) {
-                                if(!playerParty.get().getLeader().equals(player)) {
+                            if (playerParty.isPresent()) {
+                                if (!playerParty.get().getLeader().equals(player)) {
                                     Nebula.util.sendMessage(player, Messages.PARTY_NOT_ALLOWED);
                                     return;
                                 }
-                                if(queue.getNeededPlayers() != playerParty.get().getMembers().size()) {
+                                if (queue.getNeededPlayers() != playerParty.get().getMembers().size()) {
                                     Nebula.util.sendMessage(player, Messages.QUEUE_PLAYER_COUNT_MISMATCH);
                                     return;
+                                }
+                                for (Player member : playerParty.get().getMembers()) {
+                                    if (queue.getInQueue().contains(member) || Nebula.util.isPendingTransfer(member)) {
+                                        Nebula.util.sendMessage(member, Messages.ALREADY_IN_QUEUE);
+                                        return;
+                                    }
                                 }
                                 playerParty.get().getMembers().forEach(member -> {
                                     if (!queue.getInQueue().contains(member)) {
@@ -114,7 +119,11 @@ public class QueueProcessor {
                                         Nebula.util.sendMessage(member, Messages.ADDED_TO_QUEUE.replace("<queue>", queueName));
                                     }
                                 });
-                            } else  {
+                            } else {
+                                if (queue.getInQueue().contains(player)) {
+                                    Nebula.util.sendMessage(player, Messages.ALREADY_IN_QUEUE);
+                                    return;
+                                }
                                 queue.getInQueue().add(player);
                                 Nebula.util.sendMessage(player, Messages.ADDED_TO_QUEUE.replace("<queue>", queueName));
                             }
@@ -130,8 +139,8 @@ public class QueueProcessor {
             return;
         }
         Optional<Party> party = Nebula.partyManager.getParty(player);
-        if(party.isPresent()) {
-            if(!party.get().getLeader().equals(player)) {
+        if (party.isPresent()) {
+            if (!party.get().getLeader().equals(player)) {
                 Nebula.util.sendMessage(player, Messages.PARTY_NOT_ALLOWED);
                 return;
             }

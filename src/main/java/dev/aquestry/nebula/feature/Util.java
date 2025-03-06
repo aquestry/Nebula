@@ -1,7 +1,5 @@
 package dev.aquestry.nebula.feature;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
@@ -21,11 +19,9 @@ import java.net.URL;
 import java.util.*;
 
 public class Util {
-
-    private MiniMessage mm = MiniMessage.miniMessage();
+    private final MiniMessage mm = MiniMessage.miniMessage();
     private static final int LENGTH = 5;
     private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private static HashMap<CommandSource, String> lastMessages = new HashMap<>();
     private static final Set<String> generatedStrings = new HashSet<>();
     private static final Random random = new Random();
 
@@ -58,24 +54,24 @@ public class Util {
 
     public void checkLobbys(boolean online) {
         int lobbys = 0;
-        for(Container container : Config.containerMap) {
-            if(container.getFlags().contains("lobby")) {
-                if(online && container.isOnline()) {
+        for (Container container : Config.containerMap) {
+            if (container.getFlags().contains("lobby")) {
+                if (online && container.isOnline()) {
                     lobbys++;
-                } else if(!online){
+                } else if (!online) {
                     lobbys++;
                 }
             }
         }
-        if(lobbys == 0) {
+        if (lobbys == 0) {
             Nebula.defaultsManager.createDefault();
             log("No lobby server found, creating new one...");
         }
     }
 
     public void connectPlayer(Player player, Container container, boolean quit) {
-        if(container == null) {
-            if(quit) {
+        if (container == null) {
+            if (quit) {
                 player.disconnect(Component.empty());
             }
             return;
@@ -83,11 +79,11 @@ public class Util {
         String name = container.getServerName();
         Optional<RegisteredServer> target = Nebula.server.getServer(name);
         sendMessage(player, Messages.SERVER_CONNECT.replace("<name>", name));
-        if(target.isPresent()) {
+        if (target.isPresent()) {
             player.createConnectionRequest(target.get()).fireAndForget();
             return;
         }
-        if(quit) {
+        if (quit) {
             player.disconnect(Component.empty());
         }
     }
@@ -102,7 +98,7 @@ public class Util {
     }
 
     public void callPending(Container container) {
-        for(Player p : container.getPendingPlayerConnections()) {
+        for (Player p : container.getPendingPlayerConnections()) {
             if (p.getCurrentServer().isEmpty() || !p.getCurrentServer().get().getServerInfo().getName().equals(container.getServerName())) {
                 connectPlayer(p, container, false);
             }
@@ -115,20 +111,20 @@ public class Util {
         Nebula.util.sendMessage(source, "Prefix:    " + group.getPrefix());
         Nebula.util.sendMessage(source, "Level:     " + group.getLevel());
         Nebula.util.sendMessage(source, "Members:     ");
-        for(String member : group.getMembers()) {
+        for (String member : group.getMembers()) {
             Nebula.util.sendMessage(source, member);
         }
         Nebula.util.sendMessage(source, "Permissions:     ");
-        for(String permission : group.getPermissions()) {
+        for (String permission : group.getPermissions()) {
             Nebula.util.sendMessage(source, permission);
         }
     }
 
     public int getPlayerCount(Object backendServer) {
-        if(backendServer instanceof RegisteredServer registeredServer && backendServer != null) {
+        if (backendServer instanceof RegisteredServer registeredServer) {
             return registeredServer.getPlayersConnected().size();
         }
-        if(backendServer instanceof Container backend && backendServer != null) {
+        if (backendServer instanceof Container backend) {
             return Nebula.server.getServer(backend.getServerName()).get().getPlayersConnected().size();
         }
         return 0;
@@ -138,14 +134,14 @@ public class Util {
         source = source != null ? source : Nebula.server.getConsoleCommandSource();
         if (source == Nebula.server.getConsoleCommandSource()) {
             source.sendMessage(mm.deserialize(message));
-        } else if(source instanceof Player player){
+        } else if (source instanceof Player player) {
             player.sendMessage(mm.deserialize(message));
             Nebula.server.getConsoleCommandSource().sendMessage(mm.deserialize(player.getUsername() + " --> " + message));
         }
     }
 
     public void sendMemberMessage(Party party, String message) {
-        for(Player member : party.getMembers()) {
+        for (Player member : party.getMembers()) {
             sendMessage(member, message);
         }
     }
@@ -161,7 +157,7 @@ public class Util {
         String uuid;
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(new URL("https://api.mojang.com/users/profiles/minecraft/" + name).openStream()));
-            uuid = (((JsonObject)new JsonParser().parse(in)).get("id")).toString().replaceAll("\"", "");
+            uuid = (((com.google.gson.JsonObject) new com.google.gson.JsonParser().parse(in)).get("id")).toString().replaceAll("\"", "");
             uuid = uuid.replaceAll("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5");
             in.close();
         } catch (Exception e) {
@@ -174,5 +170,14 @@ public class Util {
         Group group = Nebula.permissionManager.getGroup(player.getUniqueId().toString());
         String info = player.getUsername() + ":" + group.getName() + "#" + group.getLevel() + "#" + group.getPrefix();
         player.getCurrentServer().ifPresent(serverConnection -> serverConnection.getServer().sendPluginMessage(Nebula.channelMain, info.getBytes()));
+    }
+
+    public boolean isPendingTransfer(Player player) {
+        for (Container container : Config.containerMap) {
+            if (container.getPendingPlayerConnections().contains(player)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
