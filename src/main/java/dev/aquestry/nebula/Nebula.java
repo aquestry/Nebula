@@ -83,6 +83,10 @@ public class Nebula {
                 .repeat(500, TimeUnit.MILLISECONDS)
                 .schedule();
         server.getScheduler()
+                .buildTask(this, queueProcessor::process)
+                .repeat(500, TimeUnit.MILLISECONDS)
+                .schedule();
+        server.getScheduler()
                 .buildTask(this, partyManager::refresh)
                 .repeat(1500, TimeUnit.MILLISECONDS)
                 .schedule();

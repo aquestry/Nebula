@@ -72,7 +72,7 @@ public class QueueProcessor {
     }
 
     private Container createNewServer(Queue queue, String... flags) {
-        String serverName = queue.getName() + "-" + Nebula.util.generateUniqueString();
+        String serverName = queue.getName() + "-" + Util.generateUniqueString();
         return Nebula.containerManager.createFromTemplate(
                 queue.getTemplate(),
                 serverName,
@@ -121,7 +121,6 @@ public class QueueProcessor {
                         },
                         () -> Nebula.util.sendMessage(player, Messages.QUEUE_NOT_FOUND)
                 );
-        process();
     }
 
     public void leaveQueue(Player player, boolean warn) {
