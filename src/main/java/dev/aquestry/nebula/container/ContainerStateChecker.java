@@ -22,6 +22,7 @@ public class ContainerStateChecker {
                             synchronized (container) {
                                 if (!container.isOnline()) {
                                     container.setOnline(true);
+                                    Nebula.queueProcessor.process();
                                     Nebula.util.callPending(container);
                                     CommandSource creator = container.getCreator();
                                     Nebula.util.sendMessage(creator, Messages.ONLINE.replace("<name>", container.getServerName()));
