@@ -43,6 +43,7 @@ public class QueueProcessor {
                     server.removeFlag("preload");
                     for (Player player : playersToMove) {
                         server.addPendingPlayerConnection(player);
+                        Nebula.util.callPending(server);
                     }
                     createPreloadedServer(queue);
                 } else {
